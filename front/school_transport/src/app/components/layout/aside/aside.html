@@ -1,0 +1,46 @@
+<div class="container">
+  <ul class="mcd-menu">
+    @for (item of items; track item.label) {
+      <li>
+        <a [href]="item.url || '#'" [class.active]="activeItem === item">
+          <i [class]="'pi pi-' + (item.icon || '')"></i>
+          <strong>{{ item.label }}</strong>
+          @if (item['smallText']) {
+            <small>{{ item['smallText'] }}</small>
+          }
+        </a>
+        @if (item.items) {
+          <ul>
+            @for (subItem of item.items; track subItem.label) {
+              <li>
+                <a [href]="subItem.url || '#'">
+                  <i [class]="'pi pi-' + (subItem.icon || '')"></i>
+                  {{ subItem.label }}
+                </a>
+                @if (subItem.items) {
+                  <ul>
+                    @for (subSubItem of subItem.items; track subSubItem.label) {
+                      <li>
+                        <a [href]="subSubItem.url || '#'">
+                          <i [class]="'pi pi-' + (subSubItem.icon || '')"></i>
+                          {{ subSubItem.label }}
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </li>
+    }
+    <!-- Ítem de búsqueda (estático) -->
+    <li class="float">
+      <a class="search">
+        <input type="text" placeholder="search...">
+        <button><i class="pi pi-search"></i></button>
+      </a>
+    </li>
+  </ul>
+</div>
