@@ -1,46 +1,28 @@
-<div class="container">
-  <ul class="mcd-menu">
-    @for (item of items; track item.label) {
-      <li>
-        <a [href]="item.url || '#'" [class.active]="activeItem === item">
-          <i [class]="'pi pi-' + (item.icon || '')"></i>
-          <strong>{{ item.label }}</strong>
-          @if (item['smallText']) {
-            <small>{{ item['smallText'] }}</small>
-          }
+<ul>
+  <li *ngFor="let item of items">
+    <a [routerLink]="item.routerLink" (click)="setActive(item)">
+      <i [class]="item.icon"></i>
+      <span>{{ item.label }}</span>
+    </a>
+
+    <!-- Submenú (si existen hijos) -->
+    <ul *ngIf="item.items">
+      <li *ngFor="let child of item.items">
+        <a [routerLink]="child.routerLink">
+          <i [class]="child.icon"></i>
+          <span>{{ child.label }}</span>
         </a>
-        @if (item.items) {
-          <ul>
-            @for (subItem of item.items; track subItem.label) {
-              <li>
-                <a [href]="subItem.url || '#'">
-                  <i [class]="'pi pi-' + (subItem.icon || '')"></i>
-                  {{ subItem.label }}
-                </a>
-                @if (subItem.items) {
-                  <ul>
-                    @for (subSubItem of subItem.items; track subSubItem.label) {
-                      <li>
-                        <a [href]="subSubItem.url || '#'">
-                          <i [class]="'pi pi-' + (subSubItem.icon || '')"></i>
-                          {{ subSubItem.label }}
-                        </a>
-                      </li>
-                    }
-                  </ul>
-                }
-              </li>
-            }
-          </ul>
-        }
+
+        <!-- Sub-submenú -->
+        <ul *ngIf="child.items">
+          <li *ngFor="let subChild of child.items">
+            <a [routerLink]="subChild.routerLink">
+              <i [class]="subChild.icon"></i>
+              <span>{{ subChild.label }}</span>
+            </a>
+          </li>
+        </ul>
       </li>
-    }
-    <!-- Ítem de búsqueda (estático) -->
-    <li class="float">
-      <a class="search">
-        <input type="text" placeholder="search...">
-        <button><i class="pi pi-search"></i></button>
-      </a>
-    </li>
-  </ul>
-</div>
+    </ul>
+  </li>
+</ul>

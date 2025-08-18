@@ -1,81 +1,44 @@
-@import "primeicons/primeicons.css";
-
-/* Variables para colores */
-:root {
-    --border-color: royalblue;
-    --gap: 10px;
-    --main-padding: 20px;
-}
-
-/* Reset básico */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
 main {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: 20% 70% 10%;
+    gap: 10px;
+    grid-template-columns: 1fr 1fr 1fr 1fr  1fr;
     grid-template-areas:
-        "header header header header header"
-        "aside content content content content"
-        "footer footer footer footer footer";
-    gap: var(--gap);
+    "header header  header  header  header"
+    "aside  section section section section"
+    "footer footer  footer  footer  footer";
+    row-gap: 0;
+    column-gap: 0;
+    grid-template-rows: 20% 70% 10%;
     height: 98vh;
-    padding: var(--main-padding);
 }
 
-/* Áreas principales */
-header,
-aside,
-footer,
-.content {
-    border: 1px solid var(--border-color);
-    padding: 10px;
-    background: #f8faff;
-    border-radius: 6px;
+header {
+    grid-area: header;
+    border: 1px solid royalblue;
 }
 
-/* Asignación de áreas */
-header { grid-area: header; }
-aside { grid-area: aside; }
-footer { grid-area: footer; }
-.content { grid-area: content; }
+aside {
+    grid-area: aside;
+    border: 1px solid royalblue;
+}
 
-/* Recuadros internos */
+section {
+    grid-area: section;
+    border: 1px solid royalblue;
+}
+
 .recuadros {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+    flex-flow: row wrap;
+    row-gap: 20px;
     margin: 2px 20px 2px 5px;
 }
 
 .elemento {
-    flex: 1 1 25%;
-    min-width: 200px;
-    max-width: 300px;
+    width: 25%;
 }
 
-/* Responsive para pantallas pequeñas */
-@media (max-width: 900px) {
-    main {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
-        grid-template-areas:
-            "header"
-            "aside"
-            "content"
-            "footer";
-        height: auto;
-    }
-    .recuadros {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .elemento {
-        width: 100%;
-        max-width: none;
-    }
+footer {
+    grid-area: footer;
+    border: 1px solid royalblue;
 }

@@ -1,83 +1,69 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { MenuModule } from 'primeng/menu';
-import { BadgeModule } from 'primeng/badge';
-import { RippleModule } from 'primeng/ripple';
-import { AvatarModule } from 'primeng/avatar';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+
+export interface CustomMenuItem extends MenuItem {
+  smallText?: string; // extensión para subtítulo
+}
 
 @Component({
   selector: 'app-aside',
   standalone: true,
-  imports: [MenuModule, BadgeModule, RippleModule, AvatarModule, CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './aside.html',
   styleUrls: ['./aside.css']
 })
 export class Aside implements OnInit {
-  items: MenuItem[] | undefined;
-  activeItem: MenuItem | undefined;
+  items: CustomMenuItem[] = [];
+  activeItem: CustomMenuItem | undefined;
 
   ngOnInit() {
     this.items = [
       {
         label: 'Rutas',
-        icon: 'pi pi-fw pi-map',
-        smallText: 'sweet home',
-        url: '#'
+        icon: 'pi pi-map',
+        smallText: 'Gestión de rutas',
+        command: () => this.setActive(this.items[0])
       },
       {
         label: 'Usuarios',
         icon: 'pi pi-users',
-        smallText: 'know us better',
-        url: '#',
-        command: () => this.setActive(this.items![1]) // Marcar como activo al click
+        smallText: 'Administración de usuarios',
+        command: () => this.setActive(this.items[1])
       },
       {
-        label: 'Features',
-        icon: 'gift',
-        smallText: 'our services',
-        url: '#'
+        label: 'Formulario',
+        icon: 'pi pi-file-edit',
+        smallText: 'Formularios del sistema',
+        command: () => this.setActive(this.items[2])
       },
       {
-        label: 'News',
-        icon: 'globe',
-        smallText: 'latest updates',
-        url: '#'
+        label: 'Incidentes',
+        icon: 'pi pi-exclamation-triangle',
+        smallText: 'Registro de incidentes',
+        command: () => this.setActive(this.items[3])
       },
       {
         label: 'Buses',
         icon: 'pi pi-car',
-        smallText: 'what they say',
+        smallText: 'Gestión de flota',
         items: [
           {
             label: 'Mantenimiento',
             icon: 'pi pi-wrench',
-            url: '#'
           },
           {
             label: 'Conductores',
-            icon: 'users',
+            icon: 'pi pi-users',
             items: [
               {
-                label: 'Leyla Sparks',
-                icon: 'user',
-                url: '#'
+                label: 'Registrar conductor',
+                icon: 'pi pi-user-plus',
               },
               {
-                label: 'Gleb Ismailov',
-                icon: 'user',
-                items: [
-                  {
-                    label: 'About',
-                    icon: 'info-circle',
-                    url: '#'
-                  },
-                  {
-                    label: 'Skills',
-                    icon: 'check-circle',
-                    url: '#'
-                  }
-                ]
+                label: 'Listado conductores',
+                icon: 'pi pi-list',
               }
             ]
           }
@@ -85,10 +71,10 @@ export class Aside implements OnInit {
       }
     ];
 
-    this.activeItem = this.items[1]; // "About us" como activo por defecto
+    this.activeItem = this.items[0];
   }
 
-  setActive(item: MenuItem) {
+  setActive(item: CustomMenuItem) {
     this.activeItem = item;
   }
 }
