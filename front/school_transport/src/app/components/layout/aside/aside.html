@@ -1,27 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menú de Barra Lateral Dinámico</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* Estilos personalizados para la transición de submenús */
-    .submenu {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out;
-    }
-
-    .submenu.expanded {
-      max-height: 500px;
-      /* Suficientemente grande para contener los elementos */
-    }
-  </style>
-</head>
-
 <body class="bg-gray-100 font-sans antialiased text-gray-800">
 
 
@@ -30,6 +9,7 @@
   <aside id="sidebar-menu"
     class="bg-gradient-to-br from-gray-800 to-gray-900 -translate-x-full fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0">
     <div class="relative border-b border-white/20">
+      <img src="logo3.png" alt="" class="logo" style="width: 280px;">
       <a class="flex items-center gap-4 py-6 px-8" href="#">
         <h6 class="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-white">
           Panel de Administración

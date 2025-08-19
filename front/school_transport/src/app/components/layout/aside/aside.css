@@ -1,6 +1,17 @@
 /* ======== Estilos generales del panel ======== */
 
 
+/* Espacio para logo arriba del encabezado */
+aside .relative {
+  padding-top: 20px; /* Ajusta el valor según el tamaño del logo */
+}
+
+.logo {
+  display: block;
+  margin: 0 auto;
+  width: 80px; /* ajusta el tamaño */
+}
+
 .render ul {
   list-style: none;
   margin: 0;
@@ -37,7 +48,6 @@
 }
 
 .render ul > li > a.active {
-  background-color: #2563eb; /* azul más fuerte */
   color: #ffffff;
 }
 
