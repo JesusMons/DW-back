@@ -1,33 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>school transport</title>
-</head>
-<body>
-
-  <main>
-    
-   <header>
-     <app-header></app-header>
-   </header>
-
-    <aside>
-      <app-aside></app-aside>
-    </aside>
-
-    <content>
-      <app-content></app-content>
-    </content>
-
-    <footer>
+<!-- component -->
+<div class="min-h-screen bg-gray-50/50">
+  <app-aside></app-aside>
+  <div class="p-4 xl:ml-80">
+   <app-header></app-header>
+    <div class="mt-12">
+      <!--<app-content></app-content>-->
+    </div>
+    <div class="text-blue-gray-600">
       <app-footer></app-footer>
-    </footer>
-
-  </main>
-  
-</body>
-</html>
+    </div>
+  </div>
+</div>
 
 <router-outlet />

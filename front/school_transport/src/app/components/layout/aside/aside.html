@@ -1,28 +1,83 @@
-<ul>
-  <li *ngFor="let item of items">
-    <a [routerLink]="item.routerLink" (click)="setActive(item)">
-      <i [class]="item.icon"></i>
-      <span>{{ item.label }}</span>
-    </a>
+<!DOCTYPE html>
+<html lang="es">
 
-    <!-- Submenú (si existen hijos) -->
-    <ul *ngIf="item.items">
-      <li *ngFor="let child of item.items">
-        <a [routerLink]="child.routerLink">
-          <i [class]="child.icon"></i>
-          <span>{{ child.label }}</span>
-        </a>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menú de Barra Lateral Dinámico</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Estilos personalizados para la transición de submenús */
+    .submenu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
 
-        <!-- Sub-submenú -->
-        <ul *ngIf="child.items">
-          <li *ngFor="let subChild of child.items">
-            <a [routerLink]="subChild.routerLink">
-              <i [class]="subChild.icon"></i>
-              <span>{{ subChild.label }}</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-</ul>
+    .submenu.expanded {
+      max-height: 500px;
+      /* Suficientemente grande para contener los elementos */
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 font-sans antialiased text-gray-800">
+
+
+
+  <!-- Barra lateral -->
+  <aside id="sidebar-menu"
+    class="bg-gradient-to-br from-gray-800 to-gray-900 -translate-x-full fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0">
+    <div class="relative border-b border-white/20">
+      <a class="flex items-center gap-4 py-6 px-8" href="#">
+        <h6 class="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-white">
+          Panel de Administración
+        </h6>
+      </a>
+    </div>
+    <div class="render">
+      <ul id="menu-items-list" class="mb-4 flex flex-col gap-1">
+
+        @for (item of items; track item.label) {
+        <li>
+          <a [href]="item.url || '#'" [class.active]="activeItem === item">
+            <i [class]="'pi pi-' + (item.icon || '')"></i>
+            <strong>{{ item.label }}</strong>
+            @if (item['smallText']) {
+            <small>{{ item['smallText'] }}</small>
+            }
+          </a>
+          @if (item.items) {
+          <ul>
+            @for (subItem of item.items; track subItem.label) {
+            <li>
+              <a [href]="subItem.url || '#'">
+                <i [class]="'pi pi-' + (subItem.icon || '')"></i>
+                {{ subItem.label }}
+              </a>
+              @if (subItem.items) {
+              <ul>
+                @for (subSubItem of subItem.items; track subSubItem.label) {
+                <li>
+                  <a [href]="subSubItem.url || '#'">
+                    <i [class]="'pi pi-' + (subSubItem.icon || '')"></i>
+                    {{ subSubItem.label }}
+                  </a>
+                </li>
+                }
+              </ul>
+              }
+            </li>
+            }
+          </ul>
+          }
+        </li>
+        }
+
+      </ul>
+    </div>
+  </aside>
+</body>
+
+</html>

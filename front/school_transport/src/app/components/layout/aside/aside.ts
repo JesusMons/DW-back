@@ -23,31 +23,26 @@ export class Aside implements OnInit {
       {
         label: 'Rutas',
         icon: 'pi pi-map',
-        smallText: 'Gestión de rutas',
         command: () => this.setActive(this.items[0])
       },
       {
         label: 'Usuarios',
         icon: 'pi pi-users',
-        smallText: 'Administración de usuarios',
         command: () => this.setActive(this.items[1])
       },
       {
         label: 'Formulario',
         icon: 'pi pi-file-edit',
-        smallText: 'Formularios del sistema',
         command: () => this.setActive(this.items[2])
       },
       {
         label: 'Incidentes',
         icon: 'pi pi-exclamation-triangle',
-        smallText: 'Registro de incidentes',
         command: () => this.setActive(this.items[3])
       },
       {
         label: 'Buses',
         icon: 'pi pi-car',
-        smallText: 'Gestión de flota',
         items: [
           {
             label: 'Mantenimiento',
@@ -77,4 +72,14 @@ export class Aside implements OnInit {
   setActive(item: CustomMenuItem) {
     this.activeItem = item;
   }
+
+  toggleSubmenu(event: Event, item: any) {
+  event.preventDefault();
+  if (item.items) {
+    item.expanded = !item.expanded;
+  } else {
+    // Navegar al enlace si no tiene subitems
+    window.location.href = item.url || '#';
+  }
+}
 }
