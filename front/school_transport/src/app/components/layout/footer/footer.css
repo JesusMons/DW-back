@@ -2,7 +2,7 @@
 body {
   display: flex;
   flex-direction: column;
-  min-height: 86vh; /* 100% del viewport height */
+  min-height: 27vh; /* 100% del viewport height */
   margin: 0;
 }
 
