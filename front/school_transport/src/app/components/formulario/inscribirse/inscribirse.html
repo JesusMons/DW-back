@@ -1,0 +1,62 @@
+<div class="card">
+  <div class="header">
+    <h2>Inscribirse a Ruta</h2>
+  </div>
+
+  <!-- ✅ Banner de éxito -->
+  <div class="ok-banner" *ngIf="creado">
+    <span class="icon">✅</span> Inscripción registrada correctamente
+  </div>
+
+  <form #f="ngForm" (ngSubmit)="enviar(f)" class="form-grid" novalidate>
+    <!-- Ruta -->
+    <div class="field">
+      <label for="ruta">Ruta</label>
+      <select id="ruta" name="rutaId" [(ngModel)]="form.rutaId" required (change)="onRutaChange()">
+        <option value="" disabled selected>Selecciona una ruta…</option>
+        <option *ngFor="let r of rutas" [value]="r.id">
+          {{ r.id }} — {{ r.nombre }}
+        </option>
+      </select>
+      <small class="err" *ngIf="f.submitted && !form.rutaId">Requerido</small>
+    </div>
+
+    <!-- Itinerario (filtrado por ruta) -->
+    <div class="field">
+      <label for="itinerario">Itinerario</label>
+      <select id="itinerario" name="itinerarioId" [(ngModel)]="form.itinerarioId" [disabled]="!form.rutaId" required>
+        <option value="" disabled selected>
+          {{ form.rutaId ? 'Selecciona un itinerario…' : 'Selecciona primero una ruta' }}
+        </option>
+        <option *ngFor="let it of itinerariosFiltrados" [value]="it.id">
+          {{ it.id }} — {{ it.fecha }} {{ it.hora }}
+        </option>
+      </select>
+      <small class="err" *ngIf="f.submitted && !form.itinerarioId">Requerido</small>
+    </div>
+
+    <!-- Estudiante -->
+    <div class="field">
+      <label for="estudiante">Estudiante</label>
+      <select id="estudiante" name="estudianteId" [(ngModel)]="form.estudianteId" required>
+        <option value="" disabled selected>Selecciona un estudiante…</option>
+        <option *ngFor="let e of estudiantes" [value]="e.id">
+          {{ e.id }} — {{ e.nombre }} ({{ e.grado }})
+        </option>
+      </select>
+      <small class="err" *ngIf="f.submitted && !form.estudianteId">Requerido</small>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="field field-full">
+      <label for="obs">Observaciones</label>
+      <textarea id="obs" name="observaciones" rows="3" [(ngModel)]="form.observaciones"
+                placeholder="Información adicional (opcional)"></textarea>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary" [disabled]="f.invalid" [routerLink]="['/listado-inscripciones']">Inscribirse</button>
+      <button type="reset" class="btn">Limpiar</button>
+    </div>
+  </form>
+</div>

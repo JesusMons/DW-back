@@ -1,0 +1,63 @@
+<div class="card">
+  <div class="header">
+    <h2>Editar Incidencia</h2>
+    <button class="btn" type="button" [routerLink]="['/bus/incidentes']">Volver</button>
+  </div>
+
+  <div *ngIf="cargando" class="info-banner">Cargando incidencia…</div>
+
+  <div class="ok-banner" *ngIf="guardado">
+    <span class="icon">✅</span> Cambios guardados correctamente
+  </div>
+
+  <form *ngIf="!cargando" #f="ngForm" (ngSubmit)="guardar(f)" class="form-grid" novalidate>
+    <div class="field">
+      <label for="id">ID</label>
+      <input id="id" name="id" type="text" [(ngModel)]="incidencia.id" readonly />
+    </div>
+
+    <div class="field">
+      <label for="fecha">Fecha</label>
+      <input id="fecha" name="fecha" type="date" [(ngModel)]="incidencia.fecha" required />
+    </div>
+
+    <div class="field">
+      <label for="hora">Hora</label>
+      <input id="hora" name="hora" type="time" [(ngModel)]="incidencia.hora" required />
+    </div>
+
+    <div class="field">
+      <label for="bus">Bus (placa)</label>
+      <input id="bus" name="busPlaca" type="text" [(ngModel)]="incidencia.busPlaca" required />
+    </div>
+
+    <div class="field">
+      <label for="conductor">Conductor</label>
+      <input id="conductor" name="conductorNombre" type="text" [(ngModel)]="incidencia.conductorNombre" required />
+    </div>
+
+    <div class="field">
+      <label for="severidad">Severidad</label>
+      <select id="severidad" name="severidad" [(ngModel)]="incidencia.severidad" required>
+        <option *ngFor="let s of severidades" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="estado">Estado</label>
+      <select id="estado" name="estado" [(ngModel)]="incidencia.estado" required>
+        <option *ngFor="let e of estados" [value]="e">{{ e }}</option>
+      </select>
+    </div>
+
+    <div class="field field-full">
+      <label for="descripcion">Narración</label>
+      <textarea id="descripcion" name="descripcion" rows="4" [(ngModel)]="incidencia.descripcion" required></textarea>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary" [disabled]="f.invalid" [routerLink]="['/bus/incidentes']">Guardar</button>
+      <button type="button" class="btn" (click)="cancelar()">Cancelar</button>
+    </div>
+  </form>
+</div>

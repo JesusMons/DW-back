@@ -42,3 +42,14 @@ footer {
     grid-area: footer;
     border: 1px solid royalblue;
 }
+
+footer {
+  position: fixed;
+  
+  bottom: 0;
+  left: 0;
+  width: 100%;      /* ocupa todo el ancho */
+  border: 1px solid royalblue;
+  background: white; /* ponle fondo si quieres que tape contenido */
+}
+

@@ -1,0 +1,113 @@
+<div class="grid">
+  <!-- Columna izquierda: filtros + lista -->
+  <div class="col-left">
+    <div class="card">
+      <div class="header">
+        <h2>Incidencias</h2>
+        <div class="actions">
+          <input type="text" placeholder="Buscar (texto libre)…"
+                 [ngModel]="q()" (ngModelChange)="q.set($event)" />
+          <!-- ✅ Botón para crear -->
+          <a class="btn btn-primary" [routerLink]="['/bus/incidencias/crear']">+ Crear incidencia</a>
+        </div>
+      </div>
+
+      <div class="filters">
+        <select [ngModel]="filtroSeveridad()" (ngModelChange)="filtroSeveridad.set($event)">
+          <option value="">Severidad (todas)</option>
+          <option value="BAJA">BAJA</option>
+          <option value="MEDIA">MEDIA</option>
+          <option value="ALTA">ALTA</option>
+        </select>
+
+        <select [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)">
+          <option value="">Estado (todos)</option>
+          <option value="ABIERTA">ABIERTA</option>
+          <option value="EN PROCESO">EN PROCESO</option>
+          <option value="CERRADA">CERRADA</option>
+        </select>
+
+        <input type="text" placeholder="Placa bus"
+               [ngModel]="filtroPlaca()" (ngModelChange)="filtroPlaca.set($event)" />
+        <input type="text" placeholder="Conductor"
+               [ngModel]="filtroConductor()" (ngModelChange)="filtroConductor.set($event)" />
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Bus</th>
+              <th>Conductor</th>
+              <th>Severidad</th>
+              <th>Estado</th>
+              <th style="width:220px">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let i of incidencias()">
+              <td>{{ i.id }}</td>
+              <td>{{ i.fecha }}</td>
+              <td>{{ i.hora }}</td>
+              <td>{{ i.busPlaca }}</td>
+              <td>{{ i.conductorNombre }}</td>
+              <td><span class="badge" [class]="claseSeveridad(i.severidad)">{{ i.severidad }}</span></td>
+              <td><span class="badge" [class]="claseEstado(i.estado)">{{ i.estado }}</span></td>
+              <td class="row-actions">
+                <button class="btn btn-sm" (click)="ver(i)">Ver</button>
+                <a class="btn btn-sm" [routerLink]="['/bus/incidencias/editar/', i.id]">Editar</a>
+                <button class="btn btn-sm" (click)="cerrar(i)" [disabled]="i.estado==='CERRADA'">Cerrar</button>
+                <button class="btn btn-sm danger" (click)="eliminar(i)">Borrar</button>
+              </td>
+            </tr>
+
+            <tr *ngIf="incidencias().length === 0">
+              <td colspan="8" class="empty">No hay incidencias que coincidan con el filtro.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Columna derecha: detalle / narración -->
+  <div class="col-right">
+    <div class="card" *ngIf="seleccion(); else placeholder">
+      <div class="header">
+        <h3>Detalle de incidencia</h3>
+        <button class="btn" (click)="limpiarSeleccion()">Cerrar panel</button>
+      </div>
+
+      <div class="detail-grid">
+        <div>
+          <p><strong>ID:</strong> {{ seleccion()!.id }}</p>
+          <p><strong>Fecha y hora:</strong> {{ seleccion()!.fecha }} {{ seleccion()!.hora }}</p>
+          <p><strong>Ruta:</strong> {{ seleccion()!.rutaId }}</p>
+        </div>
+        <div>
+          <p><strong>Bus (placa):</strong> {{ seleccion()!.busPlaca }}</p>
+          <p><strong>Conductor:</strong> {{ seleccion()!.conductorNombre }} ({{ seleccion()!.conductorId }})</p>
+          <p>
+            <strong>Severidad / Estado:</strong>
+            <span class="badge" [class]="claseSeveridad(seleccion()!.severidad)">{{ seleccion()!.severidad }}</span>
+            <span class="badge" [class]="claseEstado(seleccion()!.estado)">{{ seleccion()!.estado }}</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="narracion">
+        <h4>Narración</h4>
+        <p>{{ seleccion()!.descripcion }}</p>
+      </div>
+    </div>
+
+    <ng-template #placeholder>
+      <div class="card muted">
+        <p>Selecciona una incidencia de la lista para ver el detalle y la narración.</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

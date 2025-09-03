@@ -1,63 +1,64 @@
-<!DOCTYPE html>
-<html lang="es">
+<!-- aside.html (no incluyas <!DOCTYPE html> ni <body> en plantillas de Angular) -->
+<aside id="sidebar-menu"
+  class="bg-gradient-to-br from-gray-800 to-gray-900 fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0">
+  <div class="relative border-b border-white/20">
+    <img src="logo3.png" alt="Logo" class="logo cursor-pointer" style="width: 280px;" [routerLink]="['/']"
+      routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" />
 
-<body class="bg-gray-100 font-sans antialiased text-gray-800">
+    <a class="flex items-center gap-4 py-6 px-8 cursor-pointer" [routerLink]="['/']" routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }">
+      <h6 class="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-white">
+        Panel de Administración
+      </h6>
+    </a>
 
+  </div>
 
+  <div class="render">
+    <ul id="menu-items-list" class="mb-4 flex flex-col gap-1">
 
-  <!-- Barra lateral -->
-  <aside id="sidebar-menu"
-    class="bg-gradient-to-br from-gray-800 to-gray-900 -translate-x-full fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0">
-    <div class="relative border-b border-white/20">
-      <img src="logo3.png" alt="" class="logo" style="width: 280px;">
-      <a class="flex items-center gap-4 py-6 px-8" href="#">
-        <h6 class="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-white">
-          Panel de Administración
-        </h6>
-      </a>
-    </div>
-    <div class="render">
-      <ul id="menu-items-list" class="mb-4 flex flex-col gap-1">
+      @for (item of items; track item.label) {
+      <li>
+        <!-- Botón/anchor para grupo -->
+        <a class="flex items-center gap-2 px-4 py-2 text-white/90 hover:text-white cursor-pointer"
+          (click)="toggleSubmenu(item)">
+          <i [class]="item.icon"></i>
+          <strong class="flex-1">{{ item.label }}</strong>
+          <i class="pi" [ngClass]="item.expanded ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+        </a>
 
-        @for (item of items; track item.label) {
-        <li>
-          <a [href]="item.url || '#'" [class.active]="activeItem === item">
-            <i [class]="'pi pi-' + (item.icon || '')"></i>
-            <strong>{{ item.label }}</strong>
-            @if (item['smallText']) {
-            <small>{{ item['smallText'] }}</small>
-            }
-          </a>
-          @if (item.items) {
-          <ul>
-            @for (subItem of item.items; track subItem.label) {
-            <li>
-              <a [href]="subItem.url || '#'">
-                <i [class]="'pi pi-' + (subItem.icon || '')"></i>
-                {{ subItem.label }}
-              </a>
-              @if (subItem.items) {
-              <ul>
-                @for (subSubItem of subItem.items; track subSubItem.label) {
-                <li>
-                  <a [href]="subSubItem.url || '#'">
-                    <i [class]="'pi pi-' + (subSubItem.icon || '')"></i>
-                    {{ subSubItem.label }}
-                  </a>
-                </li>
-                }
-              </ul>
+        @if (item.items?.length) {
+        <ul class="ml-4" [class.hidden]="!item.expanded">
+          @for (subItem of item.items; track subItem.label) {
+          <li>
+            <!-- ENLACE DE NAVEGACIÓN -->
+            <a [routerLink]="subItem.routerLink" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+              class="flex items-center gap-2 px-4 py-2 text-white/70 hover:text-white">
+              <i [class]="subItem.icon"></i>
+              <span>{{ subItem.label }}</span>
+            </a>
+
+            @if (subItem.items?.length) {
+            <ul class="ml-4">
+              @for (subSubItem of subItem.items; track subSubItem.label) {
+              <li>
+                <a [routerLink]="subSubItem.routerLink" routerLinkActive="active"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  class="flex items-center gap-2 px-4 py-2 text-white/70 hover:text-white">
+                  <i [class]="subSubItem.icon"></i>
+                  <span>{{ subSubItem.label }}</span>
+                </a>
+              </li>
               }
-            </li>
+            </ul>
             }
-          </ul>
+          </li>
           }
-        </li>
+        </ul>
         }
+      </li>
+      }
 
-      </ul>
-    </div>
-  </aside>
-</body>
-
-</html>
+    </ul>
+  </div>
+</aside>

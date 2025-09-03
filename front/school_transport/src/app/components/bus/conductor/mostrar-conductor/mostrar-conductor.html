@@ -1,0 +1,53 @@
+<div class="card">
+  <div class="header">
+    <h2>Conductores</h2>
+    <div class="actions">
+      <input
+        type="text"
+        placeholder="Buscar por nombre, doc, licencia…"
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event)" />
+      <a class="btn btn-primary" [routerLink]="['/bus/conductor/crear']">+ Registrar</a>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Documento</th>
+          <th>Teléfono</th>
+          <th>Licencia</th>
+          <th>Vence</th>
+          <th>Estado</th>
+          <th style="width:180px">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of conductores()">
+          <td>{{ c.id }}</td>
+          <td>{{ c.nombre }}</td>
+          <td>{{ c.documento }}</td>
+          <td>{{ c.telefono }}</td>
+          <td>{{ c.licencia }}</td>
+          <td>{{ c.venceLicencia }}</td>
+          <td>
+            <span class="badge" [class.activo]="c.estado==='ACTIVO'" [class.inactivo]="c.estado==='INACTIVO'">
+              {{ c.estado }}
+            </span>
+          </td>
+          <td class="row-actions">
+            <a class="btn btn-sm" [routerLink]="['/bus/conductor/editar', c.id]">Editar</a>
+            <button class="btn btn-sm danger" (click)="eliminar(c.id)">Borrar</button>
+          </td>
+        </tr>
+
+        <tr *ngIf="conductores().length === 0">
+          <td colspan="8" class="empty">No hay conductores para mostrar.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,61 @@
+<div class="card">
+  <div class="header">
+    <h2>Registrar Estudiante</h2>
+    <a class="btn" [routerLink]="['/estudiantes/listado']">Volver al listado</a>
+  </div>
+
+  <!-- ✅ Señal afirmativa -->
+  <div class="ok-banner" *ngIf="creado">
+    <span class="icon">✅</span> Estudiante creado correctamente
+  </div>
+
+  <form #f="ngForm" (ngSubmit)="crear(f)" class="form-grid" novalidate>
+    <div class="field">
+      <label for="id">ID</label>
+      <input id="id" name="id" type="text" [(ngModel)]="estudiante.id" required />
+      <small class="err" *ngIf="f.submitted && !estudiante.id">Requerido</small>
+    </div>
+
+    <div class="field">
+      <label for="nombre">Nombre</label>
+      <input id="nombre" name="nombre" type="text" [(ngModel)]="estudiante.nombre" required />
+      <small class="err" *ngIf="f.submitted && !estudiante.nombre">Requerido</small>
+    </div>
+
+    <div class="field">
+      <label for="documento">Documento</label>
+      <input id="documento" name="documento" type="text" [(ngModel)]="estudiante.documento" required />
+      <small class="err" *ngIf="f.submitted && !estudiante.documento">Requerido</small>
+    </div>
+
+    <div class="field">
+      <label for="grado">Grado</label>
+      <input id="grado" name="grado" type="text" [(ngModel)]="estudiante.grado" required />
+      <small class="err" *ngIf="f.submitted && !estudiante.grado">Requerido</small>
+    </div>
+
+    <div class="field">
+      <label for="acudiente">Acudiente</label>
+      <input id="acudiente" name="acudiente" type="text" [(ngModel)]="estudiante.acudiente" required />
+      <small class="err" *ngIf="f.submitted && !estudiante.acudiente">Requerido</small>
+    </div>
+
+    <div class="field">
+      <label for="telefono">Teléfono</label>
+      <input id="telefono" name="telefono" type="tel" [(ngModel)]="estudiante.telefono" required />
+      <small class="err" *ngIf="f.submitted && !estudiante.telefono">Requerido</small>
+    </div>
+
+    <div class="field">
+      <label for="estado">Estado</label>
+      <select id="estado" name="estado" [(ngModel)]="estudiante.estado" required>
+        <option *ngFor="let e of estados" [ngValue]="e">{{ e }}</option>
+      </select>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary" [disabled]="f.invalid" [routerLink]="['/estudiantes/listado']">Crear</button>
+      <button type="button" class="btn" (click)="limpiar(f)">Limpiar</button>
+    </div>
+  </form>
+</div>

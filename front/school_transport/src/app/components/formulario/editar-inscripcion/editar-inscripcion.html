@@ -1,0 +1,57 @@
+<div class="card">
+  <div class="header">
+    <h2>Editar Inscripción</h2>
+    <button class="btn" type="button" [routerLink]="['/listado-inscripciones']">Volver</button>
+  </div>
+
+  <div *ngIf="cargando" class="info-banner">Cargando…</div>
+
+  <div class="ok-banner" *ngIf="guardado">
+    <span class="icon">✅</span> Cambios guardados correctamente
+  </div>
+
+  <form *ngIf="!cargando" #f="ngForm" (ngSubmit)="guardar(f)" class="form-grid" novalidate>
+    <div class="field">
+      <label for="id">ID</label>
+      <input id="id" name="id" type="text" [(ngModel)]="inscripcion.id" readonly />
+    </div>
+
+    <div class="field">
+      <label for="ruta">Ruta</label>
+      <select id="ruta" name="rutaId" [(ngModel)]="inscripcion.rutaId" (change)="onRutaChange()" required>
+        <option value="" disabled selected>Selecciona una ruta</option>
+        <option *ngFor="let r of rutas" [value]="r.id">{{ r.id }} — {{ r.nombre }}</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="itinerario">Itinerario</label>
+      <select id="itinerario" name="itinerarioId" [(ngModel)]="inscripcion.itinerarioId" [disabled]="!inscripcion.rutaId" required>
+        <option value="" disabled selected>Selecciona un itinerario</option>
+        <option *ngFor="let it of itinerariosFiltrados" [value]="it.id">
+          {{ it.id }} — {{ it.fecha }} {{ it.hora }}
+        </option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="estudiante">Estudiante</label>
+      <select id="estudiante" name="estudianteId" [(ngModel)]="inscripcion.estudianteId" required>
+        <option value="" disabled selected>Selecciona un estudiante</option>
+        <option *ngFor="let e of estudiantes" [value]="e.id">
+          {{ e.id }} — {{ e.nombre }} ({{ e.grado }})
+        </option>
+      </select>
+    </div>
+
+    <div class="field field-full">
+      <label for="obs">Observaciones</label>
+      <textarea id="obs" name="observaciones" rows="3" [(ngModel)]="inscripcion.observaciones"></textarea>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary" [disabled]="f.invalid" [routerLink]="['/listado-inscripciones']">Guardar</button>
+      <button type="button" class="btn" [routerLink]="['/listado-inscripciones']">Cancelar</button>
+    </div>
+  </form>
+</div>

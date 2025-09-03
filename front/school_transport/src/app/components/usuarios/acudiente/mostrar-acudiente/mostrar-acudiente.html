@@ -1,0 +1,48 @@
+<div class="card">
+  <div class="header">
+    <h2>Acudientes</h2>
+    <div class="actions">
+      <input
+        type="text"
+        placeholder="Buscar por nombre, documento, estudiante…"
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event)" />
+
+      <a class="btn btn-primary" [routerLink]="['/acudientes/registrar']">+ Registrar</a>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Documento</th>
+          <th>Teléfono</th>
+          <th>Dirección</th>
+          <th>Estudiante</th>
+          <th style="width:160px">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of acudientes()">
+          <td>{{ a.id }}</td>
+          <td>{{ a.nombre }}</td>
+          <td>{{ a.documento }}</td>
+          <td>{{ a.telefono }}</td>
+          <td>{{ a.direccion }}</td>
+          <td>{{ a.estudiante }}</td>
+          <td class="row-actions">
+            <a class="btn btn-sm" [routerLink]="['/acudientes/listado/editar', a.id]">Editar</a>
+            <button class="btn btn-sm danger" (click)="eliminar(a.id)">Borrar</button>
+          </td>
+        </tr>
+
+        <tr *ngIf="acudientes().length === 0">
+          <td colspan="7" class="empty">No hay acudientes para mostrar.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

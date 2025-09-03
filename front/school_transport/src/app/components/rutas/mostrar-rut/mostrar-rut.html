@@ -1,0 +1,58 @@
+<div class="card">
+  <div class="header">
+    <h2>Listado de Rutas</h2>
+
+    <div class="actions">
+      <input
+        type="text"
+        placeholder="Buscar por nombre, bus, conductor, origen o destino…"
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event)" />
+
+      <button class="btn btn-primary" [routerLink]="['/crear-rutas']">
+        + Nueva Ruta
+      </button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Nombre</th><th>Origen</th><th>Destino</th>
+          <th>Salida</th><th>Bus</th><th>Conductor</th><th>Cupos</th>
+          <th>Estado</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of rutasFiltradas(); track r.id) {
+          <tr>
+            <td>{{ r.id }}</td>
+            <td>{{ r.nombre }}</td>
+            <td>{{ r.origen }}</td>
+            <td>{{ r.destino }}</td>
+            <td>{{ r.horaSalida }}</td>
+            <td>{{ r.bus }}</td>
+            <td>{{ r.conductor }}</td>
+            <td>{{ r.cupos }}</td>
+            <td>
+              <span class="badge"
+                    [class.activa]="r.estado === 'ACTIVA'"
+                    [class.inactiva]="r.estado === 'INACTIVA'"
+                    [class.mant]="r.estado === 'MANTENIMIENTO'">
+                {{ r.estado }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm" [routerLink]="['/editar-ruta']">Editar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="10" class="empty">No hay rutas para mostrar.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

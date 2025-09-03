@@ -1,0 +1,48 @@
+<div class="card">
+  <div class="header">
+    <h2>Crear Itinerario</h2>
+    <a class="btn" [routerLink]="['/mostrar-itinerario']">Volver al listado</a>
+  </div>
+
+  <!-- ✅ Señal afirmativa -->
+  <div class="ok-banner" *ngIf="creado">
+    <span class="icon">✅</span> Itinerario creado correctamente
+  </div>
+
+  <form #f="ngForm" (ngSubmit)="crear(f)" novalidate class="form-grid">
+    <div class="form-field">
+      <label for="id">ID</label>
+      <input id="id" name="id" type="text" [(ngModel)]="itinerario.id" required />
+    </div>
+
+    <div class="form-field">
+      <label for="ruta">Ruta</label>
+      <input id="ruta" name="ruta" type="text" [(ngModel)]="itinerario.ruta" required />
+    </div>
+
+    <div class="form-field">
+      <label for="fecha">Fecha</label>
+      <input id="fecha" name="fecha" type="date" [(ngModel)]="itinerario.fecha" required />
+    </div>
+
+    <div class="form-field">
+      <label for="hora">Hora</label>
+      <input id="hora" name="hora" type="time" [(ngModel)]="itinerario.hora" required />
+    </div>
+
+    <div class="form-field">
+      <label for="paradas">Paradas</label>
+      <textarea id="paradas" name="paradas" [(ngModel)]="itinerario.paradas"></textarea>
+    </div>
+
+    <div class="form-field">
+      <label for="observaciones">Observaciones</label>
+      <textarea id="observaciones" name="observaciones" [(ngModel)]="itinerario.observaciones"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="f.invalid">Crear</button>
+      <button type="reset" class="btn">Limpiar</button>
+    </div>
+  </form>
+</div>

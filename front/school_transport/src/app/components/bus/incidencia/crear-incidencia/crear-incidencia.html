@@ -1,0 +1,65 @@
+<div class="card">
+  <div class="header">
+    <h2>Crear Incidencia</h2>
+    <a class="btn" [routerLink]="['/bus/incidentes']">Volver al listado</a>
+  </div>
+
+  <div class="ok-banner" *ngIf="creado">
+    <span class="icon">✅</span> Incidencia registrada correctamente
+  </div>
+
+  <form #f="ngForm" (ngSubmit)="crear(f)" class="form-grid" novalidate>
+    <div class="field">
+      <label for="fecha">Fecha</label>
+      <input id="fecha" name="fecha" type="date" [(ngModel)]="incidencia.fecha" required />
+    </div>
+
+    <div class="field">
+      <label for="hora">Hora</label>
+      <input id="hora" name="hora" type="time" [(ngModel)]="incidencia.hora" required />
+    </div>
+
+    <div class="field">
+      <label for="bus">Bus (placa)</label>
+      <input id="bus" name="busPlaca" type="text" [(ngModel)]="incidencia.busPlaca" required />
+      <small class="err" *ngIf="f.submitted && !incidencia.busPlaca">Requerido</small>
+    </div>
+
+    <div class="field">
+      <label for="conductorId">Conductor ID</label>
+      <input id="conductorId" name="conductorId" type="text" [(ngModel)]="incidencia.conductorId" />
+    </div>
+
+    <div class="field">
+      <label for="conductorNombre">Conductor Nombre</label>
+      <input id="conductorNombre" name="conductorNombre" type="text" [(ngModel)]="incidencia.conductorNombre" required />
+      <small class="err" *ngIf="f.submitted && !incidencia.conductorNombre">Requerido</small>
+    </div>
+
+    <div class="field">
+      <label for="severidad">Severidad</label>
+      <select id="severidad" name="severidad" [(ngModel)]="incidencia.severidad" required>
+        <option *ngFor="let s of severidades" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="estado">Estado</label>
+      <select id="estado" name="estado" [(ngModel)]="incidencia.estado" required>
+        <option *ngFor="let e of estados" [value]="e">{{ e }}</option>
+      </select>
+    </div>
+
+    <div class="field field-full">
+      <label for="descripcion">Narración</label>
+      <textarea id="descripcion" name="descripcion" rows="4" [(ngModel)]="incidencia.descripcion" required
+                placeholder="Describe en detalle lo ocurrido…"></textarea>
+      <small class="err" *ngIf="f.submitted && !incidencia.descripcion">Requerido</small>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary" [disabled]="f.invalid" [routerLink]="['/bus/incidentes']">Crear</button>
+      <button type="button" class="btn" (click)="limpiar(f)">Limpiar</button>
+    </div>
+  </form>
+</div>

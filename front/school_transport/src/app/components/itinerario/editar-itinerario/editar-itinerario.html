@@ -1,0 +1,54 @@
+<div class="card">
+  <div class="header">
+    <h2>Editar Itinerario</h2>
+    <div class="header-actions">
+      <a class="btn" [routerLink]="['/mostrar-itinerario']">Volver</a>
+    </div>
+  </div>
+
+  <div *ngIf="cargando" class="info-banner">Cargando…</div>
+  <div *ngIf="noEncontrado && !cargando" class="warn-banner">
+    No se encontró el itinerario solicitado.
+  </div>
+
+  <div class="ok-banner" *ngIf="guardado">
+    <span class="icon">✅</span> Cambios guardados correctamente
+  </div>
+
+  <form *ngIf="!cargando && !noEncontrado" #f="ngForm" (ngSubmit)="guardar(f)" class="form-grid" novalidate>
+    <div class="form-field">
+      <label for="id">ID</label>
+      <input id="id" name="id" type="text" [(ngModel)]="itinerario.id" required />
+    </div>
+
+    <div class="form-field">
+      <label for="ruta">Ruta</label>
+      <input id="ruta" name="ruta" type="text" [(ngModel)]="itinerario.ruta" required />
+    </div>
+
+    <div class="form-field">
+      <label for="fecha">Fecha</label>
+      <input id="fecha" name="fecha" type="date" [(ngModel)]="itinerario.fecha" required />
+    </div>
+
+    <div class="form-field">
+      <label for="hora">Hora</label>
+      <input id="hora" name="hora" type="time" [(ngModel)]="itinerario.hora" required />
+    </div>
+
+    <div class="form-field">
+      <label for="paradas">Paradas</label>
+      <textarea id="paradas" name="paradas" [(ngModel)]="itinerario.paradas" placeholder="Separadas por ;"></textarea>
+    </div>
+
+    <div class="form-field">
+      <label for="observaciones">Observaciones</label>
+      <textarea id="observaciones" name="observaciones" [(ngModel)]="itinerario.observaciones"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="f.invalid">Guardar</button>
+      <button type="button" class="btn" (click)="cancelar()">Cancelar</button>
+    </div>
+  </form>
+</div>

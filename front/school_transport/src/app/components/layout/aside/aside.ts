@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 export interface CustomMenuItem extends MenuItem {
-  smallText?: string; // extensión para subtítulo
+  smallText?: string;
+  expanded?: boolean;
+  routerLink?: string | any[];
+  items?: CustomMenuItem[];
 }
 
 @Component({
@@ -16,70 +19,72 @@ export interface CustomMenuItem extends MenuItem {
 })
 export class Aside implements OnInit {
   items: CustomMenuItem[] = [];
-  activeItem: CustomMenuItem | undefined;
+
+  constructor(private router: Router) { }
 
   ngOnInit() {
     this.items = [
       {
         label: 'Rutas',
         icon: 'pi pi-map',
-        command: () => this.setActive(this.items[0])
-      },
-      {
-        label: 'Usuarios',
-        icon: 'pi pi-users',
-        command: () => this.setActive(this.items[1])
-      },
-      {
-        label: 'Formulario',
-        icon: 'pi pi-file-edit',
-        command: () => this.setActive(this.items[2])
-      },
-      {
-        label: 'Incidentes',
-        icon: 'pi pi-exclamation-triangle',
-        command: () => this.setActive(this.items[3])
-      },
-      {
-        label: 'Buses',
-        icon: 'pi pi-car',
         items: [
-          {
-            label: 'Mantenimiento',
-            icon: 'pi pi-wrench',
-          },
-          {
-            label: 'Conductores',
-            icon: 'pi pi-users',
-            items: [
-              {
-                label: 'Registrar conductor',
-                icon: 'pi pi-user-plus',
-              },
-              {
-                label: 'Listado conductores',
-                icon: 'pi pi-list',
-              }
-            ]
-          }
+          { label: 'Listado rutas', icon: 'pi pi-list', routerLink: ['/mostrar-rutas'] },
+          { label: 'Crear rutas', icon: 'pi pi-pencil', routerLink: ['/crear-rutas'] }
         ]
-      }
+      },
+      {
+        label: 'Itinerarios',
+        icon: 'pi pi-calendar',
+        items: [
+          { label: 'Mostrar itinerarios', icon: 'pi pi-list', routerLink: ['/mostrar-itinerario'] },
+          { label: 'Crear itinerario', icon: 'pi pi-plus', routerLink: ['/crear-itinerario'] }
+        ]
+      },
+      {
+        label: 'Estudiantes',
+        icon: 'pi pi-users',
+        items: [
+
+          { label: 'Listado', icon: 'pi pi-list', routerLink: ['/estudiantes/listado'] },
+          { label: 'Registrar', icon: 'pi pi-user-plus', routerLink: ['/estudiantes/registrar'] },
+
+        ]
+      },
+      {
+        label: 'Acudientes', icon: 'pi pi-id-card', routerLink: ['/acudientes'], items: [
+          { label: 'Listado', icon: 'pi pi-list', routerLink: ['/acudientes/listado'] },
+          { label: 'Registrar', icon: 'pi pi-user-plus', routerLink: ['/acudientes/registrar'] },
+
+        ]
+      },
+      {
+        label: 'Formulario', icon: 'pi pi-file-edit', items: [
+          { label: 'Inscribirse', icon: 'pi pi-file-edit', routerLink: ['/formulario'] },
+          { label: 'Ver inscripciones', icon: 'pi pi-list', routerLink: ['/listado-inscripciones'] }
+        ]
+      },
+
+      { label: 'Buses', icon: 'pi pi-car', items: [
+        {label: 'Conductores', icon: 'pi pi-list', routerLink: ['/bus/conductor']},
+        {label: 'indicecias', icon: 'pi pi-info-circle', routerLink: ['/bus/incidentes']}
+      ] } // Placeholder, puedes agregar subitems aquí si es necesario  
     ];
 
-    this.activeItem = this.items[0];
+    // ❌ Nada abierto por defecto (NO pongas items[0].expanded = true)
   }
 
-  setActive(item: CustomMenuItem) {
-    this.activeItem = item;
+  toggleSubmenu(item: CustomMenuItem) {
+    if (item.items?.length) {
+      item.expanded = !item.expanded;
+    } else if (item.routerLink) {
+      this.router.navigate(Array.isArray(item.routerLink) ? item.routerLink : [item.routerLink]);
+    }
   }
 
-  toggleSubmenu(event: Event, item: any) {
-  event.preventDefault();
-  if (item.items) {
-    item.expanded = !item.expanded;
-  } else {
-    // Navegar al enlace si no tiene subitems
-    window.location.href = item.url || '#';
+  isActive(link?: string | any[]) {
+    if (!link) return false;
+    const url = this.router.url.replace(/^\//, '');
+    const target = Array.isArray(link) ? link.join('/') : String(link).replace(/^\//, '');
+    return url === target || url.startsWith(target + '/');
   }
-}
 }

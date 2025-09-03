@@ -1,0 +1,28 @@
+.card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.header h2 { margin: 0; font-size: 1.25rem; }
+.actions { display: flex; gap: 8px; align-items: center; }
+.actions select, .actions input {
+  padding: 8px 10px; border-radius: 8px; border: 1px solid #e2e8f0;
+}
+
+.table-wrap { overflow: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  text-align: left; font-weight: 600; font-size: .9rem; color: #334155;
+  border-bottom: 1px solid #e2e8f0; padding: 10px 8px; white-space: nowrap;
+}
+tbody td { padding: 10px 8px; border-bottom: 1px solid #f1f5f9; }
+tbody tr:hover { background: #f8fafc; }
+
+.row-actions { display: flex; gap: 6px; }
+.btn { border: 1px solid #e2e8f0; background: #f8fafc; padding: 6px 10px; border-radius: 8px; cursor: pointer; }
+.btn:hover { background: #eef2f7; }
+.btn-primary { border-color: transparent; background: #2563eb; color: #fff; }
+.btn-primary:hover { background: #1e40af; }
+.btn-sm { padding: 4px 8px; font-size: .85rem; }
+.btn.danger { background: #fee2e2; border-color: #fecaca; color: #b91c1c; }
+.btn.danger:hover { background: #fecaca; }
+
+.empty { text-align: center; color: #64748b; }
