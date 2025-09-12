@@ -1,0 +1,83 @@
+<div class="card">
+  <!-- Título -->
+  <h2 class="text-2xl font-bold mb-4 text-gray-700">Listado de Acudientes</h2>
+
+  <!-- Botón Crear -->
+  <div class="flex justify-end mb-4">
+    <p-button label="Crear Acudiente" severity="success" [routerLink]="['/guardian/add']"></p-button>
+  </div>
+
+  <!-- Tabla de Acudientes -->
+  <p-table [value]="guardians" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Documento</th>
+        <th>Teléfono</th>
+        <th>Email</th>
+        <th>Parentesco</th>
+        <th>Estado</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-g>
+      <tr>
+        <td>{{ g.id }}</td>
+        <td>{{ g.firstName }} {{ g.lastName }}</td>
+        <td>{{ g.document }}</td>
+        <td>{{ g.phone }}</td>
+        <td>{{ g.email || '-' }}</td>
+        <td>{{ g.relationship }}</td>
+        <td>
+          <p-tag
+            [value]="g.status || 'ACTIVO'"
+            [severity]="(g.status || 'ACTIVO') === 'ACTIVO' ? 'success' : 'danger'">
+          </p-tag>
+        </td>
+
+        <td class="flex gap-2 justify-center">
+          <p-button icon="pi pi-eye" severity="info" class="p-1" (click)="showDetails(g)"></p-button>
+          <p-button icon="pi pi-pencil" severity="warn" class="p-1" [routerLink]="['/guardian/edit', g.id]"></p-button>
+          <p-button icon="pi pi-trash" severity="danger" class="p-1" (click)="delete(g.id!)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Diálogo Detalle -->
+<p-dialog header="Detalle del Acudiente" [(visible)]="detailsVisible" [modal]="true" [style]="{width: '40rem'}">
+  <div *ngIf="selected" class="space-y-2">
+    <p><strong>ID:</strong> {{ selected.id }}</p>
+    <p><strong>Nombre:</strong> {{ selected.firstName }} {{ selected.lastName }}</p>
+    <p><strong>Documento:</strong> {{ selected.document }}</p>
+    <p><strong>Teléfono:</strong> {{ selected.phone }}</p>
+    <p><strong>Email:</strong> {{ selected.email || 'N/D' }}</p>
+    <p><strong>Parentesco:</strong> {{ selected.relationship }}</p>
+    <p><strong>Dirección:</strong> {{ selected.address || 'N/D' }}</p>
+
+    <div>
+      <strong>Estudiantes asociados:</strong>
+      <div class="mt-1">
+        <span *ngIf="!selected.students?.length">Ninguno</span>
+        <ul *ngIf="selected.students?.length" class="list-disc ml-5">
+          <li *ngFor="let sid of selected.students">Estudiante #{{ sid }}</li>
+        </ul>
+      </div>
+    </div>
+
+    <p>
+      <strong>Estado:</strong>
+      <p-tag
+        [value]="selected.status || 'ACTIVO'"
+        [severity]="(selected.status || 'ACTIVO') === 'ACTIVO' ? 'success' : 'danger'">
+      </p-tag>
+    </p>
+
+    <p class="text-xs text-gray-500">
+      Creado: {{ selected.createdAt | date:'short' }} · Actualizado: {{ selected.updatedAt | date:'short' }}
+    </p>
+  </div>
+</p-dialog>

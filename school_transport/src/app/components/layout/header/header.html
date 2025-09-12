@@ -1,0 +1,33 @@
+<!-- HEADER con degradado -->
+<div class="relative h-16 bg-gray-800 rounded-xl w-full">
+  <!-- Menubar ocupa todo el header -->
+  <p-menubar
+    [model]="items"
+    class="absolute inset-0 z-0 w-full !bg-transparent !border-none shadow-none text-white">
+    <!-- Izquierda (opcional) -->
+
+    <!-- Item template -->
+    <ng-template #item let-item let-root="root">
+      <a pRipple class="flex items-center gap-2 p-menubar-item-link text-white bg-white rounded-xl" [routerLink]="['/']">
+        <i *ngIf="item.icon" [ngClass]="[item.icon]"></i>
+        <span *ngIf="item.label">{{ item.label }}</span>
+        <i *ngIf="item.items" [ngClass]="['ml-auto pi', root ? 'pi-angle-down' : 'pi-angle-right']"></i>
+      </a>
+    </ng-template>
+
+    <!-- Derecha -->
+    <ng-template #end>
+      <div class="flex items-center gap-2 pr-3">
+        <input type="text" pInputText placeholder="Buscar" class="w-36 text-black" />
+        <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
+      </div>
+    </ng-template>
+  </p-menubar>
+
+  <!-- Título centrado, por encima del menubar -->
+  <div class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+    <h1 class="text-white font-extrabold text-xl tracking-wide ">
+      SCHOOL TRANSPORT
+    </h1>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<main class="w-full h-screen flex flex-col">
+  <div class="flex flex-1">
+    @if (showAside()) {
+      <!-- ASIDE -->
+      <aside class="basis-[15%]  p-0 h-240">
+        <app-aside></app-aside>
+      </aside>
+
+      <!-- MAIN -->
+      <section class="basis-[80%] flex flex-col">
+        <header class="h-17 p-1 ">
+          <app-header (toggleAside)="toggleAside()"></app-header>
+        </header>
+
+        <div class="flex-1 overflow-auto p-4">
+          <router-outlet />
+        </div>
+
+        <footer class="h-7 w-407  ">
+          <app-footer></app-footer>
+        </footer>
+      </section>
+    } @else {
+      <!-- FULL WIDTH SIN ASIDE -->
+      <section class="basis-full flex flex-col">
+        <header class="h-16 border-b shadow-sm">
+          <app-header (toggleAside)="toggleAside()"></app-header>
+        </header>
+
+        <div class="flex-1 overflow-auto p-4">
+          <router-outlet />
+        </div>
+
+        <footer class="h-12 border-t shadow-inner">
+          <app-footer></app-footer>
+        </footer>
+      </section>
+    }
+  </div>
+</main>

@@ -1,0 +1,48 @@
+<div class="card">
+  <!-- Botón Crear -->
+  <div class="flex justify-end mb-4">
+    <p-button label="Crear Ruta" severity="success" [routerLink]="['/routes/add']">
+    </p-button>
+  </div>
+
+  <!-- Tabla de Rutas -->
+  <p-table [value]="routes" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
+    <!-- Encabezado -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Paradas</th>
+        <th>Salida</th>
+        <th>Llegada</th>
+        <th>Horarios</th>
+        <th>Bus</th>
+        <th>Estado</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <!-- Cuerpo -->
+    <ng-template pTemplate="body" let-route>
+      <tr>
+        <td>{{ route.id }}</td>
+        <td>{{ route.name }}</td>
+        <td>{{ route.stops?.join(', ') }}</td>
+        <td>{{ route.startPoint }}</td>
+        <td>{{ route.endPoint }}</td>
+        <td>{{ route.schedule?.join(' | ') }}</td>
+        <td>{{ route.bus }}</td>
+        <td>
+          <p-tag [value]="route.status" [severity]="route.status === 'ACTIVE' ? 'success' : 'danger'">
+          </p-tag>
+        </td>
+        <td class="flex gap-2 justify-center">
+          <p-button icon="pi pi-pencil" severity="warn" class="p-1" [routerLink]="['/routes/edit', route.id]">
+          </p-button>
+          <p-button icon="pi pi-trash" severity="danger" class="p-1" (click)="delete(route.id)">
+          </p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

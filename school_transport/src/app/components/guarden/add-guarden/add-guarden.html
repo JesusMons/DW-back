@@ -1,0 +1,85 @@
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow">
+  <h2 class="text-xl font-bold mb-6">Registrar Acudiente</h2>
+
+  <form (ngSubmit)="save()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Nombre -->
+    <div>
+      <label class="block font-semibold">Nombre</label>
+      <input [(ngModel)]="form.firstName" name="firstName" class="w-full border rounded px-3 py-2" required />
+    </div>
+
+    <!-- Apellido -->
+    <div>
+      <label class="block font-semibold">Apellido</label>
+      <input [(ngModel)]="form.lastName" name="lastName" class="w-full border rounded px-3 py-2" required />
+    </div>
+
+    <!-- Documento -->
+    <div>
+      <label class="block font-semibold">Documento</label>
+      <input type="number" [(ngModel)]="form.document" name="document" class="w-full border rounded px-3 py-2" required />
+    </div>
+
+    <!-- Teléfono -->
+    <div>
+      <label class="block font-semibold">Teléfono</label>
+      <input [(ngModel)]="form.phone" name="phone" class="w-full border rounded px-3 py-2" required />
+    </div>
+
+    <!-- Email -->
+    <div>
+      <label class="block font-semibold">Email</label>
+      <input type="email" [(ngModel)]="form.email" name="email" class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Parentesco -->
+    <div>
+      <label class="block font-semibold">Parentesco</label>
+      <input [(ngModel)]="form.relationship" name="relationship" class="w-full border rounded px-3 py-2" required />
+    </div>
+
+    <!-- Dirección (full width) -->
+    <div class="md:col-span-2">
+      <label class="block font-semibold">Dirección</label>
+      <input [(ngModel)]="form.address" name="address" class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Estado -->
+    <div>
+      <label class="block font-semibold">Estado</label>
+      <select [(ngModel)]="form.status" name="status" class="w-full border rounded px-3 py-2">
+        <option value="ACTIVO">ACTIVO</option>
+        <option value="INACTIVO">INACTIVO</option>
+      </select>
+    </div>
+
+    <!-- 👇 Selección de estudiantes a cargo (full width) -->
+    <div class="md:col-span-2">
+      <label class="block font-semibold mb-1">Estudiantes a cargo</label>
+      <p-multiSelect
+        [options]="studentOptions"
+        [(ngModel)]="selectedStudentIds"
+        name="students"
+        optionLabel="label"
+        optionValue="value"
+        display="chip"
+        class="w-full">
+      </p-multiSelect>
+
+      <!-- Ayuda + caso vacío -->
+      <p class="text-sm text-gray-500 mt-1" *ngIf="studentOptions.length">
+        Selecciona uno o más estudiantes.
+      </p>
+      <div class="mt-2 text-sm text-amber-700" *ngIf="!studentOptions.length">
+        No hay estudiantes registrados. 
+        <a class="underline text-blue-600" [routerLink]="['/students/add']">Crear estudiante</a>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="md:col-span-2 flex justify-end gap-2">
+      <button pButton type="button" label="Cancelar" class="!bg-gray-500 !border-none" (click)="cancel()"></button>
+      <button pButton type="submit" label="Guardar" icon="pi pi-save" severity="primary"></button>
+    </div>
+  </form>
+</div>

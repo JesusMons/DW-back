@@ -1,0 +1,99 @@
+<div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+  <h2 class="text-xl font-bold mb-6 col-span-2">Agregar Nueva Ruta</h2>
+
+  <form (ngSubmit)="addRoute()" *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Nombre -->
+    <div>
+      <label class="block font-semibold">Nombre</label>
+      <input [(ngModel)]="newRoute.name" name="name"
+             class="w-full border rounded px-3 py-2" required />
+    </div>
+
+    <!-- Punto de inicio -->
+    <div>
+      <label class="block font-semibold">Punto de inicio</label>
+      <input [(ngModel)]="newRoute.startPoint" name="startPoint"
+             class="w-full border rounded px-3 py-2" required />
+    </div>
+
+    <!-- Punto final -->
+    <div>
+      <label class="block font-semibold">Punto final</label>
+      <input [(ngModel)]="newRoute.endPoint" name="endPoint"
+             class="w-full border rounded px-3 py-2" required />
+    </div>
+
+    <!-- Bus -->
+    <div>
+      <label class="block font-semibold">Bus</label>
+      <input type="number" [(ngModel)]="newRoute.bus" name="bus"
+             class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Conductor -->
+    <div>
+      <label class="block font-semibold">Conductor</label>
+      <input [(ngModel)]="newRoute.driver" name="driver"
+             class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Estado -->
+    <div>
+      <label class="block font-semibold">Estado</label>
+      <select [(ngModel)]="newRoute.status" name="status"
+              class="w-full border rounded px-3 py-2">
+        <option value="ACTIVE">Activo</option>
+        <option value="INACTIVE">Inactivo</option>
+      </select>
+    </div>
+
+    <!-- Paradas -->
+    <div class="md:col-span-2">
+      <label class="block font-semibold">Paradas</label>
+      <div class="flex gap-2">
+        <input [(ngModel)]="stopsInput" name="stopInput"
+               class="flex-1 border rounded px-3 py-2"
+               placeholder="Ej: Parque Central" />
+        <button type="button" (click)="addStop()"
+                class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">
+          <i class="pi pi-plus"></i>
+        </button>
+      </div>
+      <ul class="mt-2 text-sm text-gray-700 list-disc list-inside">
+        <li *ngFor="let stop of stops">{{ stop }}</li>
+      </ul>
+    </div>
+
+    <!-- Horarios -->
+    <div class="md:col-span-2">
+      <label class="block font-semibold">Horarios</label>
+      <div class="flex gap-2">
+        <input [(ngModel)]="scheduleInput" name="scheduleInput"
+               class="flex-1 border rounded px-3 py-2"
+               placeholder="Ej: 06:30" />
+        <button type="button" (click)="addSchedule()"
+                class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">
+          <i class="pi pi-plus"></i>
+        </button>
+      </div>
+      <ul class="mt-2 text-sm text-gray-700 list-disc list-inside">
+        <li *ngFor="let schedule of schedules">{{ schedule }}</li>
+      </ul>
+    </div>
+
+    <!-- Botón Crear -->
+    <div class="md:col-span-2 flex justify-end mt-4">
+      <button type="submit"
+              class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+        Crear Ruta
+      </button>
+    </div>
+  </form>
+
+  <!-- Barra de progreso -->
+  <div *ngIf="loading" class="mt-6">
+    <p-progressbar [value]="value"></p-progressbar>
+  </div>
+
+  <p-toast></p-toast>
+</div>

@@ -1,0 +1,90 @@
+<div class="card">
+  <!-- Botón Crear -->
+  <div class="flex justify-end mb-4">
+    <p-button label="Crear Itinerario" severity="success" [routerLink]="['/itinerary/add']"></p-button>
+  </div>
+
+  <!-- Tabla de Itinerarios -->
+  <p-table [value]="itineraries" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>ID</th>
+        <th>Ruta</th>
+        <th>Fecha</th>
+        <th>Salida</th>
+        <th>Llegada</th>
+        <th>Bus</th>
+        <th>Conductor</th>
+        <th>Estado</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-it>
+      <tr>
+        <td>{{ it.id }}</td>
+        <td>#{{ it.routeId }}</td>
+        <td>{{ it.date | date:'yyyy-MM-dd' }}</td>
+        <td>{{ it.departureTime }}</td>
+        <td>{{ it.arrivalTime }}</td>
+        <td>{{ it.bus }}</td>
+        <td>{{ it.driver }}</td>
+        <td>
+          <p-tag
+            [value]="it.status"
+            [severity]="
+              it.status === 'PLANNED' ? 'warning' :
+              it.status === 'IN_PROGRESS' ? 'info' :
+              it.status === 'COMPLETED' ? 'success' :
+              'danger'
+            ">
+          </p-tag>
+        </td>
+
+        <td class="flex gap-2 justify-center max-w-20">
+          <!-- Botón Ver Detalles -->
+          <p-button icon="pi pi-eye" severity="info" class="p-1"
+                    (click)="showDetails(it)"></p-button>
+
+          <p-button icon="pi pi-pencil" severity="warn" class="p-1"
+                    [routerLink]="['/itinerary/edit', it.id]"></p-button>
+
+          <p-button icon="pi pi-trash" severity="danger" class="p-1"
+                    (click)="delete(it.id!)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Diálogo de detalles -->
+<p-dialog header="Detalles del Itinerario"
+          [(visible)]="detailsVisible"
+          [modal]="true"
+          [style]="{width: '40rem'}"
+          [closable]="true">
+  <div *ngIf="selectedItinerary" class="space-y-2">
+    <p><strong>ID:</strong> {{ selectedItinerary.id }}</p>
+    <p><strong>Ruta:</strong> #{{ selectedItinerary.routeId }}</p>
+    <p><strong>Fecha:</strong> {{ selectedItinerary.date | date:'yyyy-MM-dd' }}</p>
+    <p><strong>Salida:</strong> {{ selectedItinerary.departureTime }}</p>
+    <p><strong>Llegada:</strong> {{ selectedItinerary.arrivalTime }}</p>
+    <p><strong>Bus:</strong> {{ selectedItinerary.bus }}</p>
+    <p><strong>Conductor:</strong> {{ selectedItinerary.driver }}</p>
+    <p><strong>Estado:</strong> {{ selectedItinerary.status }}</p>
+    
+    <div>
+      <strong>Paradas:</strong>
+      <ul class="list-disc ml-6">
+        <li *ngFor="let stop of selectedItinerary.stopsSchedule">
+          {{ stop.time }} — {{ stop.stop }}
+        </li>
+      </ul>
+    </div>
+
+    <div *ngIf="selectedItinerary.notes">
+      <strong>Notas:</strong>
+      <p>{{ selectedItinerary.notes }}</p>
+    </div>
+  </div>
+</p-dialog>

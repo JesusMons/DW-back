@@ -1,0 +1,90 @@
+<div class="card">
+  <!-- Botón Crear -->
+  <div class="flex justify-end mb-4">
+    <p-button label="Crear Estudiante" severity="success" [routerLink]="['/student/add']"></p-button>
+  </div>
+
+  <!-- Tabla de Estudiantes -->
+  <p-table [value]="students" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Documento</th>
+        <th>Acudiente</th>
+        <th>Grado</th>
+        <th>Estado</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-s>
+      <tr>
+        <td>{{ s.id }}</td>
+        <td>{{ s.name }} {{ s.last_name }}</td>
+        <td>{{ s.document }}</td>
+        <td>{{ s.guardian }}</td>
+        <td>{{ s.grade || '-' }}</td>
+        <td>
+          <p-tag
+            [value]="s.status || 'ACTIVO'"
+            [severity]="
+              (s.status || 'ACTIVO') === 'ACTIVO' ? 'success' :
+              (s.status || '') === 'GRADUADO' ? 'info' :
+              'danger'
+            ">
+          </p-tag>
+        </td>
+        <td class="flex gap-2 justify-center w-20">
+          <p-button icon="pi pi-eye" severity="info" class="p-1" (click)="showDetails(s)"></p-button>
+          <p-button icon="pi pi-pencil" severity="warn" class="p-1" [routerLink]="['/student/edit', s.id]"></p-button>
+          <p-button icon="pi pi-trash" severity="danger" class="p-1" (click)="delete(s.id!)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Dialog Detalle -->
+<p-dialog header="Detalle del Estudiante" [(visible)]="detailsVisible" [modal]="true" [style]="{width: '40rem'}">
+  <div *ngIf="selected" class="space-y-2">
+    <p><strong>ID:</strong> {{ selected.id }}</p>
+    <p><strong>Nombre:</strong> {{ selected.name }} {{ selected.last_name }}</p>
+    <p><strong>Documento:</strong> {{ selected.document }}</p>
+    <p><strong>Acudiente:</strong> {{ selected.guardian }} ({{ selected.guardianPhone || 'N/D' }})</p>
+    <p><strong>Grado:</strong> {{ selected.grade || 'N/D' }}</p>
+    <p><strong>Dirección:</strong> {{ selected.address || 'N/D' }}</p>
+    <p><strong>Teléfono:</strong> {{ selected.phone || 'N/D' }}</p>
+    <p><strong>Email:</strong> {{ selected.email || 'N/D' }}</p>
+    <p>
+      <strong>Estado:</strong>
+      <p-tag
+        [value]="selected.status || 'ACTIVO'"
+        [severity]="
+          (selected.status || 'ACTIVO') === 'ACTIVO' ? 'success' :
+          (selected.status || '') === 'GRADUADO' ? 'info' :
+          'danger'
+        ">
+      </p-tag>
+    </p>
+
+    <div>
+      <strong>Alergias:</strong>
+      <div class="mt-1">
+        <span *ngIf="!selected.allergies?.length">Ninguna</span>
+        <ul *ngIf="selected.allergies?.length" class="list-disc ml-5">
+          <li *ngFor="let a of selected.allergies">{{ a }}</li>
+        </ul>
+      </div>
+    </div>
+
+    <div *ngIf="selected.emergencyContact">
+      <strong>Contacto de emergencia:</strong>
+      <p>{{ selected.emergencyContact?.name }} — {{ selected.emergencyContact?.phone }} ({{ selected.emergencyContact?.relationship }})</p>
+    </div>
+
+    <p class="text-xs text-gray-500">
+      Creado: {{ selected.createdAt | date:'short' }} · Actualizado: {{ selected.updatedAt | date:'short' }}
+    </p>
+  </div>
+</p-dialog>
