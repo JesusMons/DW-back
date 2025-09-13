@@ -1,0 +1,134 @@
+<div class="card">
+  <p-dataview #dv [value]="drivers()" [sortField]="sortField" [sortOrder]="sortOrder">
+    <!-- Header (filtros/orden) -->
+    <ng-template #header>
+      <div class="flex flex-col md:flex-row md:justify-between gap-3">
+        <h2 class="text-xl font-bold">Conductores</h2>
+
+        <div class="flex items-center gap-3">
+          <p-select
+            [options]="sortOptions"
+            [(ngModel)]="sortKey"
+            placeholder="Ordenar"
+            (onChange)="onSortChange($event)"
+          />
+          <a pButton routerLink="/driver/add" label="Crear" icon="pi pi-plus" severity="success"></a>
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- Lista -->
+    <ng-template #list let-items>
+      <div class="grid grid-cols-12 gap-4 grid-nogutter">
+        <div class="col-span-12" *ngFor="let item of items; let first = first">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
+            [ngClass]="{ 'border-t border-surface-200 dark:border-surface-700': !first }"
+          >
+            <!-- Foto + estado -->
+            <div class="md:w-40 relative">
+              <img
+                class="block xl:block mx-auto rounded-border w-full object-cover"
+                [src]="item.photoUrl || '/drivers/default.jpg'"
+                (error)="onImgError($event)"
+                [alt]="item.name"
+              />
+              <p-tag
+                [value]="item.status || 'INACTIVE'"
+                [severity]="getSeverity(item)"
+                class="dark:!bg-surface-900 absolute"
+                [style.left.px]="4"
+                [style.top.px]="4"
+              />
+            </div>
+
+            <!-- Datos -->
+            <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+              <div class="flex flex-row md:flex-col justify-between items-start gap-2">
+                <div>
+                  <span class="font-medium text-secondary text-sm">
+                    Licencia {{ item.type_licence }} ·
+                    <span *ngIf="item.licenceExpiry"> vence {{ item.licenceExpiry | date:'yyyy-MM-dd' }}</span>
+                    <span *ngIf="!item.licenceExpiry"> sin fecha</span>
+                  </span>
+
+                  <div class="text-lg font-medium text-surface-900 dark:text-surface-0 mt-2">
+                    {{ item.name }}
+                  </div>
+
+                  <div class="text-sm text-muted-color mt-1">
+                    <span *ngIf="item.phone"> {{ item.phone }} · </span>
+                    <span *ngIf="item.email"> {{ item.email }}</span>
+                  </div>
+
+                  <div class="text-sm text-muted-color mt-1">
+                    Bus asignado:
+                    <strong>{{ getBusPlate(item.assignedBusId) || (item.assignedBusId ? ('#' + item.assignedBusId) : 'N/D') }}</strong>
+                  </div>
+                </div>
+
+                <!-- "Rating" adaptado a experiencia -->
+                <div class="bg-surface-100 dark:bg-surface-700 p-1" style="border-radius: 30px">
+                  <div
+                    class="bg-surface-0 dark:bg-surface-900 flex items-center gap-2 justify-center py-1 px-2"
+                    style="border-radius: 30px; box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.04), 0px 1px 2px 0px rgba(0, 0, 0, 0.06)"
+                  >
+                    <span class="text-surface-900 dark:text-surface-0 font-medium text-sm">
+                      {{ item.experienceYears || 0 }} años
+                    </span>
+                    <i ></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Acciones -->
+              <div class="flex flex-col md:items-end gap-4">
+                <div class="flex flex-row-reverse md:flex-row gap-2">
+                  <button pButton icon="pi pi-eye" [outlined]="true" (click)="showDetails(item)"></button>
+                  <a pButton icon="pi pi-pencil" class="flex-auto md:flex-initial whitespace-nowrap" [routerLink]="['/driver/edit', item.id]"></a>
+                  <button pButton icon="pi pi-trash" severity="danger" (click)="delete(item.id!)"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </p-dataview>
+</div>
+
+<!-- Diálogo detalle -->
+<p-dialog header="Detalle del Conductor" [(visible)]="detailsVisible" [modal]="true" [style]="{width: '42rem'}">
+  <div *ngIf="selected" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="md:col-span-2 flex items-center gap-4">
+      <img
+        [src]="selected.photoUrl || '/drivers/default.jpg'"
+        (error)="onImgError($event)"
+        alt="Foto"
+        class="w-16 h-16 object-cover rounded-full border"
+      />
+      <div>
+        <div class="text-lg font-semibold">{{ selected.name }}</div>
+        <div class="text-sm text-gray-500" *ngIf="selected.email">{{ selected.email }}</div>
+      </div>
+    </div>
+
+    <div><strong>ID:</strong> {{ selected.id }}</div>
+    <div><strong>Documento:</strong> {{ selected.document || 'N/D' }}</div>
+    <div><strong>Teléfono:</strong> {{ selected.phone || 'N/D' }}</div>
+    <div><strong>Dirección:</strong> {{ selected.address || 'N/D' }}</div>
+    <div><strong>Licencia:</strong> {{ selected.type_licence }}</div>
+    <div><strong>Vence:</strong> {{ selected.licenceExpiry | date:'yyyy-MM-dd' }}</div>
+    <div><strong>Experiencia:</strong> {{ selected.experienceYears || 0 }} años</div>
+    <div><strong>Bus asignado:</strong> {{ selected.busPlate || (selected.assignedBusId ? ('#' + selected.assignedBusId) : 'N/D') }}</div>
+
+    <div class="md:col-span-2">
+      <strong>Estado:</strong>
+      <p-tag [value]="selected.status || 'INACTIVE'" [severity]="getSeverity(selected)"></p-tag>
+    </div>
+
+    <div class="md:col-span-2 text-xs text-gray-500">
+      Creado: {{ selected.createdAt | date:'short' }} · Actualizado: {{ selected.updatedAt | date:'short' }}
+    </div>
+  </div>
+</p-dialog>

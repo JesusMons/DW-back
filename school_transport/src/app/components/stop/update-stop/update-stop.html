@@ -1,0 +1,44 @@
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow">
+  <h2 class="text-xl font-bold mb-6">Editar Parada #{{ form?.id }}</h2>
+
+  <form *ngIf="form" (ngSubmit)="save()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Nombre -->
+    <div>
+      <label class="block font-semibold">Nombre</label>
+      <input [(ngModel)]="form.name" name="name" class="w-full border rounded px-3 py-2" required />
+    </div>
+
+    <!-- Dirección -->
+    <div>
+      <label class="block font-semibold">Dirección</label>
+      <input [(ngModel)]="form.direction" name="direction" class="w-full border rounded px-3 py-2" required />
+    </div>
+
+    <!-- Orden -->
+    <div>
+      <label class="block font-semibold">Orden</label>
+      <input type="number" [(ngModel)]="form.order" name="order" class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Punto de referencia -->
+    <div>
+      <label class="block font-semibold">Punto de referencia</label>
+      <input [(ngModel)]="form.landmark" name="landmark" class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Estado -->
+    <div>
+      <label class="block font-semibold">Estado</label>
+      <select [(ngModel)]="form.status" name="status" class="w-full border rounded px-3 py-2">
+        <option value="ACTIVA">ACTIVA</option>
+        <option value="INACTIVA">INACTIVA</option>
+      </select>
+    </div>
+
+    <!-- Acciones -->
+    <div class="md:col-span-2 flex justify-end gap-2">
+      <button pButton type="button" label="Cancelar" class="!bg-gray-500 !border-none" (click)="cancel()"></button>
+      <button pButton type="submit" label="Guardar" icon="pi pi-save" severity="primary"></button>
+    </div>
+  </form>
+</div>

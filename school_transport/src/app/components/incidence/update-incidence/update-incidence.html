@@ -1,0 +1,85 @@
+<div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow">
+  <h2 class="text-xl font-bold mb-6">Editar Incidencia #{{ form?.id }}</h2>
+
+  <form *ngIf="form" (ngSubmit)="save()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Bus -->
+    <div>
+      <label class="block font-semibold mb-1">Bus</label>
+      <select [(ngModel)]="form.busId" name="busId" class="w-full border rounded px-3 py-2">
+        <option [ngValue]="null" disabled>Seleccione un bus</option>
+        <option *ngFor="let b of busesOpts" [ngValue]="b.value">{{ b.label }}</option>
+      </select>
+    </div>
+
+    <!-- Ruta -->
+    <div>
+      <label class="block font-semibold mb-1">Ruta</label>
+      <select [(ngModel)]="form.routeId" name="routeId" class="w-full border rounded px-3 py-2">
+        <option [ngValue]="null" disabled>Seleccione una ruta</option>
+        <option *ngFor="let r of routesOpts" [ngValue]="r.value">{{ r.label }}</option>
+      </select>
+    </div>
+
+    <!-- Severidad -->
+    <div>
+      <label class="block font-semibold mb-1">Severidad</label>
+      <select [(ngModel)]="form.severity" name="severity" class="w-full border rounded px-3 py-2">
+        <option *ngFor="let s of severities" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+
+    <!-- Estado -->
+    <div>
+      <label class="block font-semibold mb-1">Estado</label>
+      <select [(ngModel)]="form.status" name="status" class="w-full border rounded px-3 py-2">
+        <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+
+    <!-- Reportada (fecha y hora) -->
+    <div>
+      <label class="block font-semibold mb-1">Fecha/Hora Reporte</label>
+      <input
+        type="datetime-local"
+        [value]="form.reportedAt ? (form.reportedAt | date:'yyyy-MM-ddTHH:mm') : null"
+        (change)="onReportedAtChange($event)"
+        class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Reportado por -->
+    <div>
+      <label class="block font-semibold mb-1">Reportado por</label>
+      <input [(ngModel)]="form.reportedBy" name="reportedBy" class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Descripción (full width) -->
+    <div class="md:col-span-2">
+      <label class="block font-semibold mb-1">Descripción</label>
+      <textarea [(ngModel)]="form.description" name="description" rows="4"
+                class="w-full border rounded px-3 py-2"></textarea>
+    </div>
+
+    <!-- Acciones tomadas (full width) -->
+    <div class="md:col-span-2">
+      <label class="block font-semibold mb-1">Acciones tomadas (opcional)</label>
+      <textarea [(ngModel)]="form.actionsTaken" name="actionsTaken" rows="3"
+                class="w-full border rounded px-3 py-2"></textarea>
+    </div>
+
+    <!-- Resuelta en (opcional) -->
+    <div class="md:col-span-2">
+      <label class="block font-semibold mb-1">Fecha/Hora de Resolución (opcional)</label>
+      <input
+        type="datetime-local"
+        [value]="form.resolvedAt ? (form.resolvedAt | date:'yyyy-MM-ddTHH:mm') : null"
+        (change)="onResolvedAtChange($event)"
+        class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Acciones -->
+    <div class="md:col-span-2 flex justify-end gap-2">
+      <button pButton type="button" label="Cancelar" class="!bg-gray-500 !border-none" (click)="cancel()"></button>
+      <button pButton type="submit" label="Guardar" icon="pi pi-save" severity="primary"></button>
+    </div>
+  </form>
+</div>

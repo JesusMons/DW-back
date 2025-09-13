@@ -59,17 +59,49 @@ export class Aside implements OnInit {
         label: 'Formulario',
         icon: 'pi pi-file-edit',
         items: [
-          { label: 'Inscribirse',        icon: 'pi pi-file-edit', routerLink: ['/formulario'] },
-          { label: 'Ver inscripciones',  icon: 'pi pi-list',      routerLink: ['/listado-inscripciones'] }
+          { label: 'Ver inscripciones', icon: 'pi pi-file-edit', routerLink: ['/assistance'] },
+          { label: 'Inscriibirse', icon: 'pi pi-list', routerLink: ['/assistance/add'] }
         ]
       },
       {
         label: 'Buses',
         icon: 'pi pi-car',
         items: [
-          // ajusta estos paths a los reales de tu app
-          { label: 'Conductores', icon: 'pi pi-users', routerLink: ['/conductores'] },
-          { label: 'Incidencias', icon: 'pi pi-info-circle', routerLink: ['/incidencias'] }
+          { label: 'Buses', icon: 'pi pi-users', routerLink: ['/bus'] },
+          { label: 'Añadir bus', icon: 'pi pi-users', routerLink: ['/bus/add'] },
+          { label: 'Incidencias', icon: 'pi pi-info-circle', routerLink: ['/incidence'] }
+        ]
+      },
+      {
+        label: 'Paradas',
+        icon: 'pi pi-map-marker',
+        items: [
+          { label: 'Parada', icon: 'pi pi-map-marker', routerLink: ['/parada'] },
+          { label: 'Crear parada', icon: 'pi pi-th-large', routerLink: ['/parada/add'] }
+        ]
+      },
+      {
+        label: 'Conductor',
+        icon: 'pi pi-gauge',
+        items: [
+          { label: 'Conductor', icon: 'pi pi-gauge', routerLink: ['/driver'] },
+          { label: 'Crear conductor', icon: 'pi pi-th-large', routerLink: ['/driver/add'] }
+        ]
+      },
+      {
+        label: 'Asignacion de rutas',
+        icon: 'pi pi-gauge',
+        items: [
+          { label: 'Ver asignaciones', icon: 'pi pi-gauge', routerLink: ['/route-assignment'] },
+          { label: 'Crear asignacion', icon: 'pi pi-th-large', routerLink: ['/route-assignment/add'] }
+        ]
+      },
+      {
+        label: 'Mantenimiento Bus',
+        icon: 'pi pi-cog',
+        items: [
+          { label: 'Mantenimientos', icon: 'pi pi-cog', routerLink: ['/mantenimiento'] },
+          { label: 'Añadir mantenimiento', icon: 'pi pi-users', routerLink: ['/mantenimiento/add'] }
         ]
       }
     ];

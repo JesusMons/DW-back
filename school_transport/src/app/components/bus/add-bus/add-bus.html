@@ -1,0 +1,88 @@
+<div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow">
+  <h2 class="text-xl font-bold mb-6">Registrar Bus</h2>
+
+  <form (ngSubmit)="save()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Placa -->
+    <div>
+      <label class="block font-semibold">Placa</label>
+      <input [(ngModel)]="form.plate" name="plate" class="w-full border rounded px-3 py-2 uppercase" required />
+    </div>
+
+    <!-- Capacidad -->
+    <div>
+      <label class="block font-semibold">Capacidad</label>
+      <input type="number" [(ngModel)]="form.capacity" name="capacity" class="w-full border rounded px-3 py-2" required />
+    </div>
+
+    <!-- Kilometraje -->
+    <div>
+      <label class="block font-semibold">Kilometraje</label>
+      <input type="number" [(ngModel)]="form.mileage" name="mileage" class="w-full border rounded px-3 py-2" required />
+    </div>
+
+    <!-- Marca -->
+    <div>
+      <label class="block font-semibold">Marca</label>
+      <input [(ngModel)]="form.brand" name="brand" class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Modelo -->
+    <div>
+      <label class="block font-semibold">Modelo</label>
+      <input [(ngModel)]="form.model" name="model" class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Año -->
+    <div>
+      <label class="block font-semibold">Año</label>
+      <input type="number" [(ngModel)]="form.year" name="year" class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Color -->
+    <div>
+      <label class="block font-semibold">Color</label>
+      <input [(ngModel)]="form.color" name="color" class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Estado -->
+    <div>
+      <label class="block font-semibold">Estado</label>
+      <select [(ngModel)]="form.status" name="status" class="w-full border rounded px-3 py-2">
+        <option value="ACTIVO">ACTIVO</option>
+        <option value="INACTIVO">INACTIVO</option>
+        <option value="EN MANTENIMIENTO">EN MANTENIMIENTO</option>
+      </select>
+    </div>
+
+    <!-- Fechas -->
+    <div>
+      <label class="block font-semibold">Vencimiento Seguro</label>
+      <input type="date"
+             [value]="form.insuranceExpiry ? (form.insuranceExpiry | date:'yyyy-MM-dd') : null"
+             (change)="onDateChange('insuranceExpiry', $event)"
+             class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <div>
+      <label class="block font-semibold">Último Mantenimiento</label>
+      <input type="date"
+             [value]="form.lastMaintenance ? (form.lastMaintenance | date:'yyyy-MM-dd') : null"
+             (change)="onDateChange('lastMaintenance', $event)"
+             class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <div>
+      <label class="block font-semibold">Próximo Mantenimiento</label>
+      <input type="date"
+             [value]="form.nextMaintenance ? (form.nextMaintenance | date:'yyyy-MM-dd') : null"
+             (change)="onDateChange('nextMaintenance', $event)"
+             class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Acciones -->
+    <div class="md:col-span-2 flex justify-end gap-2">
+      <button pButton type="button" label="Cancelar" class="!bg-gray-500 !border-none" (click)="cancel()"></button>
+      <button pButton type="submit" label="Guardar" icon="pi pi-save" severity="primary"></button>
+    </div>
+  </form>
+</div>

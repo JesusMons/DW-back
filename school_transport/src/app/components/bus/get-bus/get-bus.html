@@ -1,0 +1,71 @@
+<div class="card">
+  <!-- Título -->
+  <h2 class="text-2xl font-bold mb-4 text-gray-700">Listado de Buses</h2>
+
+  <!-- Botón Crear -->
+  <div class="flex justify-end mb-4">
+    <p-button label="Crear Bus" severity="success" [routerLink]="['/bus/add']"></p-button>
+  </div>
+
+  <!-- Tabla -->
+  <p-table [value]="buses" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>ID</th>
+        <th>Placa</th>
+        <th>Capacidad</th>
+        <th>Kilometraje</th>
+        <th>Marca / Modelo</th>
+        <th>Año</th>
+        <th>Color</th>
+        <th>Estado</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-b>
+      <tr>
+        <td>{{ b.id }}</td>
+        <td>{{ b.plate }}</td>
+        <td>{{ b.capacity }}</td>
+        <td>{{ b.mileage | number }}</td>
+        <td>{{ b.brand || '-' }} / {{ b.model || '-' }}</td>
+        <td>{{ b.year || '-' }}</td>
+        <td>{{ b.color || '-' }}</td>
+        <td>
+          <p-tag [value]="b.status || 'INACTIVO'" [severity]="statusSeverity(b.status)"></p-tag>
+        </td>
+        <td class="flex gap-2 justify-center">
+          <p-button icon="pi pi-eye" severity="info" class="p-1" (click)="showDetails(b)"></p-button>
+          <p-button icon="pi pi-pencil" severity="warn" class="p-1" [routerLink]="['/bus/edit', b.id]"></p-button>
+          <p-button icon="pi pi-trash" severity="danger" class="p-1" (click)="delete(b.id!)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Diálogo Detalle -->
+<p-dialog header="Detalle del Bus" [(visible)]="detailsVisible" [modal]="true" [style]="{width: '42rem'}">
+  <div *ngIf="selected" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div><strong>ID:</strong> {{ selected.id }}</div>
+    <div><strong>Placa:</strong> {{ selected.plate }}</div>
+    <div><strong>Capacidad:</strong> {{ selected.capacity }}</div>
+    <div><strong>Kilometraje:</strong> {{ selected.mileage | number }}</div>
+    <div><strong>Marca:</strong> {{ selected.brand || 'N/D' }}</div>
+    <div><strong>Modelo:</strong> {{ selected.model || 'N/D' }}</div>
+    <div><strong>Año:</strong> {{ selected.year || 'N/D' }}</div>
+    <div><strong>Color:</strong> {{ selected.color || 'N/D' }}</div>
+    <div class="md:col-span-2">
+      <strong>Estado:</strong>
+      <p-tag [value]="selected.status || 'INACTIVO'" [severity]="statusSeverity(selected.status)"></p-tag>
+    </div>
+    <div><strong>Vence Seguro:</strong> {{ selected.insuranceExpiry | date:'yyyy-MM-dd' }}</div>
+    <div><strong>Último Manto.:</strong> {{ selected.lastMaintenance | date:'yyyy-MM-dd' }}</div>
+    <div><strong>Próximo Manto.:</strong> {{ selected.nextMaintenance | date:'yyyy-MM-dd' }}</div>
+
+    <div class="md:col-span-2 text-xs text-gray-500">
+      Creado: {{ selected.createdAt | date:'short' }} · Actualizado: {{ selected.updatedAt | date:'short' }}
+    </div>
+  </div>
+</p-dialog>

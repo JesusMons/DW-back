@@ -1,0 +1,69 @@
+<div class="card">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-bold text-gray-700">Mantenimientos de Buses</h2>
+    <button pButton label="Nuevo Mantenimiento" icon="pi pi-plus" severity="success" [routerLink]="['/mantenimiento/add']"></button>
+  </div>
+
+  <p-table [value]="rows" [tableStyle]="{ 'min-width': '72rem' }" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>ID</th>
+        <th>Bus</th>
+        <th>Tipo</th>
+        <th>Descripción</th>
+        <th>Costo</th>
+        <th>Fecha</th>
+        <th>Próximo</th>
+        <th>Estado</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-r>
+      <tr>
+        <td>{{ r.id }}</td>
+        <td>{{ r.busPlate }}</td>
+        <td>{{ typeLabel(r.type) }}</td>
+        <td class="max-w-80 truncate" title="{{ r.description }}">{{ r.description }}</td>
+        <td>{{ r.cost ? (r.cost | currency:'COP':'symbol-narrow') : '-' }}</td>
+        <td>{{ r.performedAt | date:'yyyy-MM-dd' }}</td>
+        <td>{{ r.nextDueDate ? (r.nextDueDate | date:'yyyy-MM-dd') : '—' }}</td>
+        <td><p-tag [value]="r.status" [severity]="statusSeverity(r.status)"></p-tag></td>
+
+        <td class="flex gap-2 justify-center">
+          <button pButton icon="pi pi-eye" severity="info" class="p-1" (click)="showDetails(r)"></button>
+          <button pButton icon="pi pi-pencil" severity="warn" class="p-1" [routerLink]="['/mantenimiento/edit', r.id]"></button>
+          <button pButton icon="pi pi-trash" severity="danger" class="p-1" (click)="delete(r)"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Modal Detalle -->
+<p-dialog header="Detalle de Mantenimiento" [(visible)]="detailVisible" [modal]="true" [style]="{ width: '40rem' }">
+  <div *ngIf="selected" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <div><b>ID:</b> {{ selected.id }}</div>
+    <div><b>Bus:</b> {{ selected.busPlate }} (#{{ selected.busId }})</div>
+
+    <div><b>Tipo:</b> {{ typeLabel(selected.type) }}</div>
+    <div><b>Estado:</b> {{ selected.status }}</div>
+
+    <div class="md:col-span-2"><b>Descripción:</b> {{ selected.description }}</div>
+
+    <div><b>Costo:</b> {{ selected.cost ? (selected.cost | currency:'COP':'symbol-narrow') : '-' }}</div>
+    <div><b>Odómetro:</b> {{ selected.odometer ?? '—' }}</div>
+
+    <div><b>Realizado:</b> {{ selected.performedAt | date:'yyyy-MM-dd' }}</div>
+    <div><b>Próximo:</b> {{ selected.nextDueDate ? (selected.nextDueDate | date:'yyyy-MM-dd') : '—' }}</div>
+
+    <div class="md:col-span-2 text-xs text-gray-500">
+      Creado: {{ selected.createdAt | date:'short' }} · Actualizado: {{ selected.updatedAt | date:'short' }}
+    </div>
+
+    <div class="md:col-span-2 flex justify-end gap-2 mt-2">
+      <button pButton label="Cerrar" (click)="detailVisible=false"></button>
+      <button pButton label="Editar" icon="pi pi-pencil" severity="warn" [routerLink]="['/mantenimiento/edit', selected.id]"></button>
+    </div>
+  </div>
+</p-dialog>

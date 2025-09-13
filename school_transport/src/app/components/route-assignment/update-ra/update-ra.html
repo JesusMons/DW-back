@@ -1,0 +1,62 @@
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow">
+  <h2 class="text-xl font-bold mb-6">Editar Asignación #{{ form?.id }}</h2>
+
+  <form *ngIf="form" (ngSubmit)="save()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Ruta -->
+    <div>
+      <label class="block font-semibold mb-1">Ruta *</label>
+      <select [(ngModel)]="form.routeId" name="routeId" class="w-full border rounded px-3 py-2" required>
+        <option [ngValue]="undefined">Seleccione una ruta</option>
+        <option *ngFor="let r of routes" [ngValue]="r.id">{{ r.name }} — #{{ r.id }}</option>
+      </select>
+    </div>
+
+    <!-- Bus -->
+    <div>
+      <label class="block font-semibold mb-1">Bus *</label>
+      <select [(ngModel)]="form.busId" name="busId" class="w-full border rounded px-3 py-2" required>
+        <option [ngValue]="undefined">Seleccione un bus</option>
+        <option *ngFor="let b of buses" [ngValue]="b.id">{{ b.plate }} — #{{ b.id }}</option>
+      </select>
+    </div>
+
+    <!-- Conductor (opcional) -->
+    <div class="md:col-span-2">
+      <label class="block font-semibold mb-1">Conductor (opcional)</label>
+      <select [(ngModel)]="form.driverId" name="driverId" class="w-full border rounded px-3 py-2">
+        <option [ngValue]="undefined">Sin asignar</option>
+        <option *ngFor="let d of drivers" [ngValue]="d.id">{{ d.name }} — #{{ d.id }}</option>
+      </select>
+    </div>
+
+    <!-- Fechas -->
+    <div>
+      <label class="block font-semibold mb-1">Fecha de inicio *</label>
+      <input type="date" class="w-full border rounded px-3 py-2" [value]="startInput" (change)="onStartChange($event)" required />
+    </div>
+
+    <div>
+      <label class="block font-semibold mb-1">Fecha de fin (opcional)</label>
+      <input type="date" class="w-full border rounded px-3 py-2" [value]="endInput" (change)="onEndChange($event)" />
+    </div>
+
+    <!-- Estado -->
+    <div class="md:col-span-2">
+      <label class="block font-semibold mb-1">Estado</label>
+      <select [(ngModel)]="form.status" name="status" class="w-full border rounded px-3 py-2">
+        <option value="ACTIVO">ACTIVO</option>
+        <option value="INACTIVO">INACTIVO</option>
+      </select>
+      <p class="text-xs text-gray-500 mt-1">
+        Nota: este editor <b>actualiza</b> la asignación existente. Si necesitas “activar” una nueva y cerrar la previa,
+        usa el formulario de creación o una acción específica de activar con reglas de negocio.
+      </p>
+    </div>
+
+    <!-- Acciones -->
+    <div class="md:col-span-2 flex justify-end gap-2 mt-2">
+      <button pButton type="button" label="Cancelar" class="!bg-gray-500 !border-none" (click)="cancel()"></button>
+      <button pButton type="submit" label="Guardar" icon="pi pi-save" severity="primary"></button>
+    </div>
+  </form>
+</div>

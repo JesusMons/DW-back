@@ -1,0 +1,81 @@
+<div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow">
+  <h2 class="text-xl font-bold mb-6">Nuevo Mantenimiento</h2>
+
+  <form (ngSubmit)="save()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Bus -->
+    <div>
+      <label class="block font-semibold mb-1">Bus *</label>
+      <select [(ngModel)]="form.busId" name="busId" required class="w-full border rounded px-3 py-2">
+        <option [ngValue]="undefined">Seleccione un bus</option>
+        <option *ngFor="let b of buses" [ngValue]="b.id">{{ b.plate }} — #{{ b.id }}</option>
+      </select>
+    </div>
+
+    <!-- Tipo -->
+    <div>
+      <label class="block font-semibold mb-1">Tipo *</label>
+      <select [(ngModel)]="form.type" name="type" required class="w-full border rounded px-3 py-2">
+        <option value="PREVENTIVO">PREVENTIVO</option>
+        <option value="CORRECTIVO">CORRECTIVO</option>
+        <option value="INSPECCION">INSPECCIÓN</option>
+      </select>
+    </div>
+
+    <!-- Descripción -->
+    <div class="md:col-span-2">
+      <label class="block font-semibold mb-1">Descripción *</label>
+      <textarea [(ngModel)]="form.description" name="description" rows="3" required
+                class="w-full border rounded px-3 py-2"></textarea>
+    </div>
+
+    <!-- Costo -->
+    <div>
+      <label class="block font-semibold mb-1">Costo (COP)</label>
+      <input type="number" min="0" step="1000" [(ngModel)]="form.cost" name="cost"
+             class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Odómetro -->
+    <div>
+      <label class="block font-semibold mb-1">Odómetro (km)</label>
+      <input type="number" min="0" step="1" [(ngModel)]="form.odometer" name="odometer"
+             class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Realizado -->
+    <div>
+      <label class="block font-semibold mb-1">Fecha realizada *</label>
+      <input type="date" [value]="performedAtInput" (change)="onPerformedChange($event)"
+             required class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Próximo vencimiento -->
+    <div>
+      <label class="block font-semibold mb-1">Próxima fecha</label>
+      <input type="date" [value]="nextDueInput" (change)="onNextDueChange($event)"
+             class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Mecánico -->
+    <div>
+      <label class="block font-semibold mb-1">Mecánico / Taller</label>
+      <input [(ngModel)]="form.mechanic" name="mechanic" class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <!-- Estado -->
+    <div>
+      <label class="block font-semibold mb-1">Estado *</label>
+      <select [(ngModel)]="form.status" name="status" required class="w-full border rounded px-3 py-2">
+        <option value="PENDIENTE">PENDIENTE</option>
+        <option value="EN PROGRESO">EN PROGRESO</option>
+        <option value="COMPLETADO">COMPLETADO</option>
+      </select>
+    </div>
+
+    <!-- Acciones -->
+    <div class="md:col-span-2 flex justify-end gap-2 mt-2">
+      <button pButton type="button" label="Cancelar" class="!bg-gray-500 !border-none" (click)="cancel()"></button>
+      <button pButton type="submit" label="Guardar" icon="pi pi-save" severity="primary"></button>
+    </div>
+  </form>
+</div>

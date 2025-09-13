@@ -1,0 +1,89 @@
+<div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow">
+  <h2 class="text-xl font-bold mb-6">Registrar Asistencia</h2>
+
+  <form (ngSubmit)="save()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Ruta -->
+    <div class="md:col-span-2">
+      <label class="block font-semibold mb-1">Ruta *</label>
+      <select [(ngModel)]="form.routeId" name="routeId" class="w-full border rounded px-3 py-2" required (change)="onRouteChange()">
+        <option [ngValue]="undefined">Seleccione una ruta</option>
+        <option *ngFor="let r of routes" [ngValue]="r.id">{{ r.name }} — #{{ r.id }}</option>
+      </select>
+
+      <!-- DISPONIBILIDAD DE BUSES PARA LA RUTA -->
+      <div *ngIf="routeAssignments?.length" class="mt-3 border rounded p-3 bg-gray-50">
+        <h3 class="font-semibold mb-2">Buses disponibles y fechas de asignación</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <div *ngFor="let a of routeAssignments" class="p-2 rounded border bg-white">
+            <div class="text-sm"><span class="font-semibold">Bus:</span> {{ busPlate(a.busId) }} (#{{ a.busId }})</div>
+            <div class="text-sm">
+              <span class="font-semibold">Desde:</span> {{ a.startDate | date:'yyyy-MM-dd' }}
+              <span class="ml-2 font-semibold">Hasta:</span> {{ a.endDate ? (a.endDate | date:'yyyy-MM-dd') : '—' }}
+            </div>
+            <div class="text-xs mt-1">
+              <span class="px-2 py-0.5 rounded"
+                    [class.bg-green-100]="a.status==='ACTIVO'"
+                    [class.text-green-800]="a.status==='ACTIVO'"
+                    [class.bg-red-100]="a.status!=='ACTIVO'"
+                    [class.text-red-800]="a.status!=='ACTIVO'">
+                {{ a.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">
+          * La lista de buses se filtra automáticamente con la fecha elegida más abajo.
+        </p>
+      </div>
+    </div>
+
+    <!-- Fecha -->
+    <div>
+      <label class="block font-semibold mb-1">Fecha *</label>
+      <input type="date" class="w-full border rounded px-3 py-2" [value]="dateInput" (change)="onDateChange($event)" required />
+    </div>
+
+    <!-- Hora -->
+    <div>
+      <label class="block font-semibold mb-1">Hora *</label>
+      <input type="time" class="w-full border rounded px-3 py-2" [value]="timeInput" (change)="onTimeChange($event)" required />
+    </div>
+
+    <!-- Bus (filtrado por ruta + fecha) -->
+    <div>
+      <label class="block font-semibold mb-1">Bus *</label>
+      <select [(ngModel)]="form.busId" name="busId" class="w-full border rounded px-3 py-2" required [disabled]="!form.routeId">
+        <option [ngValue]="undefined">Seleccione un bus</option>
+        <option *ngFor="let b of filteredBuses" [ngValue]="b.id">{{ b.plate }} — #{{ b.id }}</option>
+      </select>
+      <p *ngIf="form.routeId && !filteredBuses.length" class="text-xs text-amber-700 mt-1">
+        No hay buses asignados para la ruta en la fecha seleccionada.
+      </p>
+    </div>
+
+    <!-- Estudiante -->
+    <div class="md:col-span-2">
+      <label class="block font-semibold mb-1">Estudiante *</label>
+      <select [(ngModel)]="form.studentId" name="studentId" class="w-full border rounded px-3 py-2" required>
+        <option [ngValue]="undefined">Seleccione un estudiante</option>
+        <option *ngFor="let s of students" [ngValue]="s.id">#{{ s.id }} — {{ s.name }} {{ s.last_name || '' }}</option>
+      </select>
+    </div>
+
+    <!-- Estado -->
+    <div class="md:col-span-2">
+      <label class="block font-semibold mb-1">Estado</label>
+      <select [(ngModel)]="form.status" name="status" class="w-full border rounded px-3 py-2">
+        <option value="CONFIRMADO">CONFIRMADO</option>
+        <option value="AUSENTE">AUSENTE</option>
+        <option value="CANCELADO">CANCELADO</option>
+      </select>
+    </div>
+
+    <!-- Acciones -->
+    <div class="md:col-span-2 flex justify-end gap-2 mt-2">
+      <button pButton type="button" label="Cancelar" class="!bg-gray-500 !border-none" (click)="cancel()"></button>
+      <button pButton type="submit" label="Guardar" icon="pi pi-save" severity="primary"></button>
+    </div>
+  </form>
+</div>
