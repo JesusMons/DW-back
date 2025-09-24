@@ -1,53 +1,69 @@
-import { Sequelize } from "sequelize";
-import dotenv from "dotenv";
+import { Sequelize } from 'sequelize';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
-const dbConfig = {
-  mysql: {
-    dialect: "mysql",
-    host: process.env.DB_HOST || "localhost",
-    username: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_NAME || "test",
-    port: parseInt(process.env.DB_PORT || "3306")
-  },
-  postgres: {
-    dialect: "postgres",
-    host: process.env.DB_HOST || "localhost",
-    username: process.env.DB_USER || "postgres",
-    password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_NAME || "test",
-    port: parseInt(process.env.DB_PORT || "5432")
-  },
-  mssql: {
-    dialect: "mssql",
-    host: process.env.DB_HOST || "localhost",
-    username: process.env.DB_USER || "sa",
-    password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_NAME || "test",
-    port: parseInt(process.env.DB_PORT || "1433")
-  },
-  oracle: {
-    dialect: "oracle",
-    host: process.env.DB_HOST || "localhost",
-    username: process.env.DB_USER || "oracle",
-    password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_NAME || "test",
-    port: parseInt(process.env.DB_PORT || "1521")
-  },
-};
+let dbConfig: any = {};
 
-// Select the database engine from the .env file
-const dbEngine = process.env.DB_ENGINE || "mysql";
-const config = dbConfig[dbEngine as keyof typeof dbConfig];
-
-if (!config) {
-  throw new Error(`Unsupported DB_ENGINE: ${dbEngine}`);
+switch (process.env.DB_DIALECT) {
+  case 'postgres':
+    dbConfig = {
+      database: process.env.PG_NAME,
+      username: process.env.PG_USER,
+      password: process.env.PG_PASS,
+      host: process.env.PG_HOST,
+      port: Number(process.env.PG_PORT) || 5432,
+      dialect: 'postgres',
+      timezone: process.env.DB_TIMEZONE || 'America/Bogota',
+    };
+    break;
+  case 'mssql':
+    dbConfig = {
+      database: process.env.MSSQL_NAME,
+      username: process.env.MSSQL_USER,
+      password: process.env.MSSQL_PASS,
+      host: process.env.MSSQL_HOST,
+      port: Number(process.env.MSSQL_PORT) || 1433,
+      dialect: 'mssql',
+      timezone: process.env.DB_TIMEZONE || 'America/Bogota',
+      dialectOptions: {
+        options: {
+          encrypt: false,
+        }
+      }
+    };
+    break;
+  case 'oracle':
+    dbConfig = {
+      database: process.env.ORACLE_NAME,
+      username: process.env.ORACLE_USER,
+      password: process.env.ORACLE_PASS,
+      host: process.env.ORACLE_HOST,
+      port: Number(process.env.ORACLE_PORT) || 1521,
+      dialect: 'oracle',
+      dialectOptions: {
+        connectString: `${process.env.ORACLE_HOST}:${process.env.ORACLE_PORT}/${process.env.ORACLE_SID}`
+      },
+      timezone: process.env.DB_TIMEZONE || 'America/Bogota',
+    };
+    break;
+  default: // mysql
+    dbConfig = {
+      database: process.env.DB_NAME,
+      username: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT) || 3306,
+      dialect: 'mysql',
+      timezone: process.env.DB_TIMEZONE || 'America/Bogota',
+    };
 }
 
-// Create the Sequelize instance
-export const sequelize = new Sequelize(config.database, config.username, config.password, {
-  host: config.host,
-  dialect: config.dialect as any,
-});
+const db = new Sequelize(
+  dbConfig.database,
+  dbConfig.username,
+  dbConfig.password,
+  dbConfig
+);
+
+export default db;

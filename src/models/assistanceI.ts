@@ -1,13 +1,16 @@
 import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../database/db";
+import sequelize from "../database/db";
+import { Student } from "./studentI";
+import { Route } from "./RouteI";
+import { Bus } from "./busI";
 
 export interface AssistanceI {
   id?: number;
-  studentId: number;   // referencia a studentI
-  routeId: number;     // referencia a RouteI
-  busId: number;       // referencia a busI
-  date: Date;          // día de la asistencia
-  time: string;        // hora de confirmación
+  student_id: number;
+  route_id: number;
+  bus_id: number;
+  date: Date;
+  time: string;
   status: "CONFIRMADO" | "AUSENTE" | "CANCELADO";
   createdAt?: Date;
   updatedAt?: Date;
@@ -15,9 +18,9 @@ export interface AssistanceI {
 
 export class Assistance extends Model implements AssistanceI {
   public id!: number;
-  public studentId!: number;
-  public routeId!: number;
-  public busId!: number;
+  public student_id!: number;
+  public route_id!: number;
+  public bus_id!: number;
   public date!: Date;
   public time!: string;
   public status!: "CONFIRMADO" | "AUSENTE" | "CANCELADO";
@@ -27,18 +30,6 @@ export class Assistance extends Model implements AssistanceI {
 
 Assistance.init(
   {
-    studentId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    routeId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    busId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
     date: {
       type: DataTypes.DATEONLY,
       allowNull: false,
@@ -59,6 +50,37 @@ Assistance.init(
     sequelize,
     modelName: "Assistance",
     tableName: "assistances",
-    timestamps: true, // createdAt y updatedAt
+    timestamps: true,
   }
 );
+
+// 🔗 Relaciones
+Student.hasMany(Assistance, {
+  foreignKey: "student_id",
+  sourceKey: "id",
+});
+
+Assistance.belongsTo(Student, {
+  foreignKey: "student_id",
+  targetKey: "id",
+});
+
+Route.hasMany(Assistance, {
+  foreignKey: "route_id",
+  sourceKey: "id",
+});
+
+Assistance.belongsTo(Route, {
+  foreignKey: "route_id",
+  targetKey: "id",
+});
+
+Bus.hasMany(Assistance, {
+  foreignKey: "bus_id",
+  sourceKey: "id",
+});
+
+Assistance.belongsTo(Bus, {
+  foreignKey: "bus_id",
+  targetKey: "id",
+});

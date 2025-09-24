@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+/* import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../database/db";
 
 export interface DriverI {
@@ -107,3 +107,4 @@ Driver.init(
     timestamps: true, // Sequelize genera createdAt y updatedAt
   }
 );
+ */
