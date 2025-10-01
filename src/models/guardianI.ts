@@ -1,7 +1,7 @@
 import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../database/db";
+import sequelize from "../database/db";
 
-export interface GuardianI {
+export interface guardianI {
   id?: number;
   firstName: string;
   lastName: string;
@@ -10,13 +10,13 @@ export interface GuardianI {
   email?: string;
   relationship: string;
   address?: string;
-  students?: number[]; // relación con estudiantes
+  students?: number[]; // JSON
   status?: "ACTIVO" | "INACTIVO";
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export class Guardian extends Model implements GuardianI {
+export class Guardian extends Model implements guardianI {
   public id!: number;
   public firstName!: string;
   public lastName!: string;
@@ -26,65 +26,24 @@ export class Guardian extends Model implements GuardianI {
   public relationship!: string;
   public address?: string;
   public students?: number[];
-  public status?: "ACTIVO" | "INACTIVO";
-
+  public status!: "ACTIVO" | "INACTIVO";
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
 
 Guardian.init(
   {
-    firstName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: { msg: "El nombre no puede estar vacío" },
-      },
-    },
-    lastName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: { msg: "El apellido no puede estar vacío" },
-      },
-    },
-    document: {
-      type: DataTypes.BIGINT, // permite cédulas largas
-      allowNull: false,
-      unique: true,
-    },
-    phone: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        len: { args: [7, 15], msg: "El teléfono debe tener entre 7 y 15 caracteres" },
-      },
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      unique: true,
-      validate: {
-        isEmail: { msg: "Debe ser un correo válido" },
-      },
-    },
-    relationship: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    address: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    status: {
-      type: DataTypes.ENUM("ACTIVO", "INACTIVO"),
-      defaultValue: "ACTIVO",
-    },
+    firstName: { type: DataTypes.STRING(80), allowNull: false },
+    lastName: { type: DataTypes.STRING(80), allowNull: false },
+    document: { type: DataTypes.BIGINT, allowNull: false, unique: true },
+    phone: { type: DataTypes.STRING(30), allowNull: false },
+    email: { type: DataTypes.STRING(120), validate: { isEmail: true } },
+    relationship: { type: DataTypes.STRING(50), allowNull: false },
+    address: DataTypes.STRING(200),
+    students: DataTypes.JSON,
+    status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), defaultValue: "ACTIVO" },
   },
-  {
-    sequelize,
-    modelName: "Guardian",
-    tableName: "guardians",
-    timestamps: true, // crea createdAt y updatedAt
-  }
+  { sequelize, modelName: "Guardian", tableName: "guardians", timestamps: true }
 );
+
+// (Sin FKs físicas en tu diseño actual)

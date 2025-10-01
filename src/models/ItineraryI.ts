@@ -1,15 +1,17 @@
 import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../database/db";
+import sequelize from "../database/db";
+import { Route } from "./RouteI";
+import { Bus } from "./busI";
 
 export interface ItineraryI {
   id?: number;
-  routeId: number; // Relación con RouteI
+  routeId: number;
   date: Date;
   departureTime: string;
   arrivalTime: string;
   stopsSchedule: { stop: string; time: string }[];
   driver: string;
-  bus: number;
+  busId: number;
   status: "PLANEADO" | "EN PROGRESO" | "COMPLETADO" | "CANCELADO";
   notes?: string;
   createdAt?: Date;
@@ -24,10 +26,8 @@ export class Itinerary extends Model implements ItineraryI {
   public arrivalTime!: string;
   public stopsSchedule!: { stop: string; time: string }[];
   public driver!: string;
-  public bus!: number;
+  public busId!: number;
   public status!: "PLANEADO" | "EN PROGRESO" | "COMPLETADO" | "CANCELADO";
-  public notes?: string;
-
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -37,53 +37,52 @@ Itinerary.init(
     routeId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: { model: "routes", key: "id" },
+      onUpdate: "CASCADE",
+      onDelete: "RESTRICT",
+      field: "route_id",
     },
-    date: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
+    date: { type: DataTypes.DATEONLY, allowNull: false },
     departureTime: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(5),
       allowNull: false,
-      validate: {
-        notEmpty: { msg: "La hora de salida no puede estar vacía" },
-      },
+      validate: { is: /^\d{2}:\d{2}$/ },
     },
     arrivalTime: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(5),
       allowNull: false,
-      validate: {
-        notEmpty: { msg: "La hora de llegada no puede estar vacía" },
-      },
+      validate: { is: /^\d{2}:\d{2}$/ },
     },
-    stopsSchedule: {
-      type: DataTypes.JSON, // Guardamos un array [{ stop, time }]
-      allowNull: false,
-      validate: {
-        notEmpty: { msg: "Debe tener al menos una parada" },
-      },
-    },
-    driver: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    bus: {
+    stopsSchedule: { type: DataTypes.JSON, allowNull: false },
+    driver: { type: DataTypes.STRING(120), allowNull: false },
+    busId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: { model: "buses", key: "id" },
+      onUpdate: "CASCADE",
+      onDelete: "RESTRICT",
+      field: "bus_id",
     },
     status: {
       type: DataTypes.ENUM("PLANEADO", "EN PROGRESO", "COMPLETADO", "CANCELADO"),
       defaultValue: "PLANEADO",
     },
-    notes: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
+    notes: DataTypes.TEXT,
   },
   {
     sequelize,
     modelName: "Itinerary",
     tableName: "itineraries",
-    timestamps: true, // Sequelize genera createdAt y updatedAt
+    timestamps: true,
+    indexes: [
+      { fields: ["route_id"] },
+      { fields: ["bus_id"] },
+      { fields: ["status"] },
+      { fields: ["date"] },
+    ],
   }
 );
+
+// Asociaciones
+Itinerary.belongsTo(Route, { foreignKey: "routeId", targetKey: "id", as: "route" });
+Itinerary.belongsTo(Bus, { foreignKey: "busId", targetKey: "id", as: "bus" });

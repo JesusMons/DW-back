@@ -1,0 +1,1 @@
+{"version":3,"file":"bus.route.js","sourceRoot":"","sources":["../../src/routes/bus.route.ts"],"names":[],"mappings":";;;AACA,iEAA6D;AAE7D,MAAa,QAAQ;IAArB;QACS,kBAAa,GAAkB,IAAI,8BAAa,EAAE,CAAC;IAK5D,CAAC;IAHQ,MAAM,CAAC,GAAgB;QAC5B,GAAG,CAAC,KAAK,CAAC,YAAY,CAAC,CAAC,GAAG,CAAC,IAAI,CAAC,aAAa,CAAC,QAAQ,CAAC,CAAC;IAC3D,CAAC;CACF;AAND,4BAMC"}

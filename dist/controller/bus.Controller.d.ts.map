@@ -1,0 +1,1 @@
+{"version":3,"file":"bus.Controller.d.ts","sourceRoot":"","sources":["../../src/controller/bus.Controller.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAG5C,qBAAa,aAAa;IACX,QAAQ,CAAC,GAAG,EAAE,OAAO,EAAE,GAAG,EAAE,QAAQ;CAUlD"}

@@ -1,7 +1,9 @@
-/* import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../database/db";
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../database/db";
+import { Bus } from "./busI";
+import { RouteAssignment } from "./route_assignment";
 
-export interface DriverI {
+export interface driverI {
   id?: number;
   name: string;
   document?: number | string;
@@ -12,13 +14,13 @@ export interface DriverI {
   licenceExpiry?: Date;
   experienceYears?: number;
   status?: "ACTIVO" | "INACTIVO" | "SUSPENDIDO";
-  assignedBusId?: number;
+  assignedBusId?: number | null;
   photoUrl?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export class Driver extends Model implements DriverI {
+export class Driver extends Model implements driverI {
   public id!: number;
   public name!: string;
   public document?: number | string;
@@ -28,83 +30,38 @@ export class Driver extends Model implements DriverI {
   public type_licence!: string;
   public licenceExpiry?: Date;
   public experienceYears?: number;
-  public status?: "ACTIVO" | "INACTIVO" | "SUSPENDIDO";
-  public assignedBusId?: number;
+  public status!: "ACTIVO" | "INACTIVO" | "SUSPENDIDO";
+  public assignedBusId?: number | null;
   public photoUrl?: string;
-
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
 
 Driver.init(
   {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: { msg: "El nombre no puede estar vacío" },
-      },
-    },
-    document: {
-      type: DataTypes.STRING, // usamos STRING para soportar números grandes y alfanuméricos
-      allowNull: true,
-      unique: true,
-    },
-    phone: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      validate: {
-        len: { args: [7, 15], msg: "El teléfono debe tener entre 7 y 15 caracteres" },
-      },
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      unique: true,
-      validate: {
-        isEmail: { msg: "Debe ser un correo válido" },
-      },
-    },
-    address: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    type_licence: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    licenceExpiry: {
-      type: DataTypes.DATEONLY,
-      allowNull: true,
-    },
-    experienceYears: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      validate: {
-        min: { args: [0], msg: "La experiencia no puede ser negativa" },
-      },
-    },
-    status: {
-      type: DataTypes.ENUM("ACTIVO", "INACTIVO", "SUSPENDIDO"),
-      defaultValue: "ACTIVO",
-    },
+    name: { type: DataTypes.STRING(120), allowNull: false },
+    document: DataTypes.STRING(50),
+    phone: DataTypes.STRING(30),
+    email: { type: DataTypes.STRING(120), validate: { isEmail: true } },
+    address: DataTypes.STRING(200),
+    type_licence: { type: DataTypes.STRING(50), allowNull: false },
+    licenceExpiry: DataTypes.DATEONLY,
+    experienceYears: DataTypes.INTEGER,
+    status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO", "SUSPENDIDO"), defaultValue: "ACTIVO" },
     assignedBusId: {
       type: DataTypes.INTEGER,
-      allowNull: true, // Relación con Bus
-    },
-    photoUrl: {
-      type: DataTypes.STRING,
       allowNull: true,
-      validate: {
-        isUrl: { msg: "La foto debe ser una URL válida" },
-      },
+      references: { model: "buses", key: "id" },
+      onUpdate: "CASCADE",
+      onDelete: "SET NULL",
+      field: "assigned_bus_id",
     },
+    photoUrl: DataTypes.STRING(500),
   },
-  {
-    sequelize,
-    modelName: "Driver",
-    tableName: "drivers",
-    timestamps: true, // Sequelize genera createdAt y updatedAt
-  }
+  { sequelize, modelName: "Driver", tableName: "drivers", timestamps: true }
 );
- */
+
+// Asociaciones
+Driver.belongsTo(Bus, { foreignKey: "assignedBusId", targetKey: "id", as: "assigned_bus" });
+Driver.hasMany(RouteAssignment, { foreignKey: "driverId", sourceKey: "id", as: "assignments" });
+RouteAssignment.belongsTo(Driver, { foreignKey: "driverId", targetKey: "id", as: "driver" });

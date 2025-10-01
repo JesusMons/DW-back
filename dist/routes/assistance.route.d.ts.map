@@ -1,0 +1,1 @@
+{"version":3,"file":"assistance.route.d.ts","sourceRoot":"","sources":["../../src/routes/assistance.route.ts"],"names":[],"mappings":"AAAA,OAAO,EAAU,WAAW,EAAE,MAAM,SAAS,CAAC;AAC9C,OAAO,EAAE,qBAAqB,EAAE,MAAM,qCAAqC,CAAC;AAE5E,qBAAa,eAAe;IACjB,qBAAqB,EAAE,qBAAqB,CAA+B;IAE3E,MAAM,CAAC,GAAG,EAAE,WAAW,GAAG,IAAI;CAGxC"}

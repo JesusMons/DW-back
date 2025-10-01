@@ -10,7 +10,7 @@ export interface AssistanceI {
   route_id: number;
   bus_id: number;
   date: Date;
-  time: string;
+  time: string; // HH:mm o HH:mm:ss
   status: "CONFIRMADO" | "AUSENTE" | "CANCELADO";
   createdAt?: Date;
   updatedAt?: Date;
@@ -30,20 +30,43 @@ export class Assistance extends Model implements AssistanceI {
 
 Assistance.init(
   {
-    date: {
-      type: DataTypes.DATEONLY,
+    student_id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
+      references: { model: "students", key: "id" },
+      onUpdate: "CASCADE",
+      onDelete: "RESTRICT",
     },
+    route_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: "routes", key: "id" },
+      onUpdate: "CASCADE",
+      onDelete: "RESTRICT",
+    },
+    bus_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: "buses", key: "id" },
+      onUpdate: "CASCADE",
+      onDelete: "RESTRICT",
+    },
+    date: { type: DataTypes.DATEONLY, allowNull: false },
     time: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(8),
       allowNull: false,
       validate: {
         notEmpty: { msg: "La hora no puede estar vacía" },
+        is: {
+          args: /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/,
+          msg: "Formato de hora inválido. Usa HH:mm o HH:mm:ss",
+        },
       },
     },
     status: {
       type: DataTypes.ENUM("CONFIRMADO", "AUSENTE", "CANCELADO"),
       defaultValue: "CONFIRMADO",
+      allowNull: false,
     },
   },
   {
@@ -51,36 +74,22 @@ Assistance.init(
     modelName: "Assistance",
     tableName: "assistances",
     timestamps: true,
+    indexes: [
+      { fields: ["student_id"] },
+      { fields: ["route_id"] },
+      { fields: ["bus_id"] },
+      { fields: ["date"] },
+      { unique: true, fields: ["student_id", "route_id", "date", "time"], name: "uniq_student_route_date_time" },
+    ],
   }
 );
 
-// 🔗 Relaciones
-Student.hasMany(Assistance, {
-  foreignKey: "student_id",
-  sourceKey: "id",
-});
+// Asociaciones
+Student.hasMany(Assistance, { foreignKey: "student_id", sourceKey: "id" });
+Assistance.belongsTo(Student, { foreignKey: "student_id", targetKey: "id" });
 
-Assistance.belongsTo(Student, {
-  foreignKey: "student_id",
-  targetKey: "id",
-});
+Route.hasMany(Assistance, { foreignKey: "route_id", sourceKey: "id" });
+Assistance.belongsTo(Route, { foreignKey: "route_id", targetKey: "id" });
 
-Route.hasMany(Assistance, {
-  foreignKey: "route_id",
-  sourceKey: "id",
-});
-
-Assistance.belongsTo(Route, {
-  foreignKey: "route_id",
-  targetKey: "id",
-});
-
-Bus.hasMany(Assistance, {
-  foreignKey: "bus_id",
-  sourceKey: "id",
-});
-
-Assistance.belongsTo(Bus, {
-  foreignKey: "bus_id",
-  targetKey: "id",
-});
+Bus.hasMany(Assistance, { foreignKey: "bus_id", sourceKey: "id" });
+Assistance.belongsTo(Bus, { foreignKey: "bus_id", targetKey: "id" });

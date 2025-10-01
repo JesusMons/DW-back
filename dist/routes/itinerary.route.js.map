@@ -1,0 +1,1 @@
+{"version":3,"file":"itinerary.route.js","sourceRoot":"","sources":["../../src/routes/itinerary.route.ts"],"names":[],"mappings":";;;AACA,6EAAyE;AAEzE,MAAa,cAAc;IAA3B;QACS,wBAAmB,GAAwB,IAAI,0CAAmB,EAAE,CAAC;IAK9E,CAAC;IAHQ,MAAM,CAAC,GAAgB;QAC5B,GAAG,CAAC,KAAK,CAAC,kBAAkB,CAAC,CAAC,GAAG,CAAC,IAAI,CAAC,mBAAmB,CAAC,cAAc,CAAC,CAAC;IAC7E,CAAC;CACF;AAND,wCAMC"}

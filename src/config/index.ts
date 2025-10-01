@@ -37,7 +37,17 @@ export class App {
 
   // Route configuration
   private routes(): void {
-    this.routePrv.assistanceRoutes.routes(this.app);
+    this.routePrv.assistanceRoute.routes(this.app);
+    this.routePrv.busRoute.routes(this.app);
+    this.routePrv.driverRoute.routes(this.app);
+    this.routePrv.guardianRoute.routes(this.app);
+    this.routePrv.incidenceRoute.routes(this.app);
+    this.routePrv.itineraryRoute.routes(this.app);
+    this.routePrv.maintenanceRoute.routes(this.app);
+    this.routePrv.routeAssignmentRoute.routes(this.app);
+    this.routePrv.routeRoute.routes(this.app);
+    this.routePrv.stopRoute.routes(this.app);
+    this.routePrv.studentRoute.routes(this.app);
    
   }
 

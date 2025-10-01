@@ -1,0 +1,1 @@
+{"version":3,"file":"driver.route.js","sourceRoot":"","sources":["../../src/routes/driver.route.ts"],"names":[],"mappings":";;;AACA,uEAAmE;AAEnE,MAAa,WAAW;IAAxB;QACS,qBAAgB,GAAqB,IAAI,oCAAgB,EAAE,CAAC;IAKrE,CAAC;IAHQ,MAAM,CAAC,GAAgB;QAC5B,GAAG,CAAC,KAAK,CAAC,cAAc,CAAC,CAAC,GAAG,CAAC,IAAI,CAAC,gBAAgB,CAAC,UAAU,CAAC,CAAC;IAClE,CAAC;CACF;AAND,kCAMC"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"routeAssignment.route.d.ts","sourceRoot":"","sources":["../../src/routes/routeAssignment.route.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,SAAS,CAAC;AACtC,OAAO,EAAE,yBAAyB,EAAE,MAAM,0CAA0C,CAAC;AAErF,qBAAa,oBAAoB;IACxB,yBAAyB,EAAE,yBAAyB,CAAmC;IAEvF,MAAM,CAAC,GAAG,EAAE,WAAW,GAAG,IAAI;CAGtC"}

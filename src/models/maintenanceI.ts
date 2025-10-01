@@ -1,9 +1,10 @@
 import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../database/db";
+import sequelize from "../database/db";
+import { Bus } from "./busI";
 
-export interface MaintenanceI {
+export interface maintenanceI {
   id?: number;
-  busId: number; // referencia a busI
+  busId: number;
   type: "PREVENTIVO" | "CORRECTIVO" | "INSPECCION";
   description: string;
   cost?: number;
@@ -16,7 +17,7 @@ export interface MaintenanceI {
   updatedAt?: Date;
 }
 
-export class Maintenance extends Model implements MaintenanceI {
+export class Maintenance extends Model implements maintenanceI {
   public id!: number;
   public busId!: number;
   public type!: "PREVENTIVO" | "CORRECTIVO" | "INSPECCION";
@@ -27,7 +28,6 @@ export class Maintenance extends Model implements MaintenanceI {
   public status!: "PENDIENTE" | "EN PROGRESO" | "COMPLETADO";
   public mechanic?: string;
   public odometer?: number;
-
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -37,53 +37,35 @@ Maintenance.init(
     busId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: { model: "buses", key: "id" },
+      onUpdate: "CASCADE",
+      onDelete: "RESTRICT",
+      field: "bus_id",
     },
-    type: {
-      type: DataTypes.ENUM("PREVENTIVO", "CORRECTIVO", "INSPECCION"),
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-      validate: {
-        notEmpty: { msg: "La descripción no puede estar vacía" },
-      },
-    },
-    cost: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-      validate: {
-        min: { args: [0], msg: "El costo no puede ser negativo" },
-      },
-    },
-    performedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    nextDueDate: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
+    type: { type: DataTypes.ENUM("PREVENTIVO", "CORRECTIVO", "INSPECCION"), allowNull: false },
+    description: { type: DataTypes.TEXT, allowNull: false },
+    cost: DataTypes.DECIMAL(12, 2),
+    performedAt: { type: DataTypes.DATE, allowNull: false },
+    nextDueDate: DataTypes.DATEONLY,
     status: {
       type: DataTypes.ENUM("PENDIENTE", "EN PROGRESO", "COMPLETADO"),
       defaultValue: "PENDIENTE",
     },
-    mechanic: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    odometer: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      validate: {
-        min: { args: [0], msg: "El odómetro no puede ser negativo" },
-      },
-    },
+    mechanic: DataTypes.STRING(120),
+    odometer: DataTypes.INTEGER,
   },
   {
     sequelize,
     modelName: "Maintenance",
     tableName: "maintenances",
-    timestamps: true, // Sequelize maneja createdAt y updatedAt
+    timestamps: true,
+    indexes: [
+      { fields: ["bus_id"] },
+      { fields: ["status"] },
+      { fields: ["performedAt"] },
+    ],
   }
 );
+
+// Asociaciones
+Maintenance.belongsTo(Bus, { foreignKey: "busId", targetKey: "id", as: "bus" });
