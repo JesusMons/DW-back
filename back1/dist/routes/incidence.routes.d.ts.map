@@ -1,0 +1,1 @@
+{"version":3,"file":"incidence.routes.d.ts","sourceRoot":"","sources":["../../src/routes/incidence.routes.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,SAAS,CAAC;AAGtC,qBAAa,eAAe;IAC1B,OAAO,CAAC,QAAQ,CAAC,mBAAmB,CAA6B;IAE1D,MAAM,CAAC,GAAG,EAAE,WAAW,GAAG,IAAI;CAStC"}

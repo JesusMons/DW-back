@@ -1,0 +1,1 @@
+{"version":3,"file":"bus.routes.d.ts","sourceRoot":"","sources":["../../src/routes/bus.routes.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,SAAS,CAAC;AAGtC,qBAAa,SAAS;IACpB,OAAO,CAAC,QAAQ,CAAC,aAAa,CAAuB;IAE9C,MAAM,CAAC,GAAG,EAAE,WAAW,GAAG,IAAI;CAStC"}

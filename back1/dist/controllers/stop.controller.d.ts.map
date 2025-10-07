@@ -1,0 +1,1 @@
+{"version":3,"file":"stop.controller.d.ts","sourceRoot":"","sources":["../../src/controllers/stop.controller.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAI5C,qBAAa,cAAc;IACd,WAAW,CAAC,GAAG,EAAE,OAAO,EAAE,GAAG,EAAE,QAAQ;IAYvC,WAAW,CAAC,GAAG,EAAE,OAAO,EAAE,GAAG,EAAE,QAAQ;CAWnD"}
