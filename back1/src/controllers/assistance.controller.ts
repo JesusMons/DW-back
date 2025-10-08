@@ -48,4 +48,29 @@ export class AssistanceController {
       res.status(500).json({ error: "Error fetching assistance" });
     }
   }
+
+  public async createAssistance(req: Request, res: Response) {
+  try {
+    const { studentId, routeId, busId, date, time, status } = req.body;
+
+    // Validación de campos requeridos
+    if (!studentId || !routeId || !busId || !date || !time || !status) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const newAssistance = await Assistance.create({
+      studentId,
+      routeId,
+      busId,
+      date,
+      time,
+      status,
+    });
+
+    res.status(201).json(newAssistance);
+  } catch (err) {
+    res.status(500).json({ error: "Error creating assistance" });
+  }
+}
+
 }

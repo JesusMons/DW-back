@@ -1,0 +1,24 @@
+### Obtener todas las asistencias
+GET http://localhost:3000/api/assistances
+Content-Type: application/json
+
+###
+
+### Obtener asistencia por ID
+GET http://localhost:3000/api/assistances/19
+Content-Type: application/json
+
+###
+
+### Crear una nueva asistencia
+POST http://localhost:3000/api/assistances/create
+Content-Type: application/json
+
+{
+  "studentId": 19,
+  "routeId": 4,
+  "busId": 1,
+  "date": "2025-10-08",
+  "time": "07:45:00",
+  "status": "CONFIRMADO"
+}
