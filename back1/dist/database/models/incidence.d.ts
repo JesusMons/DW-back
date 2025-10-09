@@ -1,6 +1,6 @@
 import { Model } from "sequelize";
 export type IncidenceSeverity = "BAJA" | "MEDIA" | "ALTA" | "CRITICA";
-export type IncidenceStatus = "ABIERTA" | "EN PROGRESO" | "RESUELTO" | "CERRADO";
+export type IncidenceStatus = "ACTIVO" | "INACTIVO";
 export interface IncidenceI {
     id?: number;
     busId: number;

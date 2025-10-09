@@ -9,7 +9,7 @@ export class User extends Model {
   public username!: string;
   public email!: string;
   public password!: string;
-  public is_active!: "ACTIVE" | "INACTIVE";
+  public status!: "ACTIVO" | "INACTIVO";
   public avatar!: string;
 
   public async checkPassword(password: string): Promise<boolean> {
@@ -43,7 +43,7 @@ export interface UserI {
   username: string;
   email: string;
   password: string;
-  is_active: "ACTIVE" | "INACTIVE";
+  status: "ACTIVO" | "INACTIVO";
   avatar?: string;
 }
 
@@ -62,9 +62,9 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    is_active: {
-      type: DataTypes.ENUM("ACTIVE", "INACTIVE"),
-      defaultValue: "ACTIVE",
+    status: {
+      type: DataTypes.ENUM("ACTIVO", "INACTIVO"),
+      defaultValue: "ACTIVO",
     },
     avatar: {
       type: DataTypes.STRING,

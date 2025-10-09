@@ -13,6 +13,9 @@ class AssistanceRoutes {
         app
             .route("/api/assistances/:id")
             .get(this.assistanceController.getAssistanceById.bind(this.assistanceController));
+        app
+            .route("/api/assistances/create")
+            .post(this.assistanceController.createAssistance.bind(this.assistanceController)); // nueva línea
     }
 }
 exports.AssistanceRoutes = AssistanceRoutes;

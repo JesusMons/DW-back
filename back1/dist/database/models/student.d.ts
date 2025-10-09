@@ -1,5 +1,5 @@
 import { Model } from "sequelize";
-export type StudentStatus = "ACTIVO" | "INACTIVO" | "GRADUADO";
+export type StudentStatus = "ACTIVO" | "INACTIVO";
 export interface StudentI {
     id?: number;
     name: string;

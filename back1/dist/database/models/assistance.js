@@ -19,7 +19,7 @@ Assistance.init({
     busId: { field: "bus_id", type: sequelize_1.DataTypes.BIGINT, allowNull: false },
     date: { type: sequelize_1.DataTypes.DATEONLY, allowNull: false },
     time: { type: sequelize_1.DataTypes.TIME, allowNull: false },
-    status: { type: sequelize_1.DataTypes.ENUM("CONFIRMADO", "AUSENTE", "CANCELADO"), allowNull: false, defaultValue: "CONFIRMADO" },
+    status: { type: sequelize_1.DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 }, { sequelize: db_1.default, modelName: "Assistance", tableName: "assistances", timestamps: true, underscored: true });
 Assistance.belongsTo(student_1.Student, { foreignKey: "studentId" });
 Assistance.belongsTo(route_1.Route, { foreignKey: "routeId" });

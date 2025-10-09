@@ -18,7 +18,7 @@ Route.init({
     endPoint: { field: "end_point", type: sequelize_1.DataTypes.STRING(190), allowNull: false },
     currentBusId: { field: "current_bus_id", type: sequelize_1.DataTypes.BIGINT, allowNull: true },
     currentDriverId: { field: "current_driver_id", type: sequelize_1.DataTypes.BIGINT, allowNull: true },
-    status: { type: sequelize_1.DataTypes.ENUM("ACTIVE", "INACTIVE"), allowNull: false, defaultValue: "ACTIVE" },
+    status: { type: sequelize_1.DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 }, { sequelize: db_1.default, modelName: "Route", tableName: "routes", timestamps: true, underscored: true });
 // Relaciones Route ↔ Bus/Driver (y lado inverso aquí)
 Route.belongsTo(bus_1.Bus, { as: "currentBus", foreignKey: "currentBusId", targetKey: "id" });

@@ -1,0 +1,9 @@
+### Listar todas las paradas por ruta
+GET http://localhost:3000/api/route-stops
+Content-Type: application/json
+
+###
+
+### Obtener parada asignada por ruta y parada
+GET http://localhost:3000/api/route-stops/1/1
+Content-Type: application/json

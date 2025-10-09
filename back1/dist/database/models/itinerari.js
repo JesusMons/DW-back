@@ -20,7 +20,7 @@ Itinerary.init({
     arrivalTime: { field: "arrival_time", type: sequelize_1.DataTypes.TIME, allowNull: false },
     driverId: { field: "driver_id", type: sequelize_1.DataTypes.BIGINT, allowNull: false },
     busId: { field: "bus_id", type: sequelize_1.DataTypes.BIGINT, allowNull: false },
-    status: { type: sequelize_1.DataTypes.ENUM("PLANEADO", "EN PROGRESO", "COMPLETADO", "CANCELADO"), allowNull: false, defaultValue: "PLANEADO" },
+    status: { type: sequelize_1.DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
     notes: { type: sequelize_1.DataTypes.STRING(500), allowNull: true },
 }, { sequelize: db_1.default, modelName: "Itinerary", tableName: "itineraries", timestamps: true, underscored: true });
 Itinerary.belongsTo(route_1.Route, { foreignKey: "routeId" });

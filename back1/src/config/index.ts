@@ -46,6 +46,14 @@ export class App {
     this.routePrv.routeStopRoutes.routes(this.app);
     this.routePrv.stopRoutes.routes(this.app);
     this.routePrv.studentRoutes.routes(this.app);
+    this.routePrv.userRoutes.routes(this.app);
+    this.routePrv.roleRoutes.routes(this.app);
+    this.routePrv.roleUserRoutes.routes(this.app);
+    this.routePrv.resourceRoutes.routes(this.app);
+    this.routePrv.resourceRoleRoutes.routes(this.app);
+    this.routePrv.refreshTokenRoutes.routes(this.app);
+    this.routePrv.authRoutes.routes(this.app);
+    
   }
 
   // Method to connect and synchronize the database

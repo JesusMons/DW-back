@@ -1,5 +1,5 @@
 import { Model } from "sequelize";
-export type AssistanceStatus = "CONFIRMADO" | "AUSENTE" | "CANCELADO";
+export type AssistanceStatus = "ACTIVO" | "INACTIVO";
 export interface AssistanceI {
     id?: number;
     studentId: number;

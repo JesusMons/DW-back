@@ -1,0 +1,15 @@
+### Listar todas las incidencias
+GET http://localhost:3000/api/incidences
+Content-Type: application/json
+
+###
+
+### Filtrar incidencias por estado, severidad y ruta
+GET http://localhost:3000/api/incidences?status=ACTIVO&severity=MEDIA&routeId=1
+Content-Type: application/json
+
+###
+
+### Obtener incidencia por ID
+GET http://localhost:3000/api/incidences/1
+Content-Type: application/json

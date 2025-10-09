@@ -2,7 +2,7 @@ import { DataTypes, Model } from "sequelize";
 import  sequelize  from "../db";
 
 
-export type DriverStatus = "ACTIVO" | "INACTIVO" | "SUSPENDIDO";
+export type DriverStatus = "ACTIVO" | "INACTIVO";
 
 
 export interface DriverI {
@@ -48,7 +48,7 @@ address: { type: DataTypes.STRING(190), allowNull: true },
 typeLicence: { field: "type_licence", type: DataTypes.STRING(32), allowNull: false },
 licenceExpiry: { field: "licence_expiry", type: DataTypes.DATEONLY, allowNull: true },
 experienceYears: { field: "experience_years", type: DataTypes.INTEGER, allowNull: true },
-status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO", "SUSPENDIDO"), allowNull: false, defaultValue: "ACTIVO" },
+status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 assignedBusId: { field: "assigned_bus_id", type: DataTypes.BIGINT, allowNull: true },
 photoUrl: { field: "photo_url", type: DataTypes.STRING(255), allowNull: true },
 },

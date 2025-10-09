@@ -1,0 +1,1 @@
+{"version":3,"file":"resource-role.controller.d.ts","sourceRoot":"","sources":["../../src/controllers/resource-role.controller.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAK5C,qBAAa,sBAAsB;IACpB,mBAAmB,CAAC,GAAG,EAAE,OAAO,EAAE,GAAG,EAAE,QAAQ;IAoC/C,mBAAmB,CAAC,GAAG,EAAE,OAAO,EAAE,GAAG,EAAE,QAAQ;CAyB7D"}

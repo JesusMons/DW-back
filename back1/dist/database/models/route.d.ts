@@ -1,5 +1,5 @@
 import { Model } from "sequelize";
-export type RouteStatus = "ACTIVE" | "INACTIVE";
+export type RouteStatus = "ACTIVO" | "INACTIVO";
 export interface RouteI {
     id?: number;
     name: string;

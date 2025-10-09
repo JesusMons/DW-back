@@ -5,7 +5,7 @@ import { Route } from "./route";
 import { Bus } from "./bus";
 
 
-export type AssistanceStatus = "CONFIRMADO" | "AUSENTE" | "CANCELADO";
+export type AssistanceStatus = "ACTIVO" | "INACTIVO";
 
 
 export interface AssistanceI {
@@ -38,7 +38,7 @@ routeId: { field: "route_id", type: DataTypes.BIGINT, allowNull: false },
 busId: { field: "bus_id", type: DataTypes.BIGINT, allowNull: false },
 date: { type: DataTypes.DATEONLY, allowNull: false },
 time: { type: DataTypes.TIME, allowNull: false },
-status: { type: DataTypes.ENUM("CONFIRMADO", "AUSENTE", "CANCELADO"), allowNull: false, defaultValue: "CONFIRMADO" },
+status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 },
 { sequelize, modelName: "Assistance", tableName: "assistances", timestamps: true, underscored: true }
 );

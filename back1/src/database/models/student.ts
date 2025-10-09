@@ -2,7 +2,7 @@ import { DataTypes, Model } from "sequelize";
 import  sequelize  from "../db";
 
 
-export type StudentStatus = "ACTIVO" | "INACTIVO" | "GRADUADO";
+export type StudentStatus = "ACTIVO" | "INACTIVO";
 
 
 export interface StudentI {
@@ -54,7 +54,7 @@ address: { type: DataTypes.STRING(190), allowNull: true },
 phone: { type: DataTypes.STRING(30), allowNull: true },
 guardianPhone: { field: "guardian_phone", type: DataTypes.STRING(30), allowNull: true },
 email: { type: DataTypes.STRING(190), allowNull: true, validate: { isEmail: true } },
-status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO", "GRADUADO"), allowNull: false, defaultValue: "ACTIVO" },
+status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 allergies: { type: DataTypes.JSON, allowNull: true },
 emergencyContact: { field: "emergency_contact", type: DataTypes.JSON, allowNull: true },
 },

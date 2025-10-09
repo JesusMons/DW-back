@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { faker } from '@faker-js/faker';
+import { DataTypes, QueryInterface } from 'sequelize';
 import sequelize, { testConnection } from '../database/db';
 import { Guardian, GuardianStatus } from '../database/models/guardian';
 import { Student, StudentStatus } from '../database/models/student';
@@ -14,6 +15,178 @@ import { ItineraryStopSchedule } from '../database/models/ItineraryStopSchedule'
 import { Assistance, AssistanceStatus } from '../database/models/assistance';
 import { Incidence, IncidenceSeverity, IncidenceStatus } from '../database/models/incidence';
 import { Maintenance, MaintenanceStatus, MaintenanceType } from '../database/models/maintenance';
+import { RefreshToken } from '../database/models/auth/RefreshToken';
+import { Resource } from '../database/models/auth/Resource';
+import { ResourceRole } from '../database/models/auth/ResourceRole';
+import { Role } from '../database/models/auth/Rol';
+import { RoleUser } from '../database/models/auth/RolUser';
+import { User } from '../database/models/auth/User';
+
+const STATUS_ENUM = ['ACTIVO', 'INACTIVO'] as const;
+type StatusValue = (typeof STATUS_ENUM)[number];
+
+interface StatusMigrationConfig {
+  table: string;
+  column: string;
+  oldColumn?: string;
+  conversions?: Record<string, StatusValue>;
+  defaultValue?: StatusValue;
+  allowNull?: boolean;
+}
+
+const extractEnumValues = (rawType: string | undefined): string[] => {
+  if (!rawType) return [];
+  const match = rawType.match(/enum\s*\((.*)\)/i);
+  if (!match?.[1]) return [];
+  return match[1]
+    .split(',')
+    .map((value) => value.trim().replace(/^'(.*)'$/, '$1'));
+};
+
+const describeOrWarn = async (qi: QueryInterface, table: string): Promise<Record<string, any> | null> => {
+  try {
+    return await qi.describeTable(table);
+  } catch (error) {
+    console.warn(`⚠️  No se pudo describir la tabla ${table}:`, (error as Error).message);
+    return null;
+  }
+};
+
+const changeEnumIfNeeded = async (
+  qi: QueryInterface,
+  table: string,
+  column: string,
+  values: string[],
+  allowNull: boolean,
+  defaultValue: string | null
+): Promise<void> => {
+  await qi.changeColumn(table, column, {
+    type: DataTypes.ENUM(...values),
+    allowNull,
+    defaultValue,
+  });
+};
+
+const extendEnumForConversions = async (
+  qi: QueryInterface,
+  table: string,
+  column: string,
+  conversions: Record<string, StatusValue>
+): Promise<{ allowNull: boolean; defaultValue: string | null }> => {
+  const definition = await describeOrWarn(qi, table);
+  if (!definition) return { allowNull: false, defaultValue: null };
+  const columnDefinition = definition[column];
+  if (!columnDefinition) return { allowNull: false, defaultValue: null };
+
+  const enumValues = extractEnumValues(columnDefinition.type);
+  const allowNull = Boolean(columnDefinition.allowNull);
+  const defaultValue = columnDefinition.defaultValue as string | null;
+
+  const required = new Set<string>([
+    ...enumValues,
+    ...Object.keys(conversions),
+    ...Object.values(conversions),
+    ...STATUS_ENUM,
+  ]);
+
+  const newValues = Array.from(required);
+  const hasAll = newValues.length === enumValues.length && newValues.every((value) => enumValues.includes(value));
+
+  if (!enumValues.length || !hasAll) {
+    await changeEnumIfNeeded(qi, table, column, newValues, allowNull, defaultValue);
+  }
+
+  return { allowNull, defaultValue };
+};
+
+const runConversions = async (table: string, column: string, conversions: Record<string, StatusValue>): Promise<void> => {
+  for (const [from, to] of Object.entries(conversions)) {
+    if (from === to) continue;
+    await sequelize.query(`UPDATE \`${table}\` SET \`${column}\` = :to WHERE \`${column}\` = :from`, {
+      replacements: { from, to },
+    });
+  }
+};
+
+const finalizeEnum = async (
+  qi: QueryInterface,
+  table: string,
+  column: string,
+  allowNull: boolean,
+  defaultValue: StatusValue
+): Promise<void> => {
+  await changeEnumIfNeeded(qi, table, column, [...STATUS_ENUM], allowNull, defaultValue);
+};
+
+const migrateStatusColumn = async (qi: QueryInterface, config: StatusMigrationConfig): Promise<void> => {
+  const { table, column, oldColumn, conversions = {}, defaultValue = 'ACTIVO', allowNull = false } = config;
+
+  const definition = await describeOrWarn(qi, table);
+  if (!definition) return;
+
+  const columnExists = column in definition;
+  const oldColumnExists = oldColumn ? oldColumn in definition : false;
+
+  if (!columnExists && !oldColumnExists) {
+    await qi.addColumn(table, column, {
+      type: DataTypes.ENUM(...STATUS_ENUM),
+      allowNull,
+      defaultValue,
+    });
+    return;
+  }
+
+  const workingColumn = columnExists ? column : (oldColumnExists ? oldColumn! : column);
+
+  const { allowNull: currentAllowNull, defaultValue: currentDefault } = await extendEnumForConversions(
+    qi,
+    table,
+    workingColumn,
+    conversions
+  );
+
+  await runConversions(table, workingColumn, conversions);
+
+  if (workingColumn !== column) {
+    await qi.renameColumn(table, workingColumn, column);
+  }
+
+  const sanitizedDefault: StatusValue = STATUS_ENUM.includes((currentDefault as StatusValue) ?? defaultValue)
+    ? ((currentDefault as StatusValue) ?? defaultValue)
+    : defaultValue;
+
+  await finalizeEnum(qi, table, column, currentAllowNull ?? allowNull, sanitizedDefault);
+};
+
+const ensureStatusSchema = async (): Promise<void> => {
+  const qi = sequelize.getQueryInterface();
+
+  const migrations: StatusMigrationConfig[] = [
+    { table: 'roles', column: 'status', oldColumn: 'is_active', conversions: { ACTIVE: 'ACTIVO', INACTIVE: 'INACTIVO' } },
+    { table: 'users', column: 'status', oldColumn: 'is_active', conversions: { ACTIVE: 'ACTIVO', INACTIVE: 'INACTIVO' } },
+    { table: 'resources', column: 'status', oldColumn: 'is_active', conversions: { ACTIVE: 'ACTIVO', INACTIVE: 'INACTIVO' } },
+    { table: 'resource_roles', column: 'status', oldColumn: 'is_active', conversions: { ACTIVE: 'ACTIVO', INACTIVE: 'INACTIVO' } },
+    { table: 'role_users', column: 'status', oldColumn: 'is_active', conversions: { ACTIVE: 'ACTIVO', INACTIVE: 'INACTIVO' } },
+    { table: 'refresh_tokens', column: 'status', oldColumn: 'is_valid', conversions: { ACTIVE: 'ACTIVO', INACTIVE: 'INACTIVO' } },
+    { table: 'assistances', column: 'status', conversions: { CONFIRMADO: 'ACTIVO', AUSENTE: 'INACTIVO', CANCELADO: 'INACTIVO' } },
+    { table: 'itinerary_stop_schedule', column: 'status', allowNull: false, defaultValue: 'ACTIVO' },
+    { table: 'route_stops', column: 'status', allowNull: false, defaultValue: 'ACTIVO' },
+    { table: 'buses', column: 'status', conversions: { 'EN MANTENIMIENTO': 'INACTIVO' } },
+    { table: 'drivers', column: 'status', conversions: { SUSPENDIDO: 'INACTIVO' } },
+    { table: 'incidences', column: 'status', conversions: { ABIERTA: 'ACTIVO', 'EN PROGRESO': 'ACTIVO', RESUELTO: 'INACTIVO', CERRADO: 'INACTIVO' } },
+    { table: 'itineraries', column: 'status', conversions: { PLANEADO: 'ACTIVO', 'EN PROGRESO': 'ACTIVO', COMPLETADO: 'INACTIVO', CANCELADO: 'INACTIVO' } },
+    { table: 'maintenances', column: 'status', conversions: { PENDIENTE: 'ACTIVO', 'EN PROGRESO': 'ACTIVO', COMPLETADO: 'INACTIVO' } },
+    { table: 'routes', column: 'status', conversions: { ACTIVE: 'ACTIVO', INACTIVE: 'INACTIVO' } },
+    { table: 'stops', column: 'status', conversions: { ACTIVA: 'ACTIVO', INACTIVA: 'INACTIVO' } },
+    { table: 'students', column: 'status', conversions: { GRADUADO: 'INACTIVO' } },
+    { table: 'route_assignments', column: 'status' },
+    { table: 'guardians', column: 'status' },
+  ];
+
+  for (const migration of migrations) {
+    await migrateStatusColumn(qi, migration);
+  }
+};
 
 const pickRandomSubset = <T>(items: T[], min: number, max: number): T[] => {
   if (!items.length) {
@@ -29,6 +202,239 @@ const randomTime = (startHour: number, endHour: number): string => {
   const hour = faker.number.int({ min: startHour, max: endHour });
   const minute = faker.number.int({ min: 0, max: 59 });
   return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:00`;
+};
+
+const DEFAULT_USER_PASSWORD = 'Password123!';
+
+const createRolesIfNeeded = async (): Promise<Role[]> => {
+  let roles = await Role.findAll();
+  if (roles.length) {
+    console.log(`Roles encontrados: ${roles.length}.`);
+    return roles;
+  }
+
+  console.log('Creando roles del sistema...');
+  const roleNames = ['ADMIN', 'COORDINATOR', 'SUPPORT', 'DRIVER'];
+  const createdRoles: Role[] = [];
+
+  for (const name of roleNames) {
+    const role = await Role.create({
+      name,
+      status: 'ACTIVO',
+    });
+    createdRoles.push(role);
+  }
+
+  return createdRoles;
+};
+
+const createUsersIfNeeded = async (): Promise<User[]> => {
+  let users = await User.findAll();
+  if (users.length) {
+    console.log(`Usuarios encontrados: ${users.length}.`);
+    return users;
+  }
+
+  console.log('Creando usuarios del sistema...');
+  const seedUsers = [
+    { username: 'admin', email: 'admin@example.com', status: 'ACTIVO' as const },
+    { username: 'coordinator', email: 'coordinator@example.com', status: 'ACTIVO' as const },
+    { username: 'support', email: 'support@example.com', status: 'INACTIVO' as const },
+  ];
+
+  const createdUsers: User[] = [];
+
+  for (const seed of seedUsers) {
+    const user = await User.create({
+      username: seed.username,
+      email: seed.email,
+      password: DEFAULT_USER_PASSWORD,
+      status: seed.status,
+      avatar: faker.image.avatar(),
+    });
+    createdUsers.push(user);
+  }
+
+  for (let i = 0; i < 2; i += 1) {
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
+    const user = await User.create({
+      username: faker.internet
+        .username({ firstName, lastName })
+        .replace(/\s+/g, '_')
+        .toLowerCase(),
+      email: faker.internet.email({ firstName, lastName }).toLowerCase(),
+      password: DEFAULT_USER_PASSWORD,
+      status: faker.helpers.arrayElement(['ACTIVO', 'INACTIVO']),
+      avatar: faker.image.avatar(),
+    });
+    createdUsers.push(user);
+  }
+
+  console.log(`Usuarios de prueba creados con contraseña "${DEFAULT_USER_PASSWORD}".`);
+  return createdUsers;
+};
+
+const createRoleUsersIfNeeded = async (users: User[], roles: Role[]): Promise<void> => {
+  const existing = await RoleUser.count();
+  if (existing) {
+    console.log(`Relaciones usuario-rol encontradas: ${existing}.`);
+    return;
+  }
+
+  if (!users.length || !roles.length) {
+    console.log('No hay usuarios o roles suficientes para asociar.');
+    return;
+  }
+
+  console.log('Asignando roles a usuarios...');
+  const combos = new Set<string>();
+
+  const assignRole = async (user: User, role: Role, status: 'ACTIVO' | 'INACTIVO' = 'ACTIVO') => {
+    const key = `${user.id}-${role.id}`;
+    if (combos.has(key)) {
+      return;
+    }
+
+    combos.add(key);
+    await RoleUser.create({
+      user_id: user.id,
+      role_id: role.id,
+      status,
+    });
+  };
+
+  const adminRole = (roles.find((role) => role.name.toUpperCase() === 'ADMIN') ?? roles[0])!;
+  const coordinatorRole = roles.find((role) => role.name.toUpperCase() === 'COORDINATOR') ?? adminRole;
+  const supportRole = roles.find((role) => role.name.toUpperCase() === 'SUPPORT') ?? adminRole;
+
+  if (users[0]) await assignRole(users[0], adminRole, 'ACTIVO');
+  if (users[1]) await assignRole(users[1], coordinatorRole, 'ACTIVO');
+  if (users[2]) await assignRole(users[2], supportRole, 'ACTIVO');
+
+  for (const user of users) {
+    const randomRole = faker.helpers.arrayElement(roles);
+    await assignRole(user, randomRole, faker.helpers.arrayElement(['ACTIVO', 'INACTIVO']));
+  }
+};
+
+const createResourcesIfNeeded = async (): Promise<Resource[]> => {
+  let resources = await Resource.findAll();
+  if (resources.length) {
+    console.log(`Recursos encontrados: ${resources.length}.`);
+    return resources;
+  }
+
+  console.log('Creando recursos protegidos...');
+  const resourceSeeds = [
+    { path: '/api/auth/users', method: 'GET' },
+    { path: '/api/auth/users/:id', method: 'GET' },
+    { path: '/api/auth/roles', method: 'GET' },
+    { path: '/api/auth/roles/:id', method: 'GET' },
+    { path: '/api/auth/role-users', method: 'GET' },
+    { path: '/api/auth/role-users/:id', method: 'GET' },
+    { path: '/api/auth/resources', method: 'GET' },
+    { path: '/api/auth/resources/:id', method: 'GET' },
+    { path: '/api/auth/resource-roles', method: 'GET' },
+    { path: '/api/auth/resource-roles/:id', method: 'GET' },
+    { path: '/api/auth/refresh-tokens', method: 'GET' },
+    { path: '/api/auth/refresh-tokens/:id', method: 'GET' },
+  ];
+
+  const createdResources: Resource[] = [];
+
+  for (const seed of resourceSeeds) {
+    const resource = await Resource.create({
+      path: seed.path,
+      method: seed.method,
+      status: 'ACTIVO',
+    });
+    createdResources.push(resource);
+  }
+
+  return createdResources;
+};
+
+const createResourceRolesIfNeeded = async (roles: Role[], resources: Resource[]): Promise<void> => {
+  const existing = await ResourceRole.count();
+  if (existing) {
+    console.log(`Relaciones rol-recurso encontradas: ${existing}.`);
+    return;
+  }
+
+  if (!roles.length || !resources.length) {
+    console.log('No hay roles o recursos suficientes para asociar.');
+    return;
+  }
+
+  console.log('Asignando recursos a roles...');
+  const combos = new Set<string>();
+
+  const link = async (role: Role, resource: Resource, status: 'ACTIVO' | 'INACTIVO' = 'ACTIVO') => {
+    const key = `${role.id}-${resource.id}`;
+    if (combos.has(key)) {
+      return;
+    }
+    combos.add(key);
+
+    await ResourceRole.create({
+      role_id: role.id,
+      resource_id: resource.id,
+      status,
+    });
+  };
+
+  const adminRole = roles.find((role) => role.name.toUpperCase() === 'ADMIN');
+  if (adminRole) {
+    for (const resource of resources) {
+      await link(adminRole, resource, 'ACTIVO');
+    }
+  }
+
+  for (const role of roles) {
+    if (adminRole && role.id === adminRole.id) {
+      continue;
+    }
+
+    const subset = pickRandomSubset(resources, Math.min(2, resources.length), Math.min(6, resources.length));
+    for (const resource of subset) {
+      await link(role, resource, faker.helpers.arrayElement(['ACTIVO', 'INACTIVO']));
+    }
+  }
+};
+
+const createRefreshTokensIfNeeded = async (users: User[]): Promise<void> => {
+  const existing = await RefreshToken.count();
+  if (existing) {
+    console.log(`Tokens de refresco encontrados: ${existing}.`);
+    return;
+  }
+
+  if (!users.length) {
+    console.log('No hay usuarios para generar tokens de refresco.');
+    return;
+  }
+
+  console.log('Creando tokens de refresco...');
+  for (const user of users) {
+    const { token, expiresAt } = user.generateRefreshToken();
+
+    await RefreshToken.create({
+      user_id: user.id,
+      token,
+      device_info: faker.internet.userAgent(),
+      status: 'ACTIVO',
+      expires_at: expiresAt,
+    });
+
+    await RefreshToken.create({
+      user_id: user.id,
+      token: faker.string.alphanumeric({ length: 64 }),
+      device_info: faker.internet.userAgent(),
+      status: 'INACTIVO',
+      expires_at: faker.date.past({ years: 0.1 }),
+    });
+  }
 };
 
 const createGuardiansIfNeeded = async (target: number): Promise<Guardian[]> => {
@@ -75,7 +481,7 @@ const createStudentsIfNeeded = async (target: number, guardians: Guardian[]): Pr
     const guardian = guardians.length ? faker.helpers.arrayElement(guardians) : null;
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
-    const status: StudentStatus = faker.helpers.arrayElement(['ACTIVO', 'INACTIVO', 'GRADUADO']);
+    const status: StudentStatus = faker.helpers.arrayElement(['ACTIVO', 'INACTIVO']);
 
     const student = await Student.create({
       name: firstName,
@@ -120,7 +526,7 @@ const createBusesIfNeeded = async (target: number): Promise<Bus[]> => {
 
   console.log(`Creando ${target} buses...`);
   for (let i = 0; i < target; i += 1) {
-    const status: BusStatus = faker.helpers.arrayElement(['ACTIVO', 'INACTIVO', 'EN MANTENIMIENTO']);
+    const status: BusStatus = faker.helpers.arrayElement(['ACTIVO', 'INACTIVO']);
     const bus = await Bus.create({
       plate: `${faker.string.alphanumeric({ length: 3, casing: 'upper' })}-${faker.string.numeric({ length: 3, allowLeadingZeros: false })}`,
       capacity: faker.number.int({ min: 28, max: 45 }),
@@ -149,7 +555,7 @@ const createDriversIfNeeded = async (target: number, buses: Bus[]): Promise<Driv
 
   console.log(`Creando ${target} conductores...`);
   for (let i = 0; i < target; i += 1) {
-    const status: DriverStatus = faker.helpers.arrayElement(['ACTIVO', 'INACTIVO', 'SUSPENDIDO']);
+    const status: DriverStatus = faker.helpers.arrayElement(['ACTIVO', 'INACTIVO']);
     const bus = buses.length ? faker.helpers.arrayElement(buses) : null;
 
     const driver = await Driver.create({
@@ -196,7 +602,7 @@ const createRoutesIfNeeded = async (target: number, buses: Bus[], drivers: Drive
   for (let i = 0; i < target; i += 1) {
     const currentBus = buses.length ? faker.helpers.arrayElement(buses) : null;
     const currentDriver = drivers.length ? faker.helpers.arrayElement(drivers) : null;
-    const status: RouteStatus = faker.helpers.arrayElement(['ACTIVE', 'INACTIVE']);
+    const status: RouteStatus = faker.helpers.arrayElement(['ACTIVO', 'INACTIVO']);
 
     const route = await Route.create({
       name: `Ruta ${faker.string.alphanumeric({ length: 4, casing: 'upper' })}`,
@@ -222,7 +628,7 @@ const createStopsIfNeeded = async (target: number): Promise<Stop[]> => {
 
   console.log(`Creando ${target} paradas...`);
   for (let i = 0; i < target; i += 1) {
-    const status: StopStatus = faker.helpers.arrayElement(['ACTIVA', 'INACTIVA']);
+    const status: StopStatus = faker.helpers.arrayElement(['ACTIVO', 'INACTIVO']);
     const stop = await Stop.create({
       name: `Parada ${faker.location.street()}`,
       direction: faker.location.direction(),
@@ -260,6 +666,7 @@ const createRouteStopsIfNeeded = async (routes: Route[], stops: Stop[]): Promise
         stopId: stop.id,
         position,
         scheduledTimeHint: randomTime(6, 9),
+        status: faker.helpers.arrayElement(['ACTIVO', 'INACTIVO']),
       });
       position += 1;
     }
@@ -318,7 +725,7 @@ const createItinerariesIfNeeded = async (routes: Route[], buses: Bus[], drivers:
       const driver = faker.helpers.arrayElement(drivers);
       const departure = randomTime(6, 8);
       const arrival = randomTime(9, 12);
-      const status: ItineraryStatus = faker.helpers.arrayElement(['PLANEADO', 'EN PROGRESO', 'COMPLETADO', 'CANCELADO']);
+      const status: ItineraryStatus = faker.helpers.arrayElement(['ACTIVO', 'INACTIVO']);
 
       const itinerary = await Itinerary.create({
         routeId: route.id,
@@ -374,6 +781,7 @@ const createItineraryStopsIfNeeded = async (itineraries: Itinerary[]): Promise<v
         scheduledTime: `${scheduledHour.toString().padStart(2, '0')}:${scheduledMinute
           .toString()
           .padStart(2, '0')}:00`,
+        status: faker.helpers.arrayElement(['ACTIVO', 'INACTIVO']),
       });
     }
   }
@@ -395,7 +803,7 @@ const createAssistancesIfNeeded = async (students: Student[], routes: Route[], b
   for (const student of students) {
     const route = faker.helpers.arrayElement(routes);
     const bus = faker.helpers.arrayElement(buses);
-    const status: AssistanceStatus = faker.helpers.arrayElement(['CONFIRMADO', 'AUSENTE', 'CANCELADO']);
+    const status: AssistanceStatus = faker.helpers.arrayElement(['ACTIVO', 'INACTIVO']);
 
     await Assistance.create({
       studentId: student.id,
@@ -425,7 +833,7 @@ const createIncidencesIfNeeded = async (routes: Route[], buses: Bus[]): Promise<
     const route = faker.helpers.arrayElement(routes);
     const bus = faker.helpers.arrayElement(buses);
     const severity: IncidenceSeverity = faker.helpers.arrayElement(['BAJA', 'MEDIA', 'ALTA', 'CRITICA']);
-    const status: IncidenceStatus = faker.helpers.arrayElement(['ABIERTA', 'EN PROGRESO', 'RESUELTO', 'CERRADO']);
+    const status: IncidenceStatus = faker.helpers.arrayElement(['ACTIVO', 'INACTIVO']);
     const reportedAt = faker.date.recent({ days: 40 });
 
     await Incidence.create({
@@ -457,7 +865,7 @@ const createMaintenancesIfNeeded = async (buses: Bus[]): Promise<void> => {
   console.log('Creando mantenimientos...');
   for (const bus of buses) {
     const type: MaintenanceType = faker.helpers.arrayElement(['PREVENTIVO', 'CORRECTIVO', 'INSPECCION']);
-    const status: MaintenanceStatus = faker.helpers.arrayElement(['PENDIENTE', 'EN PROGRESO', 'COMPLETADO']);
+    const status: MaintenanceStatus = faker.helpers.arrayElement(['ACTIVO', 'INACTIVO']);
     const performedAt = faker.date.recent({ days: 90 });
 
     await Maintenance.create({
@@ -477,7 +885,16 @@ const createMaintenancesIfNeeded = async (buses: Bus[]): Promise<void> => {
 const main = async () => {
   try {
     await testConnection();
+    await ensureStatusSchema();
     await sequelize.sync();
+
+    const roles = await createRolesIfNeeded();
+    const users = await createUsersIfNeeded();
+    const resources = await createResourcesIfNeeded();
+
+    await createRoleUsersIfNeeded(users, roles);
+    await createResourceRolesIfNeeded(roles, resources);
+    await createRefreshTokensIfNeeded(users);
 
     const guardians = await createGuardiansIfNeeded(10);
     const students = await createStudentsIfNeeded(20, guardians);

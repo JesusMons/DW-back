@@ -1,0 +1,15 @@
+### Listar todos los itinerarios
+GET http://localhost:3000/api/itineraries
+Content-Type: application/json
+
+###
+
+### Filtrar itinerarios por estado y fecha
+GET http://localhost:3000/api/itineraries?status=ACTIVO&date=2024-01-15
+Content-Type: application/json
+
+###
+
+### Obtener itinerario por ID
+GET http://localhost:3000/api/itineraries/1
+Content-Type: application/json

@@ -1,5 +1,5 @@
 import { Model } from "sequelize";
-export type StopStatus = "ACTIVA" | "INACTIVA";
+export type StopStatus = "ACTIVO" | "INACTIVO";
 export interface StopI {
     id?: number;
     name: string;

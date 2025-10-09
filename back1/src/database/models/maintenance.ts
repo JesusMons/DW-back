@@ -4,7 +4,7 @@ import { Bus } from "./bus";
 
 
 export type MaintenanceType = "PREVENTIVO" | "CORRECTIVO" | "INSPECCION";
-export type MaintenanceStatus = "PENDIENTE" | "EN PROGRESO" | "COMPLETADO";
+export type MaintenanceStatus = "ACTIVO" | "INACTIVO";
 
 
 export interface MaintenanceI {
@@ -44,7 +44,7 @@ description: { type: DataTypes.STRING(500), allowNull: false },
 cost: { type: DataTypes.DECIMAL(12, 2), allowNull: true },
 performedAt: { field: "performed_at", type: DataTypes.DATEONLY, allowNull: false },
 nextDueDate: { field: "next_due_date", type: DataTypes.DATEONLY, allowNull: true },
-status: { type: DataTypes.ENUM("PENDIENTE", "EN PROGRESO", "COMPLETADO"), allowNull: false, defaultValue: "PENDIENTE" },
+status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 mechanic: { type: DataTypes.STRING(120), allowNull: true },
 odometer: { type: DataTypes.INTEGER, allowNull: true },
 },

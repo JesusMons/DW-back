@@ -3,7 +3,7 @@ import  sequelize  from "../db";
 import { Driver } from "./driver"; // Para relaciones Bus ↔ Driver
 
 
-export type BusStatus = "ACTIVO" | "INACTIVO" | "EN MANTENIMIENTO";
+export type BusStatus = "ACTIVO" | "INACTIVO";
 
 
 export interface BusI {
@@ -48,7 +48,7 @@ model: { type: DataTypes.STRING(50), allowNull: true },
 brand: { type: DataTypes.STRING(50), allowNull: true },
 year: { type: DataTypes.SMALLINT, allowNull: true },
 color: { type: DataTypes.STRING(30), allowNull: true },
-status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO", "EN MANTENIMIENTO"), allowNull: false, defaultValue: "ACTIVO" },
+status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 insuranceExpiry: { field: "insurance_expiry", type: DataTypes.DATEONLY, allowNull: true },
 lastMaintenance: { field: "last_maintenance", type: DataTypes.DATEONLY, allowNull: true },
 nextMaintenance: { field: "next_maintenance", type: DataTypes.DATEONLY, allowNull: true },

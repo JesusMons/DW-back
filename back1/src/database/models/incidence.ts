@@ -5,7 +5,7 @@ import { Route } from "./route";
 
 
 export type IncidenceSeverity = "BAJA" | "MEDIA" | "ALTA" | "CRITICA";
-export type IncidenceStatus = "ABIERTA" | "EN PROGRESO" | "RESUELTO" | "CERRADO";
+export type IncidenceStatus = "ACTIVO" | "INACTIVO";
 
 
 export interface IncidenceI {
@@ -43,7 +43,7 @@ busId: { field: "bus_id", type: DataTypes.BIGINT, allowNull: false },
 routeId: { field: "route_id", type: DataTypes.BIGINT, allowNull: false },
 description: { type: DataTypes.STRING(600), allowNull: false },
 severity: { type: DataTypes.ENUM("BAJA", "MEDIA", "ALTA", "CRITICA"), allowNull: false },
-status: { type: DataTypes.ENUM("ABIERTA", "EN PROGRESO", "RESUELTO", "CERRADO"), allowNull: false, defaultValue: "ABIERTA" },
+status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 reportedAt: { field: "reported_at", type: DataTypes.DATE, allowNull: false },
 resolvedAt: { field: "resolved_at", type: DataTypes.DATE, allowNull: true },
 reportedBy: { field: "reported_by", type: DataTypes.STRING(120), allowNull: false },

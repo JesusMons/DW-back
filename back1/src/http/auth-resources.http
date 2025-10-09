@@ -1,0 +1,15 @@
+### Listar todos los recursos protegidos
+GET http://localhost:3000/api/auth/resources
+Content-Type: application/json
+
+###
+
+### Filtrar recursos por método
+GET http://localhost:3000/api/auth/resources?method=GET
+Content-Type: application/json
+
+###
+
+### Obtener recurso por ID
+GET http://localhost:3000/api/auth/resources/1
+Content-Type: application/json

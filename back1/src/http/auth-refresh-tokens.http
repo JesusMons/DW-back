@@ -1,0 +1,15 @@
+### Listar todos los tokens de refresco
+GET http://localhost:3000/api/auth/refresh-tokens
+Content-Type: application/json
+
+###
+
+### Filtrar tokens por usuario y estado
+GET http://localhost:3000/api/auth/refresh-tokens?userId=1&status=ACTIVO
+Content-Type: application/json
+
+###
+
+### Obtener token de refresco por ID
+GET http://localhost:3000/api/auth/refresh-tokens/5
+Content-Type: application/json

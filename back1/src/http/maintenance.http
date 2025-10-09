@@ -1,0 +1,15 @@
+### Listar todos los mantenimientos
+GET http://localhost:3000/api/maintenances
+Content-Type: application/json
+
+###
+
+### Filtrar mantenimientos por bus y estado
+GET http://localhost:3000/api/maintenances?busId=1&status=ACTIVO
+Content-Type: application/json
+
+###
+
+### Obtener mantenimiento por ID
+GET http://localhost:3000/api/maintenances/1
+Content-Type: application/json

@@ -19,7 +19,7 @@ Driver.init({
     typeLicence: { field: "type_licence", type: sequelize_1.DataTypes.STRING(32), allowNull: false },
     licenceExpiry: { field: "licence_expiry", type: sequelize_1.DataTypes.DATEONLY, allowNull: true },
     experienceYears: { field: "experience_years", type: sequelize_1.DataTypes.INTEGER, allowNull: true },
-    status: { type: sequelize_1.DataTypes.ENUM("ACTIVO", "INACTIVO", "SUSPENDIDO"), allowNull: false, defaultValue: "ACTIVO" },
+    status: { type: sequelize_1.DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
     assignedBusId: { field: "assigned_bus_id", type: sequelize_1.DataTypes.BIGINT, allowNull: true },
     photoUrl: { field: "photo_url", type: sequelize_1.DataTypes.STRING(255), allowNull: true },
 }, { sequelize: db_1.default, modelName: "Driver", tableName: "drivers", timestamps: true, underscored: true });

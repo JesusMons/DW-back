@@ -15,6 +15,7 @@ ItineraryStopSchedule.init({
     itineraryId: { field: "itinerary_id", type: sequelize_1.DataTypes.BIGINT, allowNull: false, primaryKey: true },
     stopId: { field: "stop_id", type: sequelize_1.DataTypes.BIGINT, allowNull: false, primaryKey: true },
     scheduledTime: { field: "scheduled_time", type: sequelize_1.DataTypes.TIME, allowNull: false },
+    status: { type: sequelize_1.DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 }, { sequelize: db_1.default, modelName: "ItineraryStopSchedule", tableName: "itinerary_stop_schedule", timestamps: false, underscored: true });
 // m:n Itinerary ↔ Stop (definido aquí para evitar ciclos)
 itinerari_1.Itinerary.belongsToMany(stop_1.Stop, { through: ItineraryStopSchedule, foreignKey: "itineraryId", otherKey: "stopId", as: "stops" });

@@ -1,11 +1,17 @@
-### Obtener todas las asistencias
+### Listar todas las asistencias
 GET http://localhost:3000/api/assistances
 Content-Type: application/json
 
 ###
 
+### Filtrar asistencias por estudiante y estado
+GET http://localhost:3000/api/assistances?studentId=1&status=ACTIVO
+Content-Type: application/json
+
+###
+
 ### Obtener asistencia por ID
-GET http://localhost:3000/api/assistances/19
+GET http://localhost:3000/api/assistances/1
 Content-Type: application/json
 
 ###
@@ -15,10 +21,10 @@ POST http://localhost:3000/api/assistances/create
 Content-Type: application/json
 
 {
-  "studentId": 19,
-  "routeId": 4,
+  "studentId": 1,
+  "routeId": 1,
   "busId": 1,
-  "date": "2025-10-08",
+  "date": "2024-01-15",
   "time": "07:45:00",
-  "status": "CONFIRMADO"
+  "status": "ACTIVO"
 }

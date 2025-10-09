@@ -1,0 +1,16 @@
+
+### Listar todos los buses
+GET http://localhost:3000/api/buses
+Content-Type: application/json
+
+###
+
+### Filtrar buses por estado
+GET http://localhost:3000/api/buses?status=ACTIVO
+Content-Type: application/json
+
+###
+
+### Obtener bus por ID
+GET http://localhost:3000/api/buses/1
+Content-Type: application/json

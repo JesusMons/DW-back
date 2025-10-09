@@ -1,0 +1,15 @@
+### Listar todas las paradas
+GET http://localhost:3000/api/stops
+Content-Type: application/json
+
+###
+
+### Filtrar paradas por estado
+GET http://localhost:3000/api/stops?status=ACTIVO
+Content-Type: application/json
+
+###
+
+### Obtener parada por ID
+GET http://localhost:3000/api/stops/1
+Content-Type: application/json

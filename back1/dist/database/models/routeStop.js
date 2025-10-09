@@ -16,6 +16,7 @@ RouteStop.init({
     stopId: { field: "stop_id", type: sequelize_1.DataTypes.BIGINT, allowNull: false, primaryKey: true },
     position: { type: sequelize_1.DataTypes.INTEGER, allowNull: false },
     scheduledTimeHint: { field: "scheduled_time_hint", type: sequelize_1.DataTypes.TIME, allowNull: true },
+    status: { type: sequelize_1.DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 }, { sequelize: db_1.default, modelName: "RouteStop", tableName: "route_stops", timestamps: false, underscored: true });
 // m:n Route ↔ Stop (más acceso a filas puente)
 route_1.Route.belongsToMany(stop_1.Stop, { through: RouteStop, foreignKey: "routeId", otherKey: "stopId", as: "stops" });

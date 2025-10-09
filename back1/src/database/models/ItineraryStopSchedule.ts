@@ -8,6 +8,7 @@ export interface ItineraryStopScheduleI {
 itineraryId: number;
 stopId: number;
 scheduledTime: string; // TIME
+status?: "ACTIVO" | "INACTIVO";
 }
 
 
@@ -15,6 +16,7 @@ export class ItineraryStopSchedule extends Model implements ItineraryStopSchedul
 public itineraryId!: number;
 public stopId!: number;
 public scheduledTime!: string;
+public status?: "ACTIVO" | "INACTIVO";
 }
 
 
@@ -23,6 +25,7 @@ ItineraryStopSchedule.init(
 itineraryId: { field: "itinerary_id", type: DataTypes.BIGINT, allowNull: false, primaryKey: true },
 stopId: { field: "stop_id", type: DataTypes.BIGINT, allowNull: false, primaryKey: true },
 scheduledTime: { field: "scheduled_time", type: DataTypes.TIME, allowNull: false },
+status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 },
 { sequelize, modelName: "ItineraryStopSchedule", tableName: "itinerary_stop_schedule", timestamps: false, underscored: true }
 );

@@ -62,6 +62,29 @@ class AssistanceController {
             }
         });
     }
+    createAssistance(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { studentId, routeId, busId, date, time, status } = req.body;
+                // Validación de campos requeridos
+                if (!studentId || !routeId || !busId || !date || !time || !status) {
+                    return res.status(400).json({ error: "Missing required fields" });
+                }
+                const newAssistance = yield assistance_1.Assistance.create({
+                    studentId,
+                    routeId,
+                    busId,
+                    date,
+                    time,
+                    status,
+                });
+                res.status(201).json(newAssistance);
+            }
+            catch (err) {
+                res.status(500).json({ error: "Error creating assistance" });
+            }
+        });
+    }
 }
 exports.AssistanceController = AssistanceController;
 //# sourceMappingURL=assistance.controller.js.map

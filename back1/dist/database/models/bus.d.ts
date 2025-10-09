@@ -1,5 +1,5 @@
 import { Model } from "sequelize";
-export type BusStatus = "ACTIVO" | "INACTIVO" | "EN MANTENIMIENTO";
+export type BusStatus = "ACTIVO" | "INACTIVO";
 export interface BusI {
     id?: number;
     plate: string;

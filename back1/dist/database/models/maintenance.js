@@ -18,7 +18,7 @@ Maintenance.init({
     cost: { type: sequelize_1.DataTypes.DECIMAL(12, 2), allowNull: true },
     performedAt: { field: "performed_at", type: sequelize_1.DataTypes.DATEONLY, allowNull: false },
     nextDueDate: { field: "next_due_date", type: sequelize_1.DataTypes.DATEONLY, allowNull: true },
-    status: { type: sequelize_1.DataTypes.ENUM("PENDIENTE", "EN PROGRESO", "COMPLETADO"), allowNull: false, defaultValue: "PENDIENTE" },
+    status: { type: sequelize_1.DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
     mechanic: { type: sequelize_1.DataTypes.STRING(120), allowNull: true },
     odometer: { type: sequelize_1.DataTypes.INTEGER, allowNull: true },
 }, { sequelize: db_1.default, modelName: "Maintenance", tableName: "maintenances", timestamps: true, underscored: true });

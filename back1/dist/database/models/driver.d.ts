@@ -1,5 +1,5 @@
 import { Model } from "sequelize";
-export type DriverStatus = "ACTIVO" | "INACTIVO" | "SUSPENDIDO";
+export type DriverStatus = "ACTIVO" | "INACTIVO";
 export interface DriverI {
     id?: number;
     name: string;

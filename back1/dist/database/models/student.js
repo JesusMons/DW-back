@@ -21,7 +21,7 @@ Student.init({
     phone: { type: sequelize_1.DataTypes.STRING(30), allowNull: true },
     guardianPhone: { field: "guardian_phone", type: sequelize_1.DataTypes.STRING(30), allowNull: true },
     email: { type: sequelize_1.DataTypes.STRING(190), allowNull: true, validate: { isEmail: true } },
-    status: { type: sequelize_1.DataTypes.ENUM("ACTIVO", "INACTIVO", "GRADUADO"), allowNull: false, defaultValue: "ACTIVO" },
+    status: { type: sequelize_1.DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
     allergies: { type: sequelize_1.DataTypes.JSON, allowNull: true },
     emergencyContact: { field: "emergency_contact", type: sequelize_1.DataTypes.JSON, allowNull: true },
 }, { sequelize: db_1.default, modelName: "Student", tableName: "students", timestamps: true, underscored: true });

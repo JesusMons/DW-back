@@ -5,13 +5,13 @@ import { RoleUser } from "./RolUser";
 export class Role extends Model {
   public id!: number;
   public name!: string;
-  public is_active!: "ACTIVE" | "INACTIVE";
+  public status!: "ACTIVO" | "INACTIVO";
 }
 
 export interface RoleI {
     id?: number;
     name: string;
-    is_active: "ACTIVE" | "INACTIVE";
+    status: "ACTIVO" | "INACTIVO";
   }
 
 Role.init(
@@ -20,9 +20,9 @@ Role.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    is_active: {
-      type: DataTypes.ENUM("ACTIVE", "INACTIVE"),
-      defaultValue: "ACTIVE",
+    status: {
+      type: DataTypes.ENUM("ACTIVO", "INACTIVO"),
+      defaultValue: "ACTIVO",
     }
   },
   {

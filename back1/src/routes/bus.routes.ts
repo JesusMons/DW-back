@@ -1,5 +1,6 @@
 import { Application } from "express";
 import { BusController } from "../controllers/bus.controller";
+import { authMiddleware } from "../middleware/auth";
 
 export class BusRoutes {
   private readonly busController = new BusController();
@@ -7,7 +8,7 @@ export class BusRoutes {
   public routes(app: Application): void {
     app
       .route("/api/buses")
-      .get(this.busController.getAllBuses.bind(this.busController));
+      .get( authMiddleware, this.busController.getAllBuses.bind(this.busController));
 
     app
       .route("/api/buses/:id")

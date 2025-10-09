@@ -1,0 +1,15 @@
+### Listar todas las asignaciones usuario-rol
+GET http://localhost:3000/api/auth/role-users
+Content-Type: application/json
+
+###
+
+### Filtrar asignaciones por rol y usuario
+GET http://localhost:3000/api/auth/role-users?roleId=1&userId=3
+Content-Type: application/json
+
+###
+
+### Obtener asignación usuario-rol por ID
+GET http://localhost:3000/api/auth/role-users/1
+Content-Type: application/json

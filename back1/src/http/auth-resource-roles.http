@@ -1,0 +1,15 @@
+### Listar todas las asignaciones rol-recurso
+GET http://localhost:3000/api/auth/resource-roles
+Content-Type: application/json
+
+###
+
+### Filtrar asignaciones por rol y recurso
+GET http://localhost:3000/api/auth/resource-roles?roleId=1&resourceId=2
+Content-Type: application/json
+
+###
+
+### Obtener asignación rol-recurso por ID
+GET http://localhost:3000/api/auth/resource-roles/4
+Content-Type: application/json

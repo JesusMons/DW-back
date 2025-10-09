@@ -4,14 +4,14 @@ export class Resource extends Model {
   public id!: number;
   public path!: string;
   public method!: string;
-  public is_active!: "ACTIVE" | "INACTIVE";
+  public status!: "ACTIVO" | "INACTIVO";
 }
 
 export interface ResourceI {
   id?: number;
   path: string;
   method: string;
-  is_active: "ACTIVE" | "INACTIVE";
+  status: "ACTIVO" | "INACTIVO";
 }
 
 Resource.init(
@@ -30,9 +30,9 @@ Resource.init(
         notEmpty: { msg: "Method cannot be empty" },
       },
     },
-    is_active: {
-      type: DataTypes.ENUM("ACTIVE", "INACTIVE"),
-      defaultValue: "ACTIVE",
+    status: {
+      type: DataTypes.ENUM("ACTIVO", "INACTIVO"),
+      defaultValue: "ACTIVO",
     },
   },
   {

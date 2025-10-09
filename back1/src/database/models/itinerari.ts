@@ -5,7 +5,7 @@ import { Driver } from "./driver";
 import { Bus } from "./bus";
 
 
-export type ItineraryStatus = "PLANEADO" | "EN PROGRESO" | "COMPLETADO" | "CANCELADO";
+export type ItineraryStatus = "ACTIVO" | "INACTIVO";
 
 
 export interface ItineraryI {
@@ -43,7 +43,7 @@ departureTime: { field: "departure_time", type: DataTypes.TIME, allowNull: false
 arrivalTime: { field: "arrival_time", type: DataTypes.TIME, allowNull: false },
 driverId: { field: "driver_id", type: DataTypes.BIGINT, allowNull: false },
 busId: { field: "bus_id", type: DataTypes.BIGINT, allowNull: false },
-status: { type: DataTypes.ENUM("PLANEADO", "EN PROGRESO", "COMPLETADO", "CANCELADO"), allowNull: false, defaultValue: "PLANEADO" },
+status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 notes: { type: DataTypes.STRING(500), allowNull: true },
 },
 { sequelize, modelName: "Itinerary", tableName: "itineraries", timestamps: true, underscored: true }

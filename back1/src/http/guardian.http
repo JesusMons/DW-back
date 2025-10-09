@@ -1,0 +1,15 @@
+### Listar todos los tutores
+GET http://localhost:3000/api/guardians
+Content-Type: application/json
+
+###
+
+### Filtrar tutores por estado
+GET http://localhost:3000/api/guardians?status=ACTIVO
+Content-Type: application/json
+
+###
+
+### Obtener tutor por ID
+GET http://localhost:3000/api/guardians/1
+Content-Type: application/json

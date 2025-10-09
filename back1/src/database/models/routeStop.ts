@@ -9,6 +9,7 @@ routeId: number;
 stopId: number;
 position: number;
 scheduledTimeHint?: string | null; // TIME
+status?: "ACTIVO" | "INACTIVO";
 }
 
 
@@ -17,6 +18,7 @@ public routeId!: number;
 public stopId!: number;
 public position!: number;
 public scheduledTimeHint?: string | null;
+public status?: "ACTIVO" | "INACTIVO";
 }
 
 
@@ -26,6 +28,7 @@ routeId: { field: "route_id", type: DataTypes.BIGINT, allowNull: false, primaryK
 stopId: { field: "stop_id", type: DataTypes.BIGINT, allowNull: false, primaryKey: true },
 position: { type: DataTypes.INTEGER, allowNull: false },
 scheduledTimeHint: { field: "scheduled_time_hint", type: DataTypes.TIME, allowNull: true },
+status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 },
 { sequelize, modelName: "RouteStop", tableName: "route_stops", timestamps: false, underscored: true }
 );

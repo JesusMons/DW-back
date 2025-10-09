@@ -9,7 +9,7 @@ export class RefreshToken extends Model {
   public user_id!: number;
   public token!: string;
   public device_info!: string;
-  public is_valid!: "ACTIVE" | "INACTIVE";;
+  public status!: "ACTIVO" | "INACTIVO";;
   public expires_at!: Date;
   public created_at!: Date;
   public updated_at!: Date;
@@ -20,7 +20,7 @@ export interface RefreshTokenI {
   user_id?: number;
   token: string;
   device_info: string;
-  is_valid: "ACTIVE" | "INACTIVE";
+  status: "ACTIVO" | "INACTIVO";
   expires_at: Date;
   created_at: Date;
   updated_at: Date;
@@ -37,9 +37,9 @@ RefreshToken.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    is_valid: {
-      type: DataTypes.ENUM("ACTIVE", "INACTIVE"),
-      defaultValue: "ACTIVE",
+    status: {
+      type: DataTypes.ENUM("ACTIVO", "INACTIVO"),
+      defaultValue: "ACTIVO",
     },
     expires_at: {
       type: DataTypes.DATE,

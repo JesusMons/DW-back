@@ -7,11 +7,17 @@ import { IncidenceRoutes } from "./incidence.routes";
 import { ItineraryRoutes } from "./itinerary.routes";
 import { ItineraryStopScheduleRoutes } from "./itinerary-stop-schedule.routes";
 import { MaintenanceRoutes } from "./maintenance.routes";
+import { RefreshTokenRoutes } from "./refresh-token.routes";
+import { ResourceRoleRoutes } from "./resource-role.routes";
+import { ResourceRoutes } from "./resource.routes";
 import { RouteRoutes } from "./route.routes";
 import { RouteAssignmentRoutes } from "./route-assignment.routes";
 import { RouteStopRoutes } from "./route-stop.routes";
+import { RoleRoutes } from "./role.routes";
+import { RoleUserRoutes } from "./role-user.routes";
 import { StopRoutes } from "./stop.routes";
 import { StudentRoutes } from "./student.routes";
+import { UserRoutes } from "./user.routes";
 export declare class Routes {
     readonly assistanceRoutes: AssistanceRoutes;
     readonly busRoutes: BusRoutes;
@@ -26,6 +32,12 @@ export declare class Routes {
     readonly routeStopRoutes: RouteStopRoutes;
     readonly stopRoutes: StopRoutes;
     readonly studentRoutes: StudentRoutes;
+    readonly userRoutes: UserRoutes;
+    readonly roleRoutes: RoleRoutes;
+    readonly roleUserRoutes: RoleUserRoutes;
+    readonly resourceRoutes: ResourceRoutes;
+    readonly resourceRoleRoutes: ResourceRoleRoutes;
+    readonly refreshTokenRoutes: RefreshTokenRoutes;
     init(app: Application): void;
 }
 //# sourceMappingURL=index.d.ts.map

@@ -52,12 +52,18 @@ class App {
         this.routePrv.routeStopRoutes.routes(this.app);
         this.routePrv.stopRoutes.routes(this.app);
         this.routePrv.studentRoutes.routes(this.app);
+        this.routePrv.userRoutes.routes(this.app);
+        this.routePrv.roleRoutes.routes(this.app);
+        this.routePrv.roleUserRoutes.routes(this.app);
+        this.routePrv.resourceRoutes.routes(this.app);
+        this.routePrv.resourceRoleRoutes.routes(this.app);
+        this.routePrv.refreshTokenRoutes.routes(this.app);
     }
     // Method to connect and synchronize the database
     dbConnection() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield db_1.default.sync({ force: true }); // Synchronize the database
+                yield db_1.default.sync({ force: false }); // Synchronize the database para que no se borren debe estar en false
                 console.log("Database connected successfully");
             }
             catch (error) {

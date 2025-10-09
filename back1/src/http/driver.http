@@ -1,0 +1,15 @@
+### Listar todos los conductores
+GET http://localhost:3000/api/drivers
+Content-Type: application/json
+
+###
+
+### Filtrar conductores por estado
+GET http://localhost:3000/api/drivers?status=ACTIVO
+Content-Type: application/json
+
+###
+
+### Obtener conductor por ID
+GET http://localhost:3000/api/drivers/1
+Content-Type: application/json

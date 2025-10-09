@@ -1,0 +1,15 @@
+### Listar todos los estudiantes
+GET http://localhost:3000/api/students
+Content-Type: application/json
+
+###
+
+### Filtrar estudiantes por estado
+GET http://localhost:3000/api/students?status=ACTIVO
+Content-Type: application/json
+
+###
+
+### Obtener estudiante por ID
+GET http://localhost:3000/api/students/1
+Content-Type: application/json

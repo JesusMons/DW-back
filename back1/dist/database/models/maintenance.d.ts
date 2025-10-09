@@ -1,6 +1,6 @@
 import { Model } from "sequelize";
 export type MaintenanceType = "PREVENTIVO" | "CORRECTIVO" | "INSPECCION";
-export type MaintenanceStatus = "PENDIENTE" | "EN PROGRESO" | "COMPLETADO";
+export type MaintenanceStatus = "ACTIVO" | "INACTIVO";
 export interface MaintenanceI {
     id?: number;
     busId: number;

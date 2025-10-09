@@ -1,0 +1,15 @@
+### Listar todas las asignaciones de ruta
+GET http://localhost:3000/api/route-assignments
+Content-Type: application/json
+
+###
+
+### Filtrar asignaciones por estado
+GET http://localhost:3000/api/route-assignments?status=ACTIVO
+Content-Type: application/json
+
+###
+
+### Obtener asignación de ruta por ID
+GET http://localhost:3000/api/route-assignments/1
+Content-Type: application/json

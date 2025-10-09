@@ -4,7 +4,7 @@ import { Bus } from "./bus"; // definir Route ↔ Bus/Driver aquí
 import { Driver } from "./driver";
 
 
-export type RouteStatus = "ACTIVE" | "INACTIVE";
+export type RouteStatus = "ACTIVO" | "INACTIVO";
 
 
 export interface RouteI {
@@ -37,7 +37,7 @@ startPoint: { field: "start_point", type: DataTypes.STRING(190), allowNull: fals
 endPoint: { field: "end_point", type: DataTypes.STRING(190), allowNull: false },
 currentBusId: { field: "current_bus_id", type: DataTypes.BIGINT, allowNull: true },
 currentDriverId: { field: "current_driver_id", type: DataTypes.BIGINT, allowNull: true },
-status: { type: DataTypes.ENUM("ACTIVE", "INACTIVE"), allowNull: false, defaultValue: "ACTIVE" },
+status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 },
 { sequelize, modelName: "Route", tableName: "routes", timestamps: true, underscored: true }
 );

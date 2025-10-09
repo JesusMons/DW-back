@@ -17,7 +17,7 @@ Incidence.init({
     routeId: { field: "route_id", type: sequelize_1.DataTypes.BIGINT, allowNull: false },
     description: { type: sequelize_1.DataTypes.STRING(600), allowNull: false },
     severity: { type: sequelize_1.DataTypes.ENUM("BAJA", "MEDIA", "ALTA", "CRITICA"), allowNull: false },
-    status: { type: sequelize_1.DataTypes.ENUM("ABIERTA", "EN PROGRESO", "RESUELTO", "CERRADO"), allowNull: false, defaultValue: "ABIERTA" },
+    status: { type: sequelize_1.DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
     reportedAt: { field: "reported_at", type: sequelize_1.DataTypes.DATE, allowNull: false },
     resolvedAt: { field: "resolved_at", type: sequelize_1.DataTypes.DATE, allowNull: true },
     reportedBy: { field: "reported_by", type: sequelize_1.DataTypes.STRING(120), allowNull: false },

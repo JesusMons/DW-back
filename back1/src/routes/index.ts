@@ -7,11 +7,18 @@ import { IncidenceRoutes } from "./incidence.routes";
 import { ItineraryRoutes } from "./itinerary.routes";
 import { ItineraryStopScheduleRoutes } from "./itinerary-stop-schedule.routes";
 import { MaintenanceRoutes } from "./maintenance.routes";
+import { RefreshTokenRoutes } from "./refresh-token.routes";
+import { ResourceRoleRoutes } from "./resource-role.routes";
+import { ResourceRoutes } from "./resource.routes";
 import { RouteRoutes } from "./route.routes";
 import { RouteAssignmentRoutes } from "./route-assignment.routes";
 import { RouteStopRoutes } from "./route-stop.routes";
+import { RoleRoutes } from "./role.routes";
+import { RoleUserRoutes } from "./role-user.routes";
 import { StopRoutes } from "./stop.routes";
 import { StudentRoutes } from "./student.routes";
+import { UserRoutes } from "./user.routes";
+import { AuthRoutes } from "./auth";
 
 export class Routes {
   public readonly assistanceRoutes = new AssistanceRoutes();
@@ -27,6 +34,13 @@ export class Routes {
   public readonly routeStopRoutes = new RouteStopRoutes();
   public readonly stopRoutes = new StopRoutes();
   public readonly studentRoutes = new StudentRoutes();
+  public readonly userRoutes = new UserRoutes();
+  public readonly roleRoutes = new RoleRoutes();
+  public readonly roleUserRoutes = new RoleUserRoutes();
+  public readonly resourceRoutes = new ResourceRoutes();
+  public readonly resourceRoleRoutes = new ResourceRoleRoutes();
+  public readonly refreshTokenRoutes = new RefreshTokenRoutes();
+  public readonly authRoutes = new AuthRoutes();
 
   public init(app: Application): void {
     this.assistanceRoutes.routes(app);
@@ -42,5 +56,12 @@ export class Routes {
     this.routeStopRoutes.routes(app);
     this.stopRoutes.routes(app);
     this.studentRoutes.routes(app);
+    this.userRoutes.routes(app);
+    this.roleRoutes.routes(app);
+    this.roleUserRoutes.routes(app);
+    this.resourceRoutes.routes(app);
+    this.resourceRoleRoutes.routes(app);
+    this.refreshTokenRoutes.routes(app);
+    this.authRoutes.routes(app);
   }
 }

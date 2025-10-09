@@ -15,6 +15,6 @@ Stop.init({
     direction: { type: sequelize_1.DataTypes.STRING(190), allowNull: false },
     orderHint: { field: "order_hint", type: sequelize_1.DataTypes.INTEGER, allowNull: true },
     landmark: { type: sequelize_1.DataTypes.STRING(190), allowNull: true },
-    status: { type: sequelize_1.DataTypes.ENUM("ACTIVA", "INACTIVA"), allowNull: false, defaultValue: "ACTIVA" },
+    status: { type: sequelize_1.DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
 }, { sequelize: db_1.default, modelName: "Stop", tableName: "stops", timestamps: true, underscored: true });
 //# sourceMappingURL=stop.js.map

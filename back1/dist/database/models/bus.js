@@ -19,7 +19,7 @@ Bus.init({
     brand: { type: sequelize_1.DataTypes.STRING(50), allowNull: true },
     year: { type: sequelize_1.DataTypes.SMALLINT, allowNull: true },
     color: { type: sequelize_1.DataTypes.STRING(30), allowNull: true },
-    status: { type: sequelize_1.DataTypes.ENUM("ACTIVO", "INACTIVO", "EN MANTENIMIENTO"), allowNull: false, defaultValue: "ACTIVO" },
+    status: { type: sequelize_1.DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
     insuranceExpiry: { field: "insurance_expiry", type: sequelize_1.DataTypes.DATEONLY, allowNull: true },
     lastMaintenance: { field: "last_maintenance", type: sequelize_1.DataTypes.DATEONLY, allowNull: true },
     nextMaintenance: { field: "next_maintenance", type: sequelize_1.DataTypes.DATEONLY, allowNull: true },

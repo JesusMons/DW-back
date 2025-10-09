@@ -1,0 +1,15 @@
+### Listar todos los roles
+GET http://localhost:3000/api/auth/roles
+Content-Type: application/json
+
+###
+
+### Filtrar roles por estado
+GET http://localhost:3000/api/auth/roles?status=ACTIVO
+Content-Type: application/json
+
+###
+
+### Obtener rol por ID
+GET http://localhost:3000/api/auth/roles/1
+Content-Type: application/json

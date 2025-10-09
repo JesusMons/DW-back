@@ -1,5 +1,5 @@
 import { Model } from "sequelize";
-export type ItineraryStatus = "PLANEADO" | "EN PROGRESO" | "COMPLETADO" | "CANCELADO";
+export type ItineraryStatus = "ACTIVO" | "INACTIVO";
 export interface ItineraryI {
     id?: number;
     routeId: number;
