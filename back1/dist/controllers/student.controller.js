@@ -164,12 +164,8 @@ class StudentController {
                 yield studentToUpdate.update(body, { transaction });
                 let userPayload = null;
                 if (email) {
-                    // Check if a user already exists with previous or current email
                     const userByPreviousEmail = previousEmail
-                        ? yield User_1.User.findOne({
-                            where: { email: previousEmail },
-                            transaction,
-                        })
+                        ? yield User_1.User.findOne({ where: { email: previousEmail }, transaction })
                         : null;
                     const userByCurrentEmail = yield User_1.User.findOne({
                         where: { email },
@@ -181,6 +177,7 @@ class StudentController {
                         yield userByPreviousEmail.update({
                             email,
                             username: ensuredUsername,
+                            status: "ACTIVO",
                         }, { transaction });
                         userPayload = sanitizeUser(userByPreviousEmail);
                     }

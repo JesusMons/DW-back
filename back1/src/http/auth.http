@@ -7,8 +7,8 @@ POST {{baseUrl}}/api/register
 Content-Type: application/json
 
 {
-  "username": "ADMIN",
-  "email": "ADMIN@admin.com",
+  "username": "operario",
+  "email": "operario@uniguajira.com",
   "password": "6640",
   "status": "ACTIVO",
   "avatar": "https://example.com/avatar.png"
@@ -21,6 +21,6 @@ POST {{baseUrl}}/api/login
 Content-Type: application/json
 
 {
-  "email": "ADMIN@admin.com",
+  "email": "supervisor@uniguajira.com",
   "password": "6640"
 }

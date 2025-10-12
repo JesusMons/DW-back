@@ -1,5 +1,5 @@
 import { Model, DataTypes } from "sequelize";
-import sequelize  from "../../db";
+import sequelize from "../../db";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { RoleUser } from "./RolUser";
@@ -17,7 +17,7 @@ export class User extends Model {
   }
 
 
-  
+
 
   public generateToken(): string {
     return jwt.sign({ id: this.id }, process.env.JWT_SECRET || 'secret', {
@@ -31,7 +31,7 @@ export class User extends Model {
     const token = jwt.sign({ id: this.id }, process.env.JWT_SECRET || 'secret', {
       expiresIn,
     });
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 1 minutos
+    const expiresAt = new Date(Date.now() + 1 * 60 * 1000); // 1 minutos
     // const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas
     return { token, expiresAt };
   }
