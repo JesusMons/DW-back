@@ -14,7 +14,6 @@ export class AuthController {
         avatar,
       });
       const token = user_interface.generateToken();
-      // const refresh_token = user_interface.generateRefreshToken();
       res.status(201).json({ user_interface, token });
     } catch (error) {
       res.status(500).json({ error: 'Error al registrar el usuario' });
@@ -35,18 +34,27 @@ export class AuthController {
         return;
       }
 
-      
       const token = user.generateToken();
       const { token: refreshToken, expiresAt } = user.generateRefreshToken();
+      const deviceInfo = req.headers['user-agent'] || 'unknown';
 
-      // Crear un nuevo registro en RefreshToken
-      
+      await RefreshToken.update(
+        { status: "INACTIVO" },
+        {
+          where: {
+            user_id: user.id,
+            device_info: deviceInfo,
+            status: "ACTIVO",
+          },
+        }
+      );
+
       await RefreshToken.create({
         user_id: user.id,
         token: refreshToken,
-        device_info: req.headers['user-agent'] || 'unknown',
+        device_info: deviceInfo,
         status: "ACTIVO",
-        expires_at: expiresAt
+        expires_at: expiresAt,
       });
 
       res.status(200).json({ user, token, refreshToken });
@@ -55,4 +63,59 @@ export class AuthController {
     }
   }
 
+  public async refresh(req: Request, res: Response): Promise<void> {
+    try {
+      const { refreshToken } = req.body;
+
+      if (!refreshToken) {
+        res.status(400).json({ error: 'Se requiere el refresh token.' });
+        return;
+      }
+
+      const storedRefreshToken = await RefreshToken.findOne({
+        where: { token: refreshToken, status: "ACTIVO" },
+      });
+
+      if (!storedRefreshToken) {
+        res.status(401).json({ error: 'Refresh token inválido.' });
+        return;
+      }
+
+      if (
+        storedRefreshToken.expires_at &&
+        storedRefreshToken.expires_at.getTime() <= Date.now()
+      ) {
+        await storedRefreshToken.update({ status: "INACTIVO" });
+        res.status(401).json({ error: 'Refresh token expirado.' });
+        return;
+      }
+
+      const user = await User.findOne({
+        where: { id: storedRefreshToken.user_id, status: "ACTIVO" },
+      });
+
+      if (!user) {
+        await storedRefreshToken.update({ status: "INACTIVO" });
+        res.status(401).json({ error: 'Usuario no encontrado o inactivo.' });
+        return;
+      }
+
+      const token = user.generateToken();
+      const { token: newRefreshToken, expiresAt } = user.generateRefreshToken();
+
+      await storedRefreshToken.update({ status: "INACTIVO" });
+
+      await RefreshToken.create({
+        user_id: user.id,
+        token: newRefreshToken,
+        device_info: storedRefreshToken.device_info || req.headers['user-agent'] || 'unknown',
+        status: "ACTIVO",
+        expires_at: expiresAt,
+      });
+
+      res.status(200).json({ token, refreshToken: newRefreshToken });
+    } catch (error) {
+      res.status(500).json({ error: 'Error al refrescar el token' });
+    }
+  }
 }

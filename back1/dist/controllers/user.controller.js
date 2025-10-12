@@ -68,7 +68,7 @@ class UserController {
     }
     createUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { username, email, password, status, avatar, mustChangePassword } = req.body;
+            const { username, email, password, status, avatar } = req.body;
             try {
                 const body = {
                     username,
@@ -76,7 +76,6 @@ class UserController {
                     password,
                     status: status !== null && status !== void 0 ? status : "ACTIVO",
                     avatar,
-                    mustChangePassword: mustChangePassword !== null && mustChangePassword !== void 0 ? mustChangePassword : false,
                 };
                 const newUser = yield User_1.User.create(Object.assign({}, body));
                 const created = yield User_1.User.findByPk(newUser.id, {
@@ -95,7 +94,7 @@ class UserController {
             if (Number.isNaN(id)) {
                 return res.status(400).json({ error: "Invalid id" });
             }
-            const { username, email, password, status, avatar, mustChangePassword } = req.body;
+            const { username, email, password, status, avatar } = req.body;
             try {
                 const body = {
                     username,
@@ -103,7 +102,6 @@ class UserController {
                     password,
                     status,
                     avatar,
-                    mustChangePassword,
                 };
                 const userToUpdate = yield User_1.User.findByPk(id);
                 if (userToUpdate) {

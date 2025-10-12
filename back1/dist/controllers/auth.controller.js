@@ -12,11 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const User_1 = require("../database/models/auth/User");
 const RefreshToken_1 = require("../database/models/auth/RefreshToken");
-const sanitizeUser = (user) => {
-    const userJSON = user.toJSON();
-    delete userJSON.password;
-    return userJSON;
-};
 class AuthController {
     register(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -28,10 +23,9 @@ class AuthController {
                     password,
                     status: status !== null && status !== void 0 ? status : "ACTIVO",
                     avatar,
-                    mustChangePassword: false,
                 });
                 const token = user_interface.generateToken();
-                res.status(201).json({ user: sanitizeUser(user_interface), token });
+                res.status(201).json({ user_interface, token });
             }
             catch (error) {
                 res.status(500).json({ error: 'Error al registrar el usuario' });
@@ -54,24 +48,71 @@ class AuthController {
                 }
                 const token = user.generateToken();
                 const { token: refreshToken, expiresAt } = user.generateRefreshToken();
-                // Crear un nuevo registro en RefreshToken
+                const deviceInfo = req.headers['user-agent'] || 'unknown';
+                yield RefreshToken_1.RefreshToken.update({ status: "INACTIVO" }, {
+                    where: {
+                        user_id: user.id,
+                        device_info: deviceInfo,
+                        status: "ACTIVO",
+                    },
+                });
                 yield RefreshToken_1.RefreshToken.create({
                     user_id: user.id,
                     token: refreshToken,
-                    device_info: req.headers['user-agent'] || 'unknown',
+                    device_info: deviceInfo,
                     status: "ACTIVO",
-                    expires_at: expiresAt
+                    expires_at: expiresAt,
                 });
-                res.status(200).json({
-                    user: sanitizeUser(user),
-                    token,
-                    refreshToken,
-                    refreshTokenExpiresAt: expiresAt,
-                    mustChangePassword: user.mustChangePassword,
-                });
+                res.status(200).json({ user, token, refreshToken });
             }
             catch (error) {
                 res.status(500).json({ error: 'Error al iniciar sesión' });
+            }
+        });
+    }
+    refresh(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { refreshToken } = req.body;
+                if (!refreshToken) {
+                    res.status(400).json({ error: 'Se requiere el refresh token.' });
+                    return;
+                }
+                const storedRefreshToken = yield RefreshToken_1.RefreshToken.findOne({
+                    where: { token: refreshToken, status: "ACTIVO" },
+                });
+                if (!storedRefreshToken) {
+                    res.status(401).json({ error: 'Refresh token inválido.' });
+                    return;
+                }
+                if (storedRefreshToken.expires_at &&
+                    storedRefreshToken.expires_at.getTime() <= Date.now()) {
+                    yield storedRefreshToken.update({ status: "INACTIVO" });
+                    res.status(401).json({ error: 'Refresh token expirado.' });
+                    return;
+                }
+                const user = yield User_1.User.findOne({
+                    where: { id: storedRefreshToken.user_id, status: "ACTIVO" },
+                });
+                if (!user) {
+                    yield storedRefreshToken.update({ status: "INACTIVO" });
+                    res.status(401).json({ error: 'Usuario no encontrado o inactivo.' });
+                    return;
+                }
+                const token = user.generateToken();
+                const { token: newRefreshToken, expiresAt } = user.generateRefreshToken();
+                yield storedRefreshToken.update({ status: "INACTIVO" });
+                yield RefreshToken_1.RefreshToken.create({
+                    user_id: user.id,
+                    token: newRefreshToken,
+                    device_info: storedRefreshToken.device_info || req.headers['user-agent'] || 'unknown',
+                    status: "ACTIVO",
+                    expires_at: expiresAt,
+                });
+                res.status(200).json({ token, refreshToken: newRefreshToken });
+            }
+            catch (error) {
+                res.status(500).json({ error: 'Error al refrescar el token' });
             }
         });
     }

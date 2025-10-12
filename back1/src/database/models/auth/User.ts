@@ -21,18 +21,16 @@ export class User extends Model {
 
   public generateToken(): string {
     return jwt.sign({ id: this.id }, process.env.JWT_SECRET || 'secret', {
-      expiresIn: '10m',
+      expiresIn: '5m',
     });
   }
 
   public generateRefreshToken(): { token: string, expiresAt: Date } {
-    // const expiresIn = '24H';
-    const expiresIn = '5m';
+    const expiresIn = '7d';
     const token = jwt.sign({ id: this.id }, process.env.JWT_SECRET || 'secret', {
       expiresIn,
     });
-    const expiresAt = new Date(Date.now() + 1 * 60 * 1000); // 1 minutos
-    // const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas
+    const expiresAt = new Date(Date.now() + 10 *  60 * 1000); // 7 días
     return { token, expiresAt };
   }
 }

@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateAuthorization = exports.authMiddleware = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const RefreshToken_1 = require("../database/models/auth/RefreshToken");
 const User_1 = require("../database/models/auth/User");
 const Rol_1 = require("../database/models/auth/Rol");
 const ResourceRole_1 = require("../database/models/auth/ResourceRole");
@@ -24,10 +23,8 @@ const path_to_regexp_1 = require("path-to-regexp"); // Importar path-to-regexp
 const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const token = (_a = req.header('Authorization')) === null || _a === void 0 ? void 0 : _a.replace('Bearer ', '');
-    const refresh_token = req.header('x-reset-token');
     const currentRoute = req.originalUrl;
     const currentMethod = req.method;
-    console.log(currentRoute);
     if (!token) {
         res.status(401).json({ error: 'Acceso denegado: No se proporcionó el token principal.' });
         return;
@@ -40,32 +37,6 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         if (!user) {
             res.status(401).json({ error: 'Usuario no encontrado o inactivo.' });
             return;
-        }
-        // Obtener el último registro de refresh_token para este usuario
-        const lastRefreshToken = yield RefreshToken_1.RefreshToken.findOne({
-            where: { user_id: user.id },
-            order: [['created_at', 'DESC']], // Ordenar por fecha de creación descendente
-        });
-        if (!lastRefreshToken) {
-            res.status(401).json({ error: 'No se encontró un refresh token válido.' });
-            return;
-        }
-        // Verificar si el último refresh_token ha expirado
-        if (lastRefreshToken.expires_at < new Date()) {
-            // El refresh_token ha expirado, generar uno nuevo
-            const { token: newRefreshToken, expiresAt } = user.generateRefreshToken();
-            // Crear un nuevo registro en la tabla refresh_tokens
-            yield RefreshToken_1.RefreshToken.create({
-                user_id: user.id,
-                token: newRefreshToken,
-                device_info: req.headers['user-agent'] || 'unknown',
-                is_valid: true,
-                expires_at: expiresAt,
-            });
-            // Invalidar el refresh_token anterior
-            yield lastRefreshToken.update({ is_valid: false });
-            // Enviar el nuevo refresh_token en el encabezado
-            res.setHeader('x-reset-token', newRefreshToken);
         }
         // Validar autorización
         const isAuthorized = yield (0, exports.validateAuthorization)(decoded.id, currentRoute, currentMethod);

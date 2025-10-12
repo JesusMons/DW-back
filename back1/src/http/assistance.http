@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:4000
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzYwMjk3NzY2LCJleHAiOjE3NjAyOTgzNjZ9.AaIqbExioTOhh0SVvo-vdP4SJJ6dMGynV_6Vk_Wa1gU
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzYwMzA0NTg1LCJleHAiOjE3NjAzMDQ4ODV9.Yjxy4NlxjQNbtcJmPrX0jx-LAyN1-nO_fAbvq3qWriw
 ### ================== ASISTENCIAS ==================
 
 ### Obtener todas las asistencias

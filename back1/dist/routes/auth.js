@@ -9,6 +9,7 @@ class AuthRoutes {
     routes(app) {
         app.route("/api/register").post(this.authController.register);
         app.route("/api/login").post(this.authController.login);
+        app.route("/api/auth/refresh").post(this.authController.refresh);
     }
 }
 exports.AuthRoutes = AuthRoutes;
