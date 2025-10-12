@@ -21,7 +21,7 @@ export class User extends Model {
 
   public generateToken(): string {
     return jwt.sign({ id: this.id }, process.env.JWT_SECRET || 'secret', {
-      expiresIn: '5m',
+      expiresIn: '20m',
     });
   }
 
@@ -30,7 +30,7 @@ export class User extends Model {
     const token = jwt.sign({ id: this.id }, process.env.JWT_SECRET || 'secret', {
       expiresIn,
     });
-    const expiresAt = new Date(Date.now() + 10 *  60 * 1000); // 7 días
+    const expiresAt = new Date(Date.now() + 60 *  60 * 1000); // 7 días
     return { token, expiresAt };
   }
 }

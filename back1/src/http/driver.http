@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:4000
-@token =
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzYwMzA2MzI5LCJleHAiOjE3NjAzMDc1Mjl9.0rEszTwlUiKtYygWC48CLtKydJYqRJKq7xfeJjcHbNA
 
 ### ================== CONDUCTORES ==================
 
@@ -15,7 +15,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "Juan Perez",
+  "name": "Juan Perez M",
   "document": "12345678",
   "phone": "555-1234",
   "email": "juan.perez@example.com",
@@ -37,7 +37,7 @@ Authorization: Bearer {{token}}
 ###
 
 ### Actualizar un conductor
-PUT {{baseUrl}}/api/drivers/1
+PUT {{baseUrl}}/api/drivers/9
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -64,5 +64,5 @@ Authorization: Bearer {{token}}
 ###
 
 ### Eliminar un conductor lógicamente
-PATCH {{baseUrl}}/api/drivers/1/deactivate
+PATCH {{baseUrl}}/api/drivers/9/deactivate
 Authorization: Bearer {{token}}

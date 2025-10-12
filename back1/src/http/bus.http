@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:4000
-@token =
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzYwMzA2MzI5LCJleHAiOjE3NjAzMDc1Mjl9.0rEszTwlUiKtYygWC48CLtKydJYqRJKq7xfeJjcHbNA
 
 ### ================== BUSES ==================
 
@@ -37,12 +37,12 @@ Authorization: Bearer {{token}}
 ###
 
 ### Actualizar un bus
-PUT {{baseUrl}}/api/buses/1
+PUT {{baseUrl}}/api/buses/7
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "plate": "ABC-123",
+  "plate": "ABC-124",
   "capacity": 48,
   "mileage": 121000,
   "model": "Sprinter",
@@ -64,5 +64,5 @@ Authorization: Bearer {{token}}
 ###
 
 ### Eliminar un bus lógicamente
-PATCH {{baseUrl}}/api/buses/1/deactivate
+PATCH {{baseUrl}}/api/buses/7/deactivate
 Authorization: Bearer {{token}}

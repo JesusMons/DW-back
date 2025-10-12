@@ -1,6 +1,5 @@
 @baseUrl = http://localhost:4000
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzYwMzA0NTg1LCJleHAiOjE3NjAzMDQ4ODV9.Yjxy4NlxjQNbtcJmPrX0jx-LAyN1-nO_fAbvq3qWriw
-### ================== ASISTENCIAS ==================
+@token =
 
 ### Obtener todas las asistencias
 GET {{baseUrl}}/api/assistances
@@ -14,7 +13,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "studentId": 1,
+  "studentId": 2,
   "routeId": 1,
   "busId": 1,
   "date": "2024-09-15",
@@ -36,9 +35,9 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "studentId": 1,
-  "routeId": 1,
-  "busId": 1,
+  "studentId": 10,
+  "routeId": 4,
+  "busId": 2,
   "date": "2022-09-16",
   "time": "07:45:00",
   "status": "ACTIVO"
@@ -53,5 +52,5 @@ Authorization: Bearer {{token}}
 ###
 
 ### Eliminar una asistencia lógicamente
-PATCH {{baseUrl}}/api/assistances/1/deactivate
+PATCH {{baseUrl}}/api/assistances/20/deactivate
 Authorization: Bearer {{token}}

@@ -21,7 +21,7 @@ POST {{baseUrl}}/api/login
 Content-Type: application/json
 
 {
-  "email": "operario@uniguajira.com",
+  "email": "admin@uniguajira.com",
   "password": "6640"
 }
 
@@ -32,5 +32,5 @@ POST {{baseUrl}}/api/auth/refresh
 Content-Type: application/json
 
 {
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzYwMzA0NTg1LCJleHAiOjE3NjA5MDkzODV9.1R7caZL3woJXbzjWJEH4euA-ittjGosbJCC2iJFfmf0"
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzYwMzA1ODUxLCJleHAiOjE3NjA5MTA2NTF9.xyckAdXqlcgFDq7lveEjulVCtSPnJ1s7WtHi9OwMfTc"
 }

@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:4000
-@token =
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzYwMzA1ODUxLCJleHAiOjE3NjAzMDcwNTF9.ivZ30x3rp0fOHCGnm3xgBfeW6vDpwiPd6h7NXI_D_TA
 
 ### ================== ASIGNACIÓN ROL-RECURSO ==================
 
@@ -23,7 +23,7 @@ Content-Type: application/json
 ###
 
 ### Obtener asignación rol-recurso por ID
-GET {{baseUrl}}/api/auth/resource-roles/1
+GET {{baseUrl}}/api/auth/resource-roles/4
 Authorization: Bearer {{token}}
 
 ###
