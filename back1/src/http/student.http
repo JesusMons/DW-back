@@ -1,15 +1,80 @@
-### Listar todos los estudiantes
-GET http://localhost:3000/api/students
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== ESTUDIANTES ==================
+
+### Obtener todos los estudiantes
+GET {{baseUrl}}/api/students
+Authorization: Bearer {{token}}
 
 ###
 
-### Filtrar estudiantes por estado
-GET http://localhost:3000/api/students?status=ACTIVO
+### Crear un estudiante
+POST {{baseUrl}}/api/students
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "name": "Carlos",
+  "lastName": "Gomez",
+  "document": "9876543",
+  "guardianId": 1,
+  "grade": 5,
+  "birthdate": "2014-04-21",
+  "address": "Av. Los Cedros 123",
+  "phone": "555-2222",
+  "guardianPhone": "555-8888",
+  "email": "carlos.gomez@example.com",
+  "status": "ACTIVO",
+  "allergies": ["Maní"],
+  "emergencyContact": {
+    "name": "Ana Gomez",
+    "phone": "555-3333",
+    "relationship": "Madre"
+  }
+}
 
 ###
 
 ### Obtener estudiante por ID
-GET http://localhost:3000/api/students/1
+GET {{baseUrl}}/api/students/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar un estudiante
+PUT {{baseUrl}}/api/students/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "name": "Carlos",
+  "lastName": "Gomez",
+  "document": "9876543",
+  "guardianId": 2,
+  "grade": 6,
+  "birthdate": "2014-04-21",
+  "address": "Av. Los Cedros 999",
+  "phone": "555-2222",
+  "guardianPhone": "555-8888",
+  "email": "carlos.gomez@example.com",
+  "status": "ACTIVO",
+  "allergies": [],
+  "emergencyContact": {
+    "name": "Ana Gomez",
+    "phone": "555-3333",
+    "relationship": "Madre"
+  }
+}
+
+###
+
+### Eliminar un estudiante físicamente
+DELETE {{baseUrl}}/api/students/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar un estudiante lógicamente
+PATCH {{baseUrl}}/api/students/1/deactivate
+Authorization: Bearer {{token}}

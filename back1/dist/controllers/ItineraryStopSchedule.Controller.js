@@ -15,11 +15,28 @@ class ItineraryStopScheduleController {
     getAllItineraryStopSchedules(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const data = yield ItineraryStopSchedule_1.ItineraryStopSchedule.findAll();
-                res.status(200).json(data);
+                const where = {};
+                if (req.query.status)
+                    where.status = req.query.status;
+                if (req.query.itineraryId) {
+                    const itineraryId = Number(req.query.itineraryId);
+                    if (!Number.isNaN(itineraryId))
+                        where.itineraryId = itineraryId;
+                }
+                if (req.query.stopId) {
+                    const stopId = Number(req.query.stopId);
+                    if (!Number.isNaN(stopId))
+                        where.stopId = stopId;
+                }
+                const itineraryStopSchedules = yield ItineraryStopSchedule_1.ItineraryStopSchedule.findAll({
+                    where,
+                });
+                res.status(200).json({ itineraryStopSchedules });
             }
-            catch (err) {
-                res.status(500).json({ error: "Error fetching itinerary_stop_schedule" });
+            catch (error) {
+                res.status(500).json({
+                    error: "Error fetching itinerary stop schedules",
+                });
             }
         });
     }
@@ -28,15 +45,122 @@ class ItineraryStopScheduleController {
             try {
                 const itineraryId = Number(req.params.itineraryId);
                 const stopId = Number(req.params.stopId);
-                if (Number.isNaN(itineraryId) || Number.isNaN(stopId))
+                if (Number.isNaN(itineraryId) || Number.isNaN(stopId)) {
                     return res.status(400).json({ error: "Invalid composite id" });
-                const row = yield ItineraryStopSchedule_1.ItineraryStopSchedule.findOne({ where: { itineraryId, stopId } });
-                if (!row)
-                    return res.status(404).json({ error: "ItineraryStopSchedule not found" });
-                res.status(200).json(row);
+                }
+                const itineraryStopSchedule = yield ItineraryStopSchedule_1.ItineraryStopSchedule.findOne({
+                    where: { itineraryId, stopId },
+                });
+                if (itineraryStopSchedule) {
+                    res.status(200).json(itineraryStopSchedule);
+                }
+                else {
+                    res.status(404).json({ error: "Itinerary stop schedule not found" });
+                }
             }
-            catch (err) {
-                res.status(500).json({ error: "Error fetching itinerary_stop_schedule" });
+            catch (error) {
+                res.status(500).json({
+                    error: "Error fetching itinerary stop schedule",
+                });
+            }
+        });
+    }
+    createItineraryStopSchedule(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { itineraryId, stopId, scheduledTime, status } = req.body;
+            try {
+                const body = {
+                    itineraryId,
+                    stopId,
+                    scheduledTime,
+                    status,
+                };
+                const newItineraryStopSchedule = yield ItineraryStopSchedule_1.ItineraryStopSchedule.create(Object.assign({}, body));
+                res.status(201).json(newItineraryStopSchedule);
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    updateItineraryStopSchedule(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const itineraryId = Number(req.params.itineraryId);
+            const stopId = Number(req.params.stopId);
+            if (Number.isNaN(itineraryId) || Number.isNaN(stopId)) {
+                return res.status(400).json({ error: "Invalid composite id" });
+            }
+            const { scheduledTime, status } = req.body;
+            try {
+                const itineraryStopScheduleToUpdate = yield ItineraryStopSchedule_1.ItineraryStopSchedule.findOne({
+                    where: { itineraryId, stopId },
+                });
+                if (itineraryStopScheduleToUpdate) {
+                    yield itineraryStopScheduleToUpdate.update({ scheduledTime, status });
+                    res.status(200).json(itineraryStopScheduleToUpdate);
+                }
+                else {
+                    res.status(404).json({ error: "Itinerary stop schedule not found" });
+                }
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    deleteItineraryStopSchedule(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const itineraryId = Number(req.params.itineraryId);
+                const stopId = Number(req.params.stopId);
+                if (Number.isNaN(itineraryId) || Number.isNaN(stopId)) {
+                    return res.status(400).json({ error: "Invalid composite id" });
+                }
+                const itineraryStopScheduleToDelete = yield ItineraryStopSchedule_1.ItineraryStopSchedule.findOne({
+                    where: { itineraryId, stopId },
+                });
+                if (itineraryStopScheduleToDelete) {
+                    yield itineraryStopScheduleToDelete.destroy();
+                    res.status(200).json({
+                        message: "Itinerary stop schedule deleted successfully",
+                    });
+                }
+                else {
+                    res.status(404).json({ error: "Itinerary stop schedule not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({
+                    error: "Error deleting itinerary stop schedule",
+                });
+            }
+        });
+    }
+    deleteItineraryStopScheduleAdv(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const itineraryId = Number(req.params.itineraryId);
+                const stopId = Number(req.params.stopId);
+                if (Number.isNaN(itineraryId) || Number.isNaN(stopId)) {
+                    return res.status(400).json({ error: "Invalid composite id" });
+                }
+                const itineraryStopScheduleToDisable = yield ItineraryStopSchedule_1.ItineraryStopSchedule.findOne({
+                    where: { itineraryId, stopId },
+                });
+                if (itineraryStopScheduleToDisable) {
+                    yield itineraryStopScheduleToDisable.update({ status: "INACTIVO" });
+                    res.status(200).json({
+                        message: "Itinerary stop schedule marked as inactive",
+                    });
+                }
+                else {
+                    res.status(404).json({ error: "Itinerary stop schedule not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({
+                    error: "Error marking itinerary stop schedule as inactive",
+                });
             }
         });
     }

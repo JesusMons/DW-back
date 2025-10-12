@@ -1,1 +1,1 @@
-{"version":3,"file":"stop.routes.d.ts","sourceRoot":"","sources":["../../src/routes/stop.routes.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,SAAS,CAAC;AAGtC,qBAAa,UAAU;IACrB,OAAO,CAAC,QAAQ,CAAC,cAAc,CAAwB;IAEhD,MAAM,CAAC,GAAG,EAAE,WAAW,GAAG,IAAI;CAStC"}
+{"version":3,"file":"stop.routes.d.ts","sourceRoot":"","sources":["../../src/routes/stop.routes.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,SAAS,CAAC;AAItC,qBAAa,UAAU;IACrB,OAAO,CAAC,QAAQ,CAAC,cAAc,CAAwB;IAEhD,MAAM,CAAC,GAAG,EAAE,WAAW,GAAG,IAAI;CAkCtC"}

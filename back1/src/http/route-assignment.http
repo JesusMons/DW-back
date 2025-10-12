@@ -1,15 +1,58 @@
-### Listar todas las asignaciones de ruta
-GET http://localhost:3000/api/route-assignments
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== ASIGNACIONES DE RUTA ==================
+
+### Obtener todas las asignaciones
+GET {{baseUrl}}/api/route-assignments
+Authorization: Bearer {{token}}
 
 ###
 
-### Filtrar asignaciones por estado
-GET http://localhost:3000/api/route-assignments?status=ACTIVO
+### Crear una asignación de ruta
+POST {{baseUrl}}/api/route-assignments
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "routeId": 1,
+  "busId": 1,
+  "driverId": 1,
+  "startDate": "2024-09-01",
+  "endDate": null,
+  "status": "ACTIVO"
+}
 
 ###
 
-### Obtener asignación de ruta por ID
-GET http://localhost:3000/api/route-assignments/1
+### Obtener asignación por ID
+GET {{baseUrl}}/api/route-assignments/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar una asignación de ruta
+PUT {{baseUrl}}/api/route-assignments/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "routeId": 1,
+  "busId": 1,
+  "driverId": 2,
+  "startDate": "2024-09-01",
+  "endDate": "2024-12-31",
+  "status": "ACTIVO"
+}
+
+###
+
+### Eliminar una asignación físicamente
+DELETE {{baseUrl}}/api/route-assignments/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar una asignación lógicamente
+PATCH {{baseUrl}}/api/route-assignments/1/deactivate
+Authorization: Bearer {{token}}

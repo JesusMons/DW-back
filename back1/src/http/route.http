@@ -1,15 +1,58 @@
-### Listar todas las rutas
-GET http://localhost:3000/api/routes
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== RUTAS ==================
+
+### Obtener todas las rutas
+GET {{baseUrl}}/api/routes
+Authorization: Bearer {{token}}
 
 ###
 
-### Filtrar rutas por estado
-GET http://localhost:3000/api/routes?status=ACTIVO
+### Crear una ruta
+POST {{baseUrl}}/api/routes
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "name": "Ruta Norte",
+  "startPoint": "Terminal A",
+  "endPoint": "Colegio Central",
+  "currentBusId": 1,
+  "currentDriverId": 1,
+  "status": "ACTIVO"
+}
 
 ###
 
 ### Obtener ruta por ID
-GET http://localhost:3000/api/routes/1
+GET {{baseUrl}}/api/routes/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar una ruta
+PUT {{baseUrl}}/api/routes/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "name": "Ruta Norte Actualizada",
+  "startPoint": "Terminal A",
+  "endPoint": "Colegio Central",
+  "currentBusId": 2,
+  "currentDriverId": 1,
+  "status": "ACTIVO"
+}
+
+###
+
+### Eliminar una ruta físicamente
+DELETE {{baseUrl}}/api/routes/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar una ruta lógicamente
+PATCH {{baseUrl}}/api/routes/1/deactivate
+Authorization: Bearer {{token}}

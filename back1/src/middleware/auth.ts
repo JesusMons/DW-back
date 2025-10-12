@@ -26,7 +26,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as jwt.JwtPayload;
 
     // Buscar el usuario en la base de datos
-    const user: User | null = await User.findOne({ where: { id: decoded.id, is_active: true } });
+    const user: User | null = await User.findOne({ where: { id: decoded.id, status: "ACTIVO" } });
     if (!user) {
       res.status(401).json({ error: 'Usuario no encontrado o inactivo.' });
       return;
@@ -90,7 +90,7 @@ export const validateAuthorization = async (userId: number, resourcePath: string
   try {
     // Obtener todos los recursos activos que coincidan con el método
     const resources = await Resource.findAll({
-      where: { method: resourceMethod, is_active: "ACTIVE" },
+      where: { method: resourceMethod, status: "ACTIVO" },
     });
 
     // Convertir las rutas dinámicas a expresiones regulares y buscar coincidencias
@@ -111,13 +111,13 @@ export const validateAuthorization = async (userId: number, resourcePath: string
           include: [
             {
               model: RoleUser,
-              where: { user_id: userId, is_active: "ACTIVE" }, // Validar que el usuario esté asociado al rol
+              where: { user_id: userId, status: "ACTIVO" }, // Validar que el usuario esté asociado al rol
             },
           ],
-          where: { is_active: "ACTIVE" }, // Validar que el rol esté activo
+          where: { status: "ACTIVO" }, // Validar que el rol esté activo
         },
       ],
-      where: { resource_id: matchingResource.id, is_active: "ACTIVE" }, // Validar que la relación resource_role esté activa
+      where: { resource_id: matchingResource.id, status: "ACTIVO" }, // Validar que la relación resource_role esté activa
     });
 
     return !!resourceRole; // Retorna true si se encuentra un registro coincidente

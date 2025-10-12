@@ -1,15 +1,63 @@
-### Listar todas las incidencias
-GET http://localhost:3000/api/incidences
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== INCIDENCIAS ==================
+
+### Obtener todas las incidencias
+GET {{baseUrl}}/api/incidences
+Authorization: Bearer {{token}}
 
 ###
 
-### Filtrar incidencias por estado, severidad y ruta
-GET http://localhost:3000/api/incidences?status=ACTIVO&severity=MEDIA&routeId=1
+### Crear una incidencia
+POST {{baseUrl}}/api/incidences
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "busId": 1,
+  "routeId": 1,
+  "description": "Retraso por tráfico pesado",
+  "severity": "MEDIA",
+  "status": "ACTIVO",
+  "reportedAt": "2024-09-15T07:30:00Z",
+  "reportedBy": "Operador",
+  "actionsTaken": "Se notificó a los padres"
+}
 
 ###
 
 ### Obtener incidencia por ID
-GET http://localhost:3000/api/incidences/1
+GET {{baseUrl}}/api/incidences/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar una incidencia
+PUT {{baseUrl}}/api/incidences/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "busId": 1,
+  "routeId": 1,
+  "description": "Retraso por tráfico resuelto",
+  "severity": "MEDIA",
+  "status": "ACTIVO",
+  "reportedAt": "2024-09-15T07:30:00Z",
+  "resolvedAt": "2024-09-15T08:30:00Z",
+  "reportedBy": "Operador",
+  "actionsTaken": "Se ajustó el horario"
+}
+
+###
+
+### Eliminar una incidencia físicamente
+DELETE {{baseUrl}}/api/incidences/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar una incidencia lógicamente
+PATCH {{baseUrl}}/api/incidences/1/deactivate
+Authorization: Bearer {{token}}

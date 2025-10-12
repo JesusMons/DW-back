@@ -1,1 +1,1 @@
-{"version":3,"file":"student.routes.d.ts","sourceRoot":"","sources":["../../src/routes/student.routes.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,SAAS,CAAC;AAGtC,qBAAa,aAAa;IACxB,OAAO,CAAC,QAAQ,CAAC,iBAAiB,CAA2B;IAEtD,MAAM,CAAC,GAAG,EAAE,WAAW,GAAG,IAAI;CAStC"}
+{"version":3,"file":"student.routes.d.ts","sourceRoot":"","sources":["../../src/routes/student.routes.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,SAAS,CAAC;AAItC,qBAAa,aAAa;IACxB,OAAO,CAAC,QAAQ,CAAC,iBAAiB,CAA2B;IAEtD,MAAM,CAAC,GAAG,EAAE,WAAW,GAAG,IAAI;CAkCtC"}

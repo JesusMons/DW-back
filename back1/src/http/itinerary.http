@@ -1,15 +1,62 @@
-### Listar todos los itinerarios
-GET http://localhost:3000/api/itineraries
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== ITINERARIOS ==================
+
+### Obtener todos los itinerarios
+GET {{baseUrl}}/api/itineraries
+Authorization: Bearer {{token}}
 
 ###
 
-### Filtrar itinerarios por estado y fecha
-GET http://localhost:3000/api/itineraries?status=ACTIVO&date=2024-01-15
+### Crear un itinerario
+POST {{baseUrl}}/api/itineraries
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "routeId": 1,
+  "date": "2024-09-20",
+  "departureTime": "07:00:00",
+  "arrivalTime": "09:00:00",
+  "driverId": 1,
+  "busId": 1,
+  "status": "ACTIVO",
+  "notes": "Salida puntual"
+}
 
 ###
 
 ### Obtener itinerario por ID
-GET http://localhost:3000/api/itineraries/1
+GET {{baseUrl}}/api/itineraries/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar un itinerario
+PUT {{baseUrl}}/api/itineraries/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "routeId": 1,
+  "date": "2024-09-21",
+  "departureTime": "07:30:00",
+  "arrivalTime": "09:15:00",
+  "driverId": 1,
+  "busId": 2,
+  "status": "ACTIVO",
+  "notes": "Cambio de bus por mantenimiento"
+}
+
+###
+
+### Eliminar un itinerario físicamente
+DELETE {{baseUrl}}/api/itineraries/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar un itinerario lógicamente
+PATCH {{baseUrl}}/api/itineraries/1/deactivate
+Authorization: Bearer {{token}}

@@ -1,15 +1,56 @@
-### Listar todas las paradas
-GET http://localhost:3000/api/stops
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== PARADAS ==================
+
+### Obtener todas las paradas
+GET {{baseUrl}}/api/stops
+Authorization: Bearer {{token}}
 
 ###
 
-### Filtrar paradas por estado
-GET http://localhost:3000/api/stops?status=ACTIVO
+### Crear una parada
+POST {{baseUrl}}/api/stops
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "name": "Parada Central",
+  "direction": "Av. Libertad 100",
+  "orderHint": 1,
+  "landmark": "Frente al parque",
+  "status": "ACTIVO"
+}
 
 ###
 
 ### Obtener parada por ID
-GET http://localhost:3000/api/stops/1
+GET {{baseUrl}}/api/stops/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar una parada
+PUT {{baseUrl}}/api/stops/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "name": "Parada Central Actualizada",
+  "direction": "Av. Libertad 102",
+  "orderHint": 2,
+  "landmark": "Frente al parque",
+  "status": "ACTIVO"
+}
+
+###
+
+### Eliminar una parada físicamente
+DELETE {{baseUrl}}/api/stops/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar una parada lógicamente
+PATCH {{baseUrl}}/api/stops/1/deactivate
+Authorization: Bearer {{token}}

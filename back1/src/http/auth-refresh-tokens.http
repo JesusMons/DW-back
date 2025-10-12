@@ -1,15 +1,57 @@
-### Listar todos los tokens de refresco
-GET http://localhost:3000/api/auth/refresh-tokens
-Content-Type: application/json
+
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== TOKENS DE REFRESCO ==================
+
+### Obtener todos los tokens de refresco
+GET {{baseUrl}}/api/auth/refresh-tokens
+Authorization: Bearer {{token}}
 
 ###
 
-### Filtrar tokens por usuario y estado
-GET http://localhost:3000/api/auth/refresh-tokens?userId=1&status=ACTIVO
+### Crear un token de refresco (para pruebas)
+POST {{baseUrl}}/api/auth/refresh-tokens
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "user_id": 1,
+  "token": "demo-refresh-token",
+  "device_info": "http-client",
+  "status": "ACTIVO",
+  "expires_at": "2024-09-30T12:00:00Z"
+}
 
 ###
 
 ### Obtener token de refresco por ID
-GET http://localhost:3000/api/auth/refresh-tokens/5
+GET {{baseUrl}}/api/auth/refresh-tokens/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar un token de refresco
+PUT {{baseUrl}}/api/auth/refresh-tokens/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "user_id": 1,
+  "token": "demo-refresh-token-actualizado",
+  "device_info": "http-client",
+  "status": "ACTIVO",
+  "expires_at": "2024-10-15T12:00:00Z"
+}
+
+###
+
+### Eliminar un token de refresco físicamente
+DELETE {{baseUrl}}/api/auth/refresh-tokens/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar un token de refresco lógicamente
+PATCH {{baseUrl}}/api/auth/refresh-tokens/1/deactivate
+Authorization: Bearer {{token}}

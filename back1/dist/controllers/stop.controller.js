@@ -18,10 +18,10 @@ class StopController {
                 const where = {};
                 if (req.query.status)
                     where.status = req.query.status;
-                const data = yield stop_1.Stop.findAll({ where });
-                res.status(200).json(data);
+                const stops = yield stop_1.Stop.findAll({ where });
+                res.status(200).json({ stops });
             }
-            catch (err) {
+            catch (error) {
                 res.status(500).json({ error: "Error fetching stops" });
             }
         });
@@ -29,16 +29,104 @@ class StopController {
     getStopById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const id = Number(req.params.id);
-                if (Number.isNaN(id))
-                    return res.status(400).json({ error: "Invalid id" });
-                const row = yield stop_1.Stop.findByPk(id);
-                if (!row)
-                    return res.status(404).json({ error: "Stop not found" });
-                res.status(200).json(row);
+                const { id: pk } = req.params;
+                const stop = yield stop_1.Stop.findOne({
+                    where: { id: pk },
+                });
+                if (stop) {
+                    res.status(200).json(stop);
+                }
+                else {
+                    res.status(404).json({ error: "Stop not found" });
+                }
             }
-            catch (err) {
+            catch (error) {
                 res.status(500).json({ error: "Error fetching stop" });
+            }
+        });
+    }
+    createStop(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { name, direction, orderHint, landmark, status } = req.body;
+            try {
+                const body = {
+                    name,
+                    direction,
+                    orderHint,
+                    landmark,
+                    status,
+                };
+                const newStop = yield stop_1.Stop.create(Object.assign({}, body));
+                res.status(201).json(newStop);
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    updateStop(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id: pk } = req.params;
+            const { name, direction, orderHint, landmark, status } = req.body;
+            try {
+                const body = {
+                    name,
+                    direction,
+                    orderHint,
+                    landmark,
+                    status,
+                };
+                const stopToUpdate = yield stop_1.Stop.findOne({
+                    where: { id: pk },
+                });
+                if (stopToUpdate) {
+                    yield stopToUpdate.update(body);
+                    res.status(200).json(stopToUpdate);
+                }
+                else {
+                    res.status(404).json({ error: "Stop not found" });
+                }
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    deleteStop(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id: pk } = req.params;
+                const stopToDelete = yield stop_1.Stop.findByPk(pk);
+                if (stopToDelete) {
+                    yield stopToDelete.destroy();
+                    res.status(200).json({ message: "Stop deleted successfully" });
+                }
+                else {
+                    res.status(404).json({ error: "Stop not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error deleting stop" });
+            }
+        });
+    }
+    deleteStopAdv(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id: pk } = req.params;
+                const stopToDisable = yield stop_1.Stop.findOne({
+                    where: { id: pk },
+                });
+                if (stopToDisable) {
+                    yield stopToDisable.update({ status: "INACTIVO" });
+                    res.status(200).json({ message: "Stop marked as inactive" });
+                }
+                else {
+                    res.status(404).json({ error: "Stop not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error marking stop as inactive" });
             }
         });
     }

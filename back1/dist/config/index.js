@@ -58,12 +58,13 @@ class App {
         this.routePrv.resourceRoutes.routes(this.app);
         this.routePrv.resourceRoleRoutes.routes(this.app);
         this.routePrv.refreshTokenRoutes.routes(this.app);
+        this.routePrv.authRoutes.routes(this.app);
     }
     // Method to connect and synchronize the database
     dbConnection() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield db_1.default.sync({ force: false }); // Synchronize the database para que no se borren debe estar en false
+                yield db_1.default.sync({ force: true }); // Synchronize the database para que no se borren debe estar en false
                 console.log("Database connected successfully");
             }
             catch (error) {

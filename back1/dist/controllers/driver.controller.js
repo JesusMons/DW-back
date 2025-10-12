@@ -18,10 +18,10 @@ class DriverController {
                 const where = {};
                 if (req.query.status)
                     where.status = req.query.status;
-                const data = yield driver_1.Driver.findAll({ where });
-                res.status(200).json(data);
+                const drivers = yield driver_1.Driver.findAll({ where });
+                res.status(200).json({ drivers });
             }
-            catch (err) {
+            catch (error) {
                 res.status(500).json({ error: "Error fetching drivers" });
             }
         });
@@ -29,16 +29,116 @@ class DriverController {
     getDriverById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const id = Number(req.params.id);
-                if (Number.isNaN(id))
-                    return res.status(400).json({ error: "Invalid id" });
-                const row = yield driver_1.Driver.findByPk(id);
-                if (!row)
-                    return res.status(404).json({ error: "Driver not found" });
-                res.status(200).json(row);
+                const { id: pk } = req.params;
+                const driver = yield driver_1.Driver.findOne({
+                    where: { id: pk },
+                });
+                if (driver) {
+                    res.status(200).json(driver);
+                }
+                else {
+                    res.status(404).json({ error: "Driver not found" });
+                }
             }
-            catch (err) {
+            catch (error) {
                 res.status(500).json({ error: "Error fetching driver" });
+            }
+        });
+    }
+    createDriver(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { name, document, phone, email, address, typeLicence, licenceExpiry, experienceYears, status, assignedBusId, photoUrl, } = req.body;
+            try {
+                const body = {
+                    name,
+                    document,
+                    phone,
+                    email,
+                    address,
+                    typeLicence,
+                    licenceExpiry,
+                    experienceYears,
+                    status,
+                    assignedBusId,
+                    photoUrl,
+                };
+                const newDriver = yield driver_1.Driver.create(Object.assign({}, body));
+                res.status(201).json(newDriver);
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    updateDriver(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id: pk } = req.params;
+            const { name, document, phone, email, address, typeLicence, licenceExpiry, experienceYears, status, assignedBusId, photoUrl, } = req.body;
+            try {
+                const body = {
+                    name,
+                    document,
+                    phone,
+                    email,
+                    address,
+                    typeLicence,
+                    licenceExpiry,
+                    experienceYears,
+                    status,
+                    assignedBusId,
+                    photoUrl,
+                };
+                const driverToUpdate = yield driver_1.Driver.findOne({
+                    where: { id: pk },
+                });
+                if (driverToUpdate) {
+                    yield driverToUpdate.update(body);
+                    res.status(200).json(driverToUpdate);
+                }
+                else {
+                    res.status(404).json({ error: "Driver not found" });
+                }
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    deleteDriver(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id: pk } = req.params;
+                const driverToDelete = yield driver_1.Driver.findByPk(pk);
+                if (driverToDelete) {
+                    yield driverToDelete.destroy();
+                    res.status(200).json({ message: "Driver deleted successfully" });
+                }
+                else {
+                    res.status(404).json({ error: "Driver not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error deleting driver" });
+            }
+        });
+    }
+    deleteDriverAdv(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id: pk } = req.params;
+                const driverToDisable = yield driver_1.Driver.findOne({
+                    where: { id: pk },
+                });
+                if (driverToDisable) {
+                    yield driverToDisable.update({ status: "INACTIVO" });
+                    res.status(200).json({ message: "Driver marked as inactive" });
+                }
+                else {
+                    res.status(404).json({ error: "Driver not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error marking driver as inactive" });
             }
         });
     }

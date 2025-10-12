@@ -1,15 +1,64 @@
-### Listar todos los mantenimientos
-GET http://localhost:3000/api/maintenances
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== MANTENIMIENTOS ==================
+
+### Obtener todos los mantenimientos
+GET {{baseUrl}}/api/maintenances
+Authorization: Bearer {{token}}
 
 ###
 
-### Filtrar mantenimientos por bus y estado
-GET http://localhost:3000/api/maintenances?busId=1&status=ACTIVO
+### Crear un mantenimiento
+POST {{baseUrl}}/api/maintenances
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "busId": 1,
+  "type": "PREVENTIVO",
+  "description": "Cambio de aceite y filtros",
+  "cost": 250.5,
+  "performedAt": "2024-09-10",
+  "nextDueDate": "2025-03-10",
+  "status": "ACTIVO",
+  "mechanic": "Taller Central",
+  "odometer": 125000
+}
 
 ###
 
 ### Obtener mantenimiento por ID
-GET http://localhost:3000/api/maintenances/1
+GET {{baseUrl}}/api/maintenances/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar un mantenimiento
+PUT {{baseUrl}}/api/maintenances/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "busId": 1,
+  "type": "PREVENTIVO",
+  "description": "Cambio de aceite y filtros",
+  "cost": 260.0,
+  "performedAt": "2024-09-11",
+  "nextDueDate": "2025-03-11",
+  "status": "ACTIVO",
+  "mechanic": "Taller Central",
+  "odometer": 125200
+}
+
+###
+
+### Eliminar un mantenimiento físicamente
+DELETE {{baseUrl}}/api/maintenances/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar un mantenimiento lógicamente
+PATCH {{baseUrl}}/api/maintenances/1/deactivate
+Authorization: Bearer {{token}}

@@ -1,15 +1,68 @@
-### Listar todos los conductores
-GET http://localhost:3000/api/drivers
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== CONDUCTORES ==================
+
+### Obtener todos los conductores
+GET {{baseUrl}}/api/drivers
+Authorization: Bearer {{token}}
 
 ###
 
-### Filtrar conductores por estado
-GET http://localhost:3000/api/drivers?status=ACTIVO
+### Crear un conductor
+POST {{baseUrl}}/api/drivers
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "name": "Juan Perez",
+  "document": "12345678",
+  "phone": "555-1234",
+  "email": "juan.perez@example.com",
+  "address": "Av. Principal 123",
+  "typeLicence": "B",
+  "licenceExpiry": "2026-01-01",
+  "experienceYears": 5,
+  "status": "ACTIVO",
+  "assignedBusId": 1,
+  "photoUrl": "https://example.com/photo.jpg"
+}
 
 ###
 
 ### Obtener conductor por ID
-GET http://localhost:3000/api/drivers/1
+GET {{baseUrl}}/api/drivers/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar un conductor
+PUT {{baseUrl}}/api/drivers/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "name": "Juan Perez",
+  "document": "12345678",
+  "phone": "555-5678",
+  "email": "juan.perez@example.com",
+  "address": "Av. Actualizada 456",
+  "typeLicence": "B",
+  "licenceExpiry": "2026-06-01",
+  "experienceYears": 6,
+  "status": "ACTIVO",
+  "assignedBusId": 2,
+  "photoUrl": "https://example.com/photo.jpg"
+}
+
+###
+
+### Eliminar un conductor físicamente
+DELETE {{baseUrl}}/api/drivers/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar un conductor lógicamente
+PATCH {{baseUrl}}/api/drivers/1/deactivate
+Authorization: Bearer {{token}}

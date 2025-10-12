@@ -1,15 +1,50 @@
-### Listar todos los roles
-GET http://localhost:3000/api/auth/roles
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== ROLES (ADMIN) ==================
+
+### Obtener todos los roles
+GET {{baseUrl}}/api/auth/roles
+Authorization: Bearer {{token}}
 
 ###
 
-### Filtrar roles por estado
-GET http://localhost:3000/api/auth/roles?status=ACTIVO
+### Crear un rol
+POST {{baseUrl}}/api/auth/roles
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "name": "Administrador",
+  "status": "ACTIVO"
+}
 
 ###
 
 ### Obtener rol por ID
-GET http://localhost:3000/api/auth/roles/1
+GET {{baseUrl}}/api/auth/roles/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar un rol
+PUT {{baseUrl}}/api/auth/roles/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "name": "Administrador General",
+  "status": "ACTIVO"
+}
+
+###
+
+### Eliminar un rol físicamente
+DELETE {{baseUrl}}/api/auth/roles/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar un rol lógicamente
+PATCH {{baseUrl}}/api/auth/roles/1/deactivate
+Authorization: Bearer {{token}}

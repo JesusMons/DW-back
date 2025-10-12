@@ -20,6 +20,7 @@ const role_user_routes_1 = require("./role-user.routes");
 const stop_routes_1 = require("./stop.routes");
 const student_routes_1 = require("./student.routes");
 const user_routes_1 = require("./user.routes");
+const auth_1 = require("./auth");
 class Routes {
     constructor() {
         this.assistanceRoutes = new assistance_routes_1.AssistanceRoutes();
@@ -41,6 +42,7 @@ class Routes {
         this.resourceRoutes = new resource_routes_1.ResourceRoutes();
         this.resourceRoleRoutes = new resource_role_routes_1.ResourceRoleRoutes();
         this.refreshTokenRoutes = new refresh_token_routes_1.RefreshTokenRoutes();
+        this.authRoutes = new auth_1.AuthRoutes();
     }
     init(app) {
         this.assistanceRoutes.routes(app);
@@ -62,6 +64,7 @@ class Routes {
         this.resourceRoutes.routes(app);
         this.resourceRoleRoutes.routes(app);
         this.refreshTokenRoutes.routes(app);
+        this.authRoutes.routes(app);
     }
 }
 exports.Routes = Routes;

@@ -6,6 +6,7 @@ export declare class User extends Model {
     password: string;
     status: "ACTIVO" | "INACTIVO";
     avatar: string;
+    mustChangePassword: boolean;
     checkPassword(password: string): Promise<boolean>;
     generateToken(): string;
     generateRefreshToken(): {
@@ -20,5 +21,6 @@ export interface UserI {
     password: string;
     status: "ACTIVO" | "INACTIVO";
     avatar?: string;
+    mustChangePassword?: boolean;
 }
 //# sourceMappingURL=User.d.ts.map

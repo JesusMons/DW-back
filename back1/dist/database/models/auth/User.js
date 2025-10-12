@@ -62,6 +62,12 @@ User.init({
     avatar: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: true
+    },
+    mustChangePassword: {
+        field: "must_change_password",
+        type: sequelize_1.DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
     }
 }, {
     tableName: "users",

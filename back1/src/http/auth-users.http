@@ -1,15 +1,56 @@
-### Listar todos los usuarios
-GET http://localhost:3000/api/auth/users
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== USUARIOS (ADMIN) ==================
+
+### Obtener todos los usuarios
+GET {{baseUrl}}/api/auth/users
+Authorization: Bearer {{token}}
 
 ###
 
-### Filtrar usuarios por estado
-GET http://localhost:3000/api/auth/users?status=ACTIVO
+### Crear un usuario
+POST {{baseUrl}}/api/auth/users
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "username": "usuario.demo",
+  "email": "usuario.demo@example.com",
+  "password": "Secret123!",
+  "status": "ACTIVO",
+  "avatar": "https://example.com/avatar.png"
+}
 
 ###
 
 ### Obtener usuario por ID
-GET http://localhost:3000/api/auth/users/1
+GET {{baseUrl}}/api/auth/users/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar un usuario
+PUT {{baseUrl}}/api/auth/users/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "username": "usuario.actualizado",
+  "email": "usuario.demo@example.com",
+  "password": "Secret456!",
+  "status": "ACTIVO",
+  "avatar": "https://example.com/avatar.png"
+}
+
+###
+
+### Eliminar un usuario físicamente
+DELETE {{baseUrl}}/api/auth/users/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar un usuario lógicamente
+PATCH {{baseUrl}}/api/auth/users/1/deactivate
+Authorization: Bearer {{token}}

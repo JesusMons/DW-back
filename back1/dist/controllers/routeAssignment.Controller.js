@@ -18,27 +18,123 @@ class RouteAssignmentController {
                 const where = {};
                 if (req.query.status)
                     where.status = req.query.status;
-                const data = yield routeAssignment_1.RouteAssignment.findAll({ where });
-                res.status(200).json(data);
+                const routeAssignments = yield routeAssignment_1.RouteAssignment.findAll({ where });
+                res.status(200).json({ routeAssignments });
             }
-            catch (err) {
-                res.status(500).json({ error: "Error fetching route_assignments" });
+            catch (error) {
+                res.status(500).json({ error: "Error fetching route assignments" });
             }
         });
     }
     getRouteAssignmentById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const id = Number(req.params.id);
-                if (Number.isNaN(id))
-                    return res.status(400).json({ error: "Invalid id" });
-                const row = yield routeAssignment_1.RouteAssignment.findByPk(id);
-                if (!row)
-                    return res.status(404).json({ error: "RouteAssignment not found" });
-                res.status(200).json(row);
+                const { id: pk } = req.params;
+                const routeAssignment = yield routeAssignment_1.RouteAssignment.findOne({
+                    where: { id: pk },
+                });
+                if (routeAssignment) {
+                    res.status(200).json(routeAssignment);
+                }
+                else {
+                    res.status(404).json({ error: "Route assignment not found" });
+                }
             }
-            catch (err) {
-                res.status(500).json({ error: "Error fetching route_assignment" });
+            catch (error) {
+                res.status(500).json({ error: "Error fetching route assignment" });
+            }
+        });
+    }
+    createRouteAssignment(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { routeId, busId, driverId, startDate, endDate, status, } = req.body;
+            try {
+                const body = {
+                    routeId,
+                    busId,
+                    driverId,
+                    startDate,
+                    endDate,
+                    status,
+                };
+                const newRouteAssignment = yield routeAssignment_1.RouteAssignment.create(Object.assign({}, body));
+                res.status(201).json(newRouteAssignment);
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    updateRouteAssignment(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id: pk } = req.params;
+            const { routeId, busId, driverId, startDate, endDate, status, } = req.body;
+            try {
+                const body = {
+                    routeId,
+                    busId,
+                    driverId,
+                    startDate,
+                    endDate,
+                    status,
+                };
+                const routeAssignmentToUpdate = yield routeAssignment_1.RouteAssignment.findOne({
+                    where: { id: pk },
+                });
+                if (routeAssignmentToUpdate) {
+                    yield routeAssignmentToUpdate.update(body);
+                    res.status(200).json(routeAssignmentToUpdate);
+                }
+                else {
+                    res.status(404).json({ error: "Route assignment not found" });
+                }
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    deleteRouteAssignment(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id: pk } = req.params;
+                const routeAssignmentToDelete = yield routeAssignment_1.RouteAssignment.findByPk(pk);
+                if (routeAssignmentToDelete) {
+                    yield routeAssignmentToDelete.destroy();
+                    res
+                        .status(200)
+                        .json({ message: "Route assignment deleted successfully" });
+                }
+                else {
+                    res.status(404).json({ error: "Route assignment not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error deleting route assignment" });
+            }
+        });
+    }
+    deleteRouteAssignmentAdv(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id: pk } = req.params;
+                const routeAssignmentToDisable = yield routeAssignment_1.RouteAssignment.findOne({
+                    where: { id: pk },
+                });
+                if (routeAssignmentToDisable) {
+                    yield routeAssignmentToDisable.update({ status: "INACTIVO" });
+                    res
+                        .status(200)
+                        .json({ message: "Route assignment marked as inactive" });
+                }
+                else {
+                    res.status(404).json({ error: "Route assignment not found" });
+                }
+            }
+            catch (error) {
+                res
+                    .status(500)
+                    .json({ error: "Error marking route assignment as inactive" });
             }
         });
     }

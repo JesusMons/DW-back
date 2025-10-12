@@ -18,10 +18,10 @@ class BusController {
                 const where = {};
                 if (req.query.status)
                     where.status = req.query.status;
-                const data = yield bus_1.Bus.findAll({ where });
-                res.status(200).json(data);
+                const buses = yield bus_1.Bus.findAll({ where });
+                res.status(200).json({ buses });
             }
-            catch (err) {
+            catch (error) {
                 res.status(500).json({ error: "Error fetching buses" });
             }
         });
@@ -29,16 +29,116 @@ class BusController {
     getBusById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const id = Number(req.params.id);
-                if (Number.isNaN(id))
-                    return res.status(400).json({ error: "Invalid id" });
-                const row = yield bus_1.Bus.findByPk(id);
-                if (!row)
-                    return res.status(404).json({ error: "Bus not found" });
-                res.status(200).json(row);
+                const { id: pk } = req.params;
+                const bus = yield bus_1.Bus.findOne({
+                    where: { id: pk },
+                });
+                if (bus) {
+                    res.status(200).json(bus);
+                }
+                else {
+                    res.status(404).json({ error: "Bus not found" });
+                }
             }
-            catch (err) {
+            catch (error) {
                 res.status(500).json({ error: "Error fetching bus" });
+            }
+        });
+    }
+    createBus(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { plate, capacity, mileage, model, brand, year, color, status, insuranceExpiry, lastMaintenance, nextMaintenance, } = req.body;
+            try {
+                const body = {
+                    plate,
+                    capacity,
+                    mileage,
+                    model,
+                    brand,
+                    year,
+                    color,
+                    status,
+                    insuranceExpiry,
+                    lastMaintenance,
+                    nextMaintenance,
+                };
+                const newBus = yield bus_1.Bus.create(Object.assign({}, body));
+                res.status(201).json(newBus);
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    updateBus(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id: pk } = req.params;
+            const { plate, capacity, mileage, model, brand, year, color, status, insuranceExpiry, lastMaintenance, nextMaintenance, } = req.body;
+            try {
+                const body = {
+                    plate,
+                    capacity,
+                    mileage,
+                    model,
+                    brand,
+                    year,
+                    color,
+                    status,
+                    insuranceExpiry,
+                    lastMaintenance,
+                    nextMaintenance,
+                };
+                const busToUpdate = yield bus_1.Bus.findOne({
+                    where: { id: pk },
+                });
+                if (busToUpdate) {
+                    yield busToUpdate.update(body);
+                    res.status(200).json(busToUpdate);
+                }
+                else {
+                    res.status(404).json({ error: "Bus not found" });
+                }
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    deleteBus(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id: pk } = req.params;
+                const busToDelete = yield bus_1.Bus.findByPk(pk);
+                if (busToDelete) {
+                    yield busToDelete.destroy();
+                    res.status(200).json({ message: "Bus deleted successfully" });
+                }
+                else {
+                    res.status(404).json({ error: "Bus not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error deleting bus" });
+            }
+        });
+    }
+    deleteBusAdv(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id: pk } = req.params;
+                const busToDisable = yield bus_1.Bus.findOne({
+                    where: { id: pk },
+                });
+                if (busToDisable) {
+                    yield busToDisable.update({ status: "INACTIVO" });
+                    res.status(200).json({ message: "Bus marked as inactive" });
+                }
+                else {
+                    res.status(404).json({ error: "Bus not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error marking bus as inactive" });
             }
         });
     }

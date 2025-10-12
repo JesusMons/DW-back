@@ -1,9 +1,53 @@
-### Listar todas las paradas por ruta
-GET http://localhost:3000/api/route-stops
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+### ================== PARADAS DE RUTA ==================
+
+### Obtener todas las paradas asignadas
+GET {{baseUrl}}/api/route-stops
+Authorization: Bearer {{token}}
 
 ###
 
-### Obtener parada asignada por ruta y parada
-GET http://localhost:3000/api/route-stops/1/1
+### Crear una parada para una ruta
+POST {{baseUrl}}/api/route-stops
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "routeId": 1,
+  "stopId": 1,
+  "position": 1,
+  "scheduledTimeHint": "07:10:00",
+  "status": "ACTIVO"
+}
+
+###
+
+### Obtener parada de ruta por IDs
+GET {{baseUrl}}/api/route-stops/1/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar parada de ruta
+PUT {{baseUrl}}/api/route-stops/1/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "position": 2,
+  "scheduledTimeHint": "07:20:00",
+  "status": "ACTIVO"
+}
+
+###
+
+### Eliminar parada de ruta físicamente
+DELETE {{baseUrl}}/api/route-stops/1/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar parada de ruta lógicamente
+PATCH {{baseUrl}}/api/route-stops/1/1/deactivate
+Authorization: Bearer {{token}}

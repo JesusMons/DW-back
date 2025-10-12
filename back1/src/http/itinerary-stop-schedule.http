@@ -1,9 +1,52 @@
-### Listar horarios de paradas por itinerario
-GET http://localhost:3000/api/itinerary-stop-schedules
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== ITINERARY STOP SCHEDULE ==================
+
+### Obtener todos los horarios de paradas
+GET {{baseUrl}}/api/itinerary-stop-schedules
+Authorization: Bearer {{token}}
 
 ###
 
-### Obtener horario de parada por itinerario y parada
-GET http://localhost:3000/api/itinerary-stop-schedules/1/1
+### Crear un horario para una parada
+POST {{baseUrl}}/api/itinerary-stop-schedules
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "itineraryId": 1,
+  "stopId": 1,
+  "scheduledTime": "07:15:00",
+  "status": "ACTIVO"
+}
+
+###
+
+### Obtener horario por itinerario y parada
+GET {{baseUrl}}/api/itinerary-stop-schedules/1/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar horario por itinerario y parada
+PUT {{baseUrl}}/api/itinerary-stop-schedules/1/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "scheduledTime": "07:20:00",
+  "status": "ACTIVO"
+}
+
+###
+
+### Eliminar físicamente un horario
+DELETE {{baseUrl}}/api/itinerary-stop-schedules/1/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar lógicamente un horario
+PATCH {{baseUrl}}/api/itinerary-stop-schedules/1/1/deactivate
+Authorization: Bearer {{token}}

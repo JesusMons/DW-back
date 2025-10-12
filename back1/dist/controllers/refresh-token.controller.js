@@ -12,6 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RefreshTokenController = void 0;
 const RefreshToken_1 = require("../database/models/auth/RefreshToken");
 const User_1 = require("../database/models/auth/User");
+const refreshTokenInclude = [
+    {
+        model: User_1.User,
+        attributes: ["id", "username", "email", "status"],
+    },
+];
 class RefreshTokenController {
     getAllRefreshTokens(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -21,22 +27,19 @@ class RefreshTokenController {
                     where.status = req.query.status;
                 if (req.query.userId) {
                     const userId = Number(req.query.userId);
-                    if (Number.isNaN(userId))
-                        return res.status(400).json({ error: "Invalid userId" });
-                    where.user_id = userId;
+                    if (!Number.isNaN(userId)) {
+                        where.user_id = userId;
+                    }
                 }
                 if (req.query.device_info)
                     where.device_info = req.query.device_info;
-                const include = [
-                    {
-                        model: User_1.User,
-                        attributes: ["id", "username", "email", "status"],
-                    },
-                ];
-                const refreshTokens = yield RefreshToken_1.RefreshToken.findAll({ where, include });
-                res.status(200).json(refreshTokens);
+                const refreshTokens = yield RefreshToken_1.RefreshToken.findAll({
+                    where,
+                    include: refreshTokenInclude,
+                });
+                res.status(200).json({ refreshTokens });
             }
-            catch (err) {
+            catch (error) {
                 res.status(500).json({ error: "Error fetching refresh tokens" });
             }
         });
@@ -45,21 +48,121 @@ class RefreshTokenController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = Number(req.params.id);
-                if (Number.isNaN(id))
+                if (Number.isNaN(id)) {
                     return res.status(400).json({ error: "Invalid id" });
-                const include = [
-                    {
-                        model: User_1.User,
-                        attributes: ["id", "username", "email", "status"],
-                    },
-                ];
-                const refreshToken = yield RefreshToken_1.RefreshToken.findByPk(id, { include });
-                if (!refreshToken)
-                    return res.status(404).json({ error: "Refresh token not found" });
-                res.status(200).json(refreshToken);
+                }
+                const refreshToken = yield RefreshToken_1.RefreshToken.findByPk(id, {
+                    include: refreshTokenInclude,
+                });
+                if (refreshToken) {
+                    res.status(200).json(refreshToken);
+                }
+                else {
+                    res.status(404).json({ error: "Refresh token not found" });
+                }
             }
-            catch (err) {
+            catch (error) {
                 res.status(500).json({ error: "Error fetching refresh token" });
+            }
+        });
+    }
+    createRefreshToken(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { user_id, token, device_info, status, expires_at } = req.body;
+            try {
+                const body = {
+                    user_id,
+                    token,
+                    device_info,
+                    status,
+                    expires_at,
+                };
+                const newRefreshToken = yield RefreshToken_1.RefreshToken.create(Object.assign({}, body));
+                const created = yield RefreshToken_1.RefreshToken.findByPk(newRefreshToken.id, {
+                    include: refreshTokenInclude,
+                });
+                res.status(201).json(created);
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    updateRefreshToken(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = Number(req.params.id);
+            if (Number.isNaN(id)) {
+                return res.status(400).json({ error: "Invalid id" });
+            }
+            const { user_id, token, device_info, status, expires_at } = req.body;
+            try {
+                const body = {
+                    user_id,
+                    token,
+                    device_info,
+                    status,
+                    expires_at,
+                };
+                const refreshTokenToUpdate = yield RefreshToken_1.RefreshToken.findByPk(id);
+                if (refreshTokenToUpdate) {
+                    yield refreshTokenToUpdate.update(body);
+                    const updated = yield RefreshToken_1.RefreshToken.findByPk(id, {
+                        include: refreshTokenInclude,
+                    });
+                    res.status(200).json(updated);
+                }
+                else {
+                    res.status(404).json({ error: "Refresh token not found" });
+                }
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    deleteRefreshToken(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const id = Number(req.params.id);
+                if (Number.isNaN(id)) {
+                    return res.status(400).json({ error: "Invalid id" });
+                }
+                const refreshTokenToDelete = yield RefreshToken_1.RefreshToken.findByPk(id);
+                if (refreshTokenToDelete) {
+                    yield refreshTokenToDelete.destroy();
+                    res.status(200).json({ message: "Refresh token deleted successfully" });
+                }
+                else {
+                    res.status(404).json({ error: "Refresh token not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error deleting refresh token" });
+            }
+        });
+    }
+    deleteRefreshTokenAdv(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const id = Number(req.params.id);
+                if (Number.isNaN(id)) {
+                    return res.status(400).json({ error: "Invalid id" });
+                }
+                const refreshTokenToDisable = yield RefreshToken_1.RefreshToken.findByPk(id);
+                if (refreshTokenToDisable) {
+                    yield refreshTokenToDisable.update({ status: "INACTIVO" });
+                    res
+                        .status(200)
+                        .json({ message: "Refresh token marked as inactive" });
+                }
+                else {
+                    res.status(404).json({ error: "Refresh token not found" });
+                }
+            }
+            catch (error) {
+                res
+                    .status(500)
+                    .json({ error: "Error marking refresh token as inactive" });
             }
         });
     }

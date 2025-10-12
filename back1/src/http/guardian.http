@@ -1,15 +1,62 @@
-### Listar todos los tutores
-GET http://localhost:3000/api/guardians
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== TUTORES ==================
+
+### Obtener todos los tutores
+GET {{baseUrl}}/api/guardians
+Authorization: Bearer {{token}}
 
 ###
 
-### Filtrar tutores por estado
-GET http://localhost:3000/api/guardians?status=ACTIVO
+### Crear un tutor
+POST {{baseUrl}}/api/guardians
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "firstName": "Maria",
+  "lastName": "Lopez",
+  "document": "87654321",
+  "phone": "555-8888",
+  "email": "maria.lopez@example.com",
+  "relationship": "Madre",
+  "address": "Calle Secundaria 456",
+  "status": "ACTIVO"
+}
 
 ###
 
 ### Obtener tutor por ID
-GET http://localhost:3000/api/guardians/1
+GET {{baseUrl}}/api/guardians/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar un tutor
+PUT {{baseUrl}}/api/guardians/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "firstName": "Maria",
+  "lastName": "Lopez",
+  "document": "87654321",
+  "phone": "555-9999",
+  "email": "maria.lopez@example.com",
+  "relationship": "Madre",
+  "address": "Calle Actualizada 789",
+  "status": "ACTIVO"
+}
+
+###
+
+### Eliminar un tutor físicamente
+DELETE {{baseUrl}}/api/guardians/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar un tutor lógicamente
+PATCH {{baseUrl}}/api/guardians/1/deactivate
+Authorization: Bearer {{token}}

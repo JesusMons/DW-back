@@ -18,10 +18,10 @@ class GuardianController {
                 const where = {};
                 if (req.query.status)
                     where.status = req.query.status;
-                const data = yield guardian_1.Guardian.findAll({ where });
-                res.status(200).json(data);
+                const guardians = yield guardian_1.Guardian.findAll({ where });
+                res.status(200).json({ guardians });
             }
-            catch (err) {
+            catch (error) {
                 res.status(500).json({ error: "Error fetching guardians" });
             }
         });
@@ -29,16 +29,110 @@ class GuardianController {
     getGuardianById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const id = Number(req.params.id);
-                if (Number.isNaN(id))
-                    return res.status(400).json({ error: "Invalid id" });
-                const row = yield guardian_1.Guardian.findByPk(id);
-                if (!row)
-                    return res.status(404).json({ error: "Guardian not found" });
-                res.status(200).json(row);
+                const { id: pk } = req.params;
+                const guardian = yield guardian_1.Guardian.findOne({
+                    where: { id: pk },
+                });
+                if (guardian) {
+                    res.status(200).json(guardian);
+                }
+                else {
+                    res.status(404).json({ error: "Guardian not found" });
+                }
             }
-            catch (err) {
+            catch (error) {
                 res.status(500).json({ error: "Error fetching guardian" });
+            }
+        });
+    }
+    createGuardian(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { firstName, lastName, document, phone, email, relationship, address, status, } = req.body;
+            try {
+                const body = {
+                    firstName,
+                    lastName,
+                    document,
+                    phone,
+                    email,
+                    relationship,
+                    address,
+                    status,
+                };
+                const newGuardian = yield guardian_1.Guardian.create(Object.assign({}, body));
+                res.status(201).json(newGuardian);
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    updateGuardian(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id: pk } = req.params;
+            const { firstName, lastName, document, phone, email, relationship, address, status, } = req.body;
+            try {
+                const body = {
+                    firstName,
+                    lastName,
+                    document,
+                    phone,
+                    email,
+                    relationship,
+                    address,
+                    status,
+                };
+                const guardianToUpdate = yield guardian_1.Guardian.findOne({
+                    where: { id: pk },
+                });
+                if (guardianToUpdate) {
+                    yield guardianToUpdate.update(body);
+                    res.status(200).json(guardianToUpdate);
+                }
+                else {
+                    res.status(404).json({ error: "Guardian not found" });
+                }
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    deleteGuardian(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id: pk } = req.params;
+                const guardianToDelete = yield guardian_1.Guardian.findByPk(pk);
+                if (guardianToDelete) {
+                    yield guardianToDelete.destroy();
+                    res.status(200).json({ message: "Guardian deleted successfully" });
+                }
+                else {
+                    res.status(404).json({ error: "Guardian not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error deleting guardian" });
+            }
+        });
+    }
+    deleteGuardianAdv(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id: pk } = req.params;
+                const guardianToDisable = yield guardian_1.Guardian.findOne({
+                    where: { id: pk },
+                });
+                if (guardianToDisable) {
+                    yield guardianToDisable.update({ status: "INACTIVO" });
+                    res.status(200).json({ message: "Guardian marked as inactive" });
+                }
+                else {
+                    res.status(404).json({ error: "Guardian not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error marking guardian as inactive" });
             }
         });
     }

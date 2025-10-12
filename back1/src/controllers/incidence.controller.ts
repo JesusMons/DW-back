@@ -1,44 +1,157 @@
 import { Request, Response } from "express";
-import { Incidence } from "../database/models/incidence";
+import { Incidence, IncidenceI } from "../database/models/incidence";
 
 export class IncidenceController {
   public async getAllIncidences(req: Request, res: Response) {
     try {
-      const where: any = {};
-
+      const where: Record<string, unknown> = {};
       if (req.query.status) where.status = req.query.status;
       if (req.query.severity) where.severity = req.query.severity;
 
       if (req.query.busId) {
         const busId = Number(req.query.busId);
-        if (Number.isNaN(busId)) return res.status(400).json({ error: "Invalid busId" });
-        where.busId = busId;
+        if (!Number.isNaN(busId)) {
+          where.busId = busId;
+        }
       }
 
       if (req.query.routeId) {
         const routeId = Number(req.query.routeId);
-        if (Number.isNaN(routeId)) return res.status(400).json({ error: "Invalid routeId" });
-        where.routeId = routeId;
+        if (!Number.isNaN(routeId)) {
+          where.routeId = routeId;
+        }
       }
 
-      const data = await Incidence.findAll({ where });
-      res.status(200).json(data);
-    } catch (err) {
+      const incidences = await Incidence.findAll({ where });
+      res.status(200).json({ incidences });
+    } catch (error) {
       res.status(500).json({ error: "Error fetching incidences" });
     }
   }
 
   public async getIncidenceById(req: Request, res: Response) {
     try {
-      const id = Number(req.params.id);
-      if (Number.isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+      const { id: pk } = req.params;
+      const incidence = await Incidence.findOne({
+        where: { id: pk },
+      });
 
-      const row = await Incidence.findByPk(id);
-      if (!row) return res.status(404).json({ error: "Incidence not found" });
-
-      res.status(200).json(row);
-    } catch (err) {
+      if (incidence) {
+        res.status(200).json(incidence);
+      } else {
+        res.status(404).json({ error: "Incidence not found" });
+      }
+    } catch (error) {
       res.status(500).json({ error: "Error fetching incidence" });
+    }
+  }
+
+  public async createIncidence(req: Request, res: Response) {
+    const {
+      busId,
+      routeId,
+      description,
+      severity,
+      status,
+      reportedAt,
+      resolvedAt,
+      reportedBy,
+      actionsTaken,
+    } = req.body;
+
+    try {
+      const body: IncidenceI = {
+        busId,
+        routeId,
+        description,
+        severity,
+        status,
+        reportedAt,
+        resolvedAt,
+        reportedBy,
+        actionsTaken,
+      };
+
+      const newIncidence = await Incidence.create({ ...body });
+      res.status(201).json(newIncidence);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  public async updateIncidence(req: Request, res: Response) {
+    const { id: pk } = req.params;
+    const {
+      busId,
+      routeId,
+      description,
+      severity,
+      status,
+      reportedAt,
+      resolvedAt,
+      reportedBy,
+      actionsTaken,
+    } = req.body;
+
+    try {
+      const body: IncidenceI = {
+        busId,
+        routeId,
+        description,
+        severity,
+        status,
+        reportedAt,
+        resolvedAt,
+        reportedBy,
+        actionsTaken,
+      };
+
+      const incidenceToUpdate = await Incidence.findOne({
+        where: { id: pk },
+      });
+
+      if (incidenceToUpdate) {
+        await incidenceToUpdate.update(body);
+        res.status(200).json(incidenceToUpdate);
+      } else {
+        res.status(404).json({ error: "Incidence not found" });
+      }
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  public async deleteIncidence(req: Request, res: Response) {
+    try {
+      const { id: pk } = req.params;
+      const incidenceToDelete = await Incidence.findByPk(pk);
+
+      if (incidenceToDelete) {
+        await incidenceToDelete.destroy();
+        res.status(200).json({ message: "Incidence deleted successfully" });
+      } else {
+        res.status(404).json({ error: "Incidence not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ error: "Error deleting incidence" });
+    }
+  }
+
+  public async deleteIncidenceAdv(req: Request, res: Response) {
+    try {
+      const { id: pk } = req.params;
+      const incidenceToDisable = await Incidence.findOne({
+        where: { id: pk },
+      });
+
+      if (incidenceToDisable) {
+        await incidenceToDisable.update({ status: "INACTIVO" });
+        res.status(200).json({ message: "Incidence marked as inactive" });
+      } else {
+        res.status(404).json({ error: "Incidence not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ error: "Error marking incidence as inactive" });
     }
   }
 }

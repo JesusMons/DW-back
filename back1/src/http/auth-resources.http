@@ -1,15 +1,52 @@
-### Listar todos los recursos protegidos
-GET http://localhost:3000/api/auth/resources
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== RECURSOS ==================
+
+### Obtener todos los recursos
+GET {{baseUrl}}/api/auth/resources
+Authorization: Bearer {{token}}
 
 ###
 
-### Filtrar recursos por método
-GET http://localhost:3000/api/auth/resources?method=GET
+### Crear un recurso
+POST {{baseUrl}}/api/auth/resources
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "path": "/api/example",
+  "method": "GET",
+  "status": "ACTIVO"
+}
 
 ###
 
 ### Obtener recurso por ID
-GET http://localhost:3000/api/auth/resources/1
+GET {{baseUrl}}/api/auth/resources/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar un recurso
+PUT {{baseUrl}}/api/auth/resources/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "path": "/api/example",
+  "method": "POST",
+  "status": "ACTIVO"
+}
+
+###
+
+### Eliminar un recurso físicamente
+DELETE {{baseUrl}}/api/auth/resources/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar un recurso lógicamente
+PATCH {{baseUrl}}/api/auth/resources/1/deactivate
+Authorization: Bearer {{token}}

@@ -20,28 +20,28 @@ class AssistanceController {
                     where.status = req.query.status;
                 if (req.query.studentId) {
                     const studentId = Number(req.query.studentId);
-                    if (Number.isNaN(studentId))
-                        return res.status(400).json({ error: "Invalid studentId" });
-                    where.studentId = studentId;
+                    if (!Number.isNaN(studentId)) {
+                        where.studentId = studentId;
+                    }
                 }
                 if (req.query.routeId) {
                     const routeId = Number(req.query.routeId);
-                    if (Number.isNaN(routeId))
-                        return res.status(400).json({ error: "Invalid routeId" });
-                    where.routeId = routeId;
+                    if (!Number.isNaN(routeId)) {
+                        where.routeId = routeId;
+                    }
                 }
                 if (req.query.busId) {
                     const busId = Number(req.query.busId);
-                    if (Number.isNaN(busId))
-                        return res.status(400).json({ error: "Invalid busId" });
-                    where.busId = busId;
+                    if (!Number.isNaN(busId)) {
+                        where.busId = busId;
+                    }
                 }
                 if (req.query.date)
                     where.date = req.query.date;
-                const data = yield assistance_1.Assistance.findAll({ where });
-                res.status(200).json(data);
+                const assistances = yield assistance_1.Assistance.findAll({ where });
+                res.status(200).json({ assistances });
             }
-            catch (err) {
+            catch (error) {
                 res.status(500).json({ error: "Error fetching assistances" });
             }
         });
@@ -49,39 +49,106 @@ class AssistanceController {
     getAssistanceById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const id = Number(req.params.id);
-                if (Number.isNaN(id))
-                    return res.status(400).json({ error: "Invalid id" });
-                const row = yield assistance_1.Assistance.findByPk(id);
-                if (!row)
-                    return res.status(404).json({ error: "Assistance not found" });
-                res.status(200).json(row);
+                const { id: pk } = req.params;
+                const assistance = yield assistance_1.Assistance.findOne({
+                    where: { id: pk },
+                });
+                if (assistance) {
+                    res.status(200).json(assistance);
+                }
+                else {
+                    res.status(404).json({ error: "Assistance not found" });
+                }
             }
-            catch (err) {
+            catch (error) {
                 res.status(500).json({ error: "Error fetching assistance" });
             }
         });
     }
     createAssistance(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { studentId, routeId, busId, date, time, status } = req.body;
             try {
-                const { studentId, routeId, busId, date, time, status } = req.body;
-                // Validación de campos requeridos
-                if (!studentId || !routeId || !busId || !date || !time || !status) {
-                    return res.status(400).json({ error: "Missing required fields" });
-                }
-                const newAssistance = yield assistance_1.Assistance.create({
+                const body = {
                     studentId,
                     routeId,
                     busId,
                     date,
                     time,
                     status,
-                });
+                };
+                const newAssistance = yield assistance_1.Assistance.create(Object.assign({}, body));
                 res.status(201).json(newAssistance);
             }
-            catch (err) {
-                res.status(500).json({ error: "Error creating assistance" });
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    updateAssistance(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id: pk } = req.params;
+            const { studentId, routeId, busId, date, time, status } = req.body;
+            try {
+                const body = {
+                    studentId,
+                    routeId,
+                    busId,
+                    date,
+                    time,
+                    status,
+                };
+                const assistanceToUpdate = yield assistance_1.Assistance.findOne({
+                    where: { id: pk },
+                });
+                if (assistanceToUpdate) {
+                    yield assistanceToUpdate.update(body);
+                    res.status(200).json(assistanceToUpdate);
+                }
+                else {
+                    res.status(404).json({ error: "Assistance not found" });
+                }
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    deleteAssistance(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id: pk } = req.params;
+                const assistanceToDelete = yield assistance_1.Assistance.findByPk(pk);
+                if (assistanceToDelete) {
+                    yield assistanceToDelete.destroy();
+                    res.status(200).json({ message: "Assistance deleted successfully" });
+                }
+                else {
+                    res.status(404).json({ error: "Assistance not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error deleting assistance" });
+            }
+        });
+    }
+    deleteAssistanceAdv(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id: pk } = req.params;
+                const assistanceToDisable = yield assistance_1.Assistance.findOne({
+                    where: { id: pk },
+                });
+                if (assistanceToDisable) {
+                    yield assistanceToDisable.update({ status: "INACTIVO" });
+                    res.status(200).json({ message: "Assistance marked as inactive" });
+                }
+                else {
+                    res.status(404).json({ error: "Assistance not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error marking assistance as inactive" });
             }
         });
     }

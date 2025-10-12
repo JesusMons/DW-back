@@ -1,15 +1,52 @@
-### Listar todas las asignaciones rol-recurso
-GET http://localhost:3000/api/auth/resource-roles
-Content-Type: application/json
+@baseUrl = http://localhost:4000
+@token =
+
+### ================== ASIGNACIÓN ROL-RECURSO ==================
+
+### Obtener todas las asignaciones rol-recurso
+GET {{baseUrl}}/api/auth/resource-roles
+Authorization: Bearer {{token}}
 
 ###
 
-### Filtrar asignaciones por rol y recurso
-GET http://localhost:3000/api/auth/resource-roles?roleId=1&resourceId=2
+### Crear una asignación rol-recurso
+POST {{baseUrl}}/api/auth/resource-roles
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "resource_id": 1,
+  "role_id": 1,
+  "status": "ACTIVO"
+}
 
 ###
 
 ### Obtener asignación rol-recurso por ID
-GET http://localhost:3000/api/auth/resource-roles/4
+GET {{baseUrl}}/api/auth/resource-roles/1
+Authorization: Bearer {{token}}
+
+###
+
+### Actualizar una asignación rol-recurso
+PUT {{baseUrl}}/api/auth/resource-roles/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "resource_id": 2,
+  "role_id": 1,
+  "status": "ACTIVO"
+}
+
+###
+
+### Eliminar una asignación físicamente
+DELETE {{baseUrl}}/api/auth/resource-roles/1
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar una asignación lógicamente
+PATCH {{baseUrl}}/api/auth/resource-roles/1/deactivate
+Authorization: Bearer {{token}}

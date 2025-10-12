@@ -15,11 +15,24 @@ class RouteStopController {
     getAllRouteStops(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const data = yield routeStop_1.RouteStop.findAll();
-                res.status(200).json(data);
+                const where = {};
+                if (req.query.status)
+                    where.status = req.query.status;
+                if (req.query.routeId) {
+                    const routeId = Number(req.query.routeId);
+                    if (!Number.isNaN(routeId))
+                        where.routeId = routeId;
+                }
+                if (req.query.stopId) {
+                    const stopId = Number(req.query.stopId);
+                    if (!Number.isNaN(stopId))
+                        where.stopId = stopId;
+                }
+                const routeStops = yield routeStop_1.RouteStop.findAll({ where });
+                res.status(200).json({ routeStops });
             }
-            catch (err) {
-                res.status(500).json({ error: "Error fetching route_stops" });
+            catch (error) {
+                res.status(500).json({ error: "Error fetching route stops" });
             }
         });
     }
@@ -28,15 +41,113 @@ class RouteStopController {
             try {
                 const routeId = Number(req.params.routeId);
                 const stopId = Number(req.params.stopId);
-                if (Number.isNaN(routeId) || Number.isNaN(stopId))
+                if (Number.isNaN(routeId) || Number.isNaN(stopId)) {
                     return res.status(400).json({ error: "Invalid composite id" });
-                const row = yield routeStop_1.RouteStop.findOne({ where: { routeId, stopId } });
-                if (!row)
-                    return res.status(404).json({ error: "RouteStop not found" });
-                res.status(200).json(row);
+                }
+                const routeStop = yield routeStop_1.RouteStop.findOne({
+                    where: { routeId, stopId },
+                });
+                if (routeStop) {
+                    res.status(200).json(routeStop);
+                }
+                else {
+                    res.status(404).json({ error: "Route stop not found" });
+                }
             }
-            catch (err) {
-                res.status(500).json({ error: "Error fetching route_stop" });
+            catch (error) {
+                res.status(500).json({ error: "Error fetching route stop" });
+            }
+        });
+    }
+    createRouteStop(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { routeId, stopId, position, scheduledTimeHint, status } = req.body;
+            try {
+                const body = {
+                    routeId,
+                    stopId,
+                    position,
+                    scheduledTimeHint,
+                    status,
+                };
+                const newRouteStop = yield routeStop_1.RouteStop.create(Object.assign({}, body));
+                res.status(201).json(newRouteStop);
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    updateRouteStop(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const routeId = Number(req.params.routeId);
+            const stopId = Number(req.params.stopId);
+            if (Number.isNaN(routeId) || Number.isNaN(stopId)) {
+                return res.status(400).json({ error: "Invalid composite id" });
+            }
+            const { position, scheduledTimeHint, status } = req.body;
+            try {
+                const routeStopToUpdate = yield routeStop_1.RouteStop.findOne({
+                    where: { routeId, stopId },
+                });
+                if (routeStopToUpdate) {
+                    yield routeStopToUpdate.update({ position, scheduledTimeHint, status });
+                    res.status(200).json(routeStopToUpdate);
+                }
+                else {
+                    res.status(404).json({ error: "Route stop not found" });
+                }
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    deleteRouteStop(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const routeId = Number(req.params.routeId);
+                const stopId = Number(req.params.stopId);
+                if (Number.isNaN(routeId) || Number.isNaN(stopId)) {
+                    return res.status(400).json({ error: "Invalid composite id" });
+                }
+                const routeStopToDelete = yield routeStop_1.RouteStop.findOne({
+                    where: { routeId, stopId },
+                });
+                if (routeStopToDelete) {
+                    yield routeStopToDelete.destroy();
+                    res.status(200).json({ message: "Route stop deleted successfully" });
+                }
+                else {
+                    res.status(404).json({ error: "Route stop not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error deleting route stop" });
+            }
+        });
+    }
+    deleteRouteStopAdv(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const routeId = Number(req.params.routeId);
+                const stopId = Number(req.params.stopId);
+                if (Number.isNaN(routeId) || Number.isNaN(stopId)) {
+                    return res.status(400).json({ error: "Invalid composite id" });
+                }
+                const routeStopToDisable = yield routeStop_1.RouteStop.findOne({
+                    where: { routeId, stopId },
+                });
+                if (routeStopToDisable) {
+                    yield routeStopToDisable.update({ status: "INACTIVO" });
+                    res.status(200).json({ message: "Route stop marked as inactive" });
+                }
+                else {
+                    res.status(404).json({ error: "Route stop not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error marking route stop as inactive" });
             }
         });
     }

@@ -18,6 +18,7 @@ import { RoleUserRoutes } from "./role-user.routes";
 import { StopRoutes } from "./stop.routes";
 import { StudentRoutes } from "./student.routes";
 import { UserRoutes } from "./user.routes";
+import { AuthRoutes } from "./auth";
 export declare class Routes {
     readonly assistanceRoutes: AssistanceRoutes;
     readonly busRoutes: BusRoutes;
@@ -38,6 +39,7 @@ export declare class Routes {
     readonly resourceRoutes: ResourceRoutes;
     readonly resourceRoleRoutes: ResourceRoleRoutes;
     readonly refreshTokenRoutes: RefreshTokenRoutes;
+    readonly authRoutes: AuthRoutes;
     init(app: Application): void;
 }
 //# sourceMappingURL=index.d.ts.map

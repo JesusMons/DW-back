@@ -19,11 +19,11 @@ class ItineraryController {
                 if (req.query.status)
                     where.status = req.query.status;
                 if (req.query.date)
-                    where.date = req.query.date; // opcional
-                const data = yield itinerari_1.Itinerary.findAll({ where });
-                res.status(200).json(data);
+                    where.date = req.query.date;
+                const itineraries = yield itinerari_1.Itinerary.findAll({ where });
+                res.status(200).json({ itineraries });
             }
-            catch (err) {
+            catch (error) {
                 res.status(500).json({ error: "Error fetching itineraries" });
             }
         });
@@ -31,16 +31,110 @@ class ItineraryController {
     getItineraryById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const id = Number(req.params.id);
-                if (Number.isNaN(id))
-                    return res.status(400).json({ error: "Invalid id" });
-                const row = yield itinerari_1.Itinerary.findByPk(id);
-                if (!row)
-                    return res.status(404).json({ error: "Itinerary not found" });
-                res.status(200).json(row);
+                const { id: pk } = req.params;
+                const itinerary = yield itinerari_1.Itinerary.findOne({
+                    where: { id: pk },
+                });
+                if (itinerary) {
+                    res.status(200).json(itinerary);
+                }
+                else {
+                    res.status(404).json({ error: "Itinerary not found" });
+                }
             }
-            catch (err) {
+            catch (error) {
                 res.status(500).json({ error: "Error fetching itinerary" });
+            }
+        });
+    }
+    createItinerary(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { routeId, date, departureTime, arrivalTime, driverId, busId, status, notes, } = req.body;
+            try {
+                const body = {
+                    routeId,
+                    date,
+                    departureTime,
+                    arrivalTime,
+                    driverId,
+                    busId,
+                    status,
+                    notes,
+                };
+                const newItinerary = yield itinerari_1.Itinerary.create(Object.assign({}, body));
+                res.status(201).json(newItinerary);
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    updateItinerary(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id: pk } = req.params;
+            const { routeId, date, departureTime, arrivalTime, driverId, busId, status, notes, } = req.body;
+            try {
+                const body = {
+                    routeId,
+                    date,
+                    departureTime,
+                    arrivalTime,
+                    driverId,
+                    busId,
+                    status,
+                    notes,
+                };
+                const itineraryToUpdate = yield itinerari_1.Itinerary.findOne({
+                    where: { id: pk },
+                });
+                if (itineraryToUpdate) {
+                    yield itineraryToUpdate.update(body);
+                    res.status(200).json(itineraryToUpdate);
+                }
+                else {
+                    res.status(404).json({ error: "Itinerary not found" });
+                }
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    deleteItinerary(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id: pk } = req.params;
+                const itineraryToDelete = yield itinerari_1.Itinerary.findByPk(pk);
+                if (itineraryToDelete) {
+                    yield itineraryToDelete.destroy();
+                    res.status(200).json({ message: "Itinerary deleted successfully" });
+                }
+                else {
+                    res.status(404).json({ error: "Itinerary not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error deleting itinerary" });
+            }
+        });
+    }
+    deleteItineraryAdv(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id: pk } = req.params;
+                const itineraryToDisable = yield itinerari_1.Itinerary.findOne({
+                    where: { id: pk },
+                });
+                if (itineraryToDisable) {
+                    yield itineraryToDisable.update({ status: "INACTIVO" });
+                    res.status(200).json({ message: "Itinerary marked as inactive" });
+                }
+                else {
+                    res.status(404).json({ error: "Itinerary not found" });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ error: "Error marking itinerary as inactive" });
             }
         });
     }

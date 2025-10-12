@@ -8,10 +8,17 @@ export class BusRoutes {
   public routes(app: Application): void {
     app
       .route("/api/buses")
-      .get( authMiddleware, this.busController.getAllBuses.bind(this.busController));
+      .get(authMiddleware, this.busController.getAllBuses.bind(this.busController))
+      .post(authMiddleware, this.busController.createBus.bind(this.busController));
 
     app
       .route("/api/buses/:id")
-      .get(this.busController.getBusById.bind(this.busController));
+      .get(authMiddleware, this.busController.getBusById.bind(this.busController))
+      .put(authMiddleware, this.busController.updateBus.bind(this.busController))
+      .delete(authMiddleware, this.busController.deleteBus.bind(this.busController));
+
+    app
+      .route("/api/buses/:id/deactivate")
+      .patch(authMiddleware, this.busController.deleteBusAdv.bind(this.busController));
   }
 }
