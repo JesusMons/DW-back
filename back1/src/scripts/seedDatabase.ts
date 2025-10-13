@@ -99,10 +99,27 @@ const extendEnumForConversions = async (
   return { allowNull, defaultValue };
 };
 
+const quoteIdentifier = (identifier: string): string => {
+  const dialect = sequelize.getDialect();
+  if (dialect === 'postgres') {
+    return `"${identifier.replace(/"/g, '""')}"`;
+  }
+  if (dialect === 'mssql') {
+    return `[${identifier.replace(/]/g, ']]')}]`;
+  }
+  return `\`${identifier.replace(/`/g, '``')}\``;
+};
+
 const runConversions = async (table: string, column: string, conversions: Record<string, StatusValue>): Promise<void> => {
+  const quotedTable = quoteIdentifier(table);
+  const quotedColumn = quoteIdentifier(column);
+  const dialect = sequelize.getDialect();
+  const whereClause =
+    dialect === 'postgres' ? `${quotedColumn}::text = :from` : `${quotedColumn} = :from`;
+
   for (const [from, to] of Object.entries(conversions)) {
     if (from === to) continue;
-    await sequelize.query(`UPDATE \`${table}\` SET \`${column}\` = :to WHERE \`${column}\` = :from`, {
+    await sequelize.query(`UPDATE ${quotedTable} SET ${quotedColumn} = :to WHERE ${whereClause}`, {
       replacements: { from, to },
     });
   }
