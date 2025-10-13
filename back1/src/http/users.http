@@ -6,3 +6,15 @@
 ### Listar usuarios
 GET {{baseUrl}}/api/auth/users
 Authorization: Bearer {{token}}
+
+###
+
+### Cambiar contraseña propia
+POST {{baseUrl}}/api/auth/users/reset-password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "currentPassword": "123456789",
+  "newPassword": "nuevaClaveSegura123"
+}

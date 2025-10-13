@@ -141,4 +141,46 @@ export class UserController {
       res.status(500).json({ error: "Error marking user as inactive" });
     }
   }
+
+  public async resetPassword(req: Request, res: Response) {
+    const authUser = req.currentUser;
+    if (!authUser) {
+      return res.status(401).json({ error: "Usuario no autenticado" });
+    }
+
+    const { currentPassword, newPassword } = req.body ?? {};
+
+    if (
+      typeof currentPassword !== "string" ||
+      typeof newPassword !== "string" ||
+      currentPassword.trim() === "" ||
+      newPassword.trim() === ""
+    ) {
+      return res
+        .status(400)
+        .json({ error: "Debe proporcionar la contraseña actual y la nueva." });
+    }
+
+    try {
+      const user = await User.findByPk(authUser.id);
+
+      if (!user) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+
+      const isPasswordValid = await user.checkPassword(currentPassword);
+
+      if (!isPasswordValid) {
+        return res
+          .status(400)
+          .json({ error: "La contraseña actual no es correcta." });
+      }
+
+      await user.update({ password: newPassword });
+
+      res.status(200).json({ message: "Contraseña actualizada correctamente." });
+    } catch (error: any) {
+      res.status(500).json({ error: "Error al actualizar la contraseña." });
+    }
+  }
 }

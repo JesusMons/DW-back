@@ -1,7 +1,5 @@
 @baseUrl = http://localhost:4000
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzYwMzI4MzU5LCJleHAiOjE3NjAzMjk1NTl9.R_UAeptTDKDIpYt-5LmYY-3A1IQWQVvCob7pt_YWxAM
-
-### ================== CONDUCTORES ==================
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwiaWF0IjoxNzYwMzMwMTk4LCJleHAiOjE3NjAzMzEzOTh9.K02YYpWlD0ZP0PHjTMxYEVVR21UBqiyHdIcdmnVchzk
 
 ### Obtener todos los conductores
 GET {{baseUrl}}/api/drivers
@@ -66,3 +64,13 @@ Authorization: Bearer {{token}}
 ### Eliminar un conductor lógicamente
 PATCH {{baseUrl}}/api/drivers/9/deactivate
 Authorization: Bearer {{token}}
+
+### Cambio de contraseña 
+POST {{baseUrl}}/api/auth/users/reset-password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "currentPassword": "123456789",
+  "newPassword": "12345"
+}

@@ -21,8 +21,8 @@ POST {{baseUrl}}/api/login
 Content-Type: application/json
 
 {
-  "email": "admin@uniguajira.com",
-  "password": "6640"
+  "email": "juan.marco@example.com",
+  "password": "12345"
 }
 
 ###
@@ -34,3 +34,5 @@ Content-Type: application/json
 {
   "refreshToken": ""
 }
+
+

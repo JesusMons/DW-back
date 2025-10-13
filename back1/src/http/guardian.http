@@ -60,3 +60,13 @@ Authorization: Bearer {{token}}
 ### Eliminar un tutor lógicamente
 PATCH {{baseUrl}}/api/guardians/1/deactivate
 Authorization: Bearer {{token}}
+
+### Cambio de contraseña 
+POST {{baseUrl}}/api/auth/users/reset-password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "currentPassword": "123456789",
+  "newPassword": "nuevaClaveSegura123"
+}

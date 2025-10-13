@@ -38,5 +38,12 @@ export class UserRoutes {
         authMiddleware,
         this.userController.deleteUserAdv.bind(this.userController)
       );
+
+    app
+      .route("/api/auth/users/reset-password")
+      .post(
+        authMiddleware,
+        this.userController.resetPassword.bind(this.userController)
+      );
   }
 }

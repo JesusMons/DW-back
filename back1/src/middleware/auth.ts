@@ -7,6 +7,14 @@ import { Resource } from '../database/models/auth/Resource';
 import { RoleUser } from '../database/models/auth/RolUser';
 import { pathToRegexp } from 'path-to-regexp'; // Importar path-to-regexp
 
+declare global {
+  namespace Express {
+    interface Request {
+      currentUser?: User;
+    }
+  }
+}
+
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
   const currentRoute = req.originalUrl;
@@ -34,6 +42,8 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
       res.status(403).json({ error: 'No está autorizado para ejecutar esta petición.' });
       return;
     }
+
+    req.currentUser = user;
 
     // Continuar con la solicitud
     next();
