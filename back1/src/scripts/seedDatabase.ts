@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { faker } from '@faker-js/faker';
-import { DataTypes, QueryInterface } from 'sequelize';
+import { DataTypes, QueryInterface, QueryTypes } from 'sequelize';
 import sequelize, { testConnection } from '../database/db';
 import { Guardian, GuardianStatus } from '../database/models/guardian';
 import { Student, StudentStatus } from '../database/models/student';
@@ -60,6 +60,99 @@ const changeEnumIfNeeded = async (
   allowNull: boolean,
   defaultValue: string | null
 ): Promise<void> => {
+  const dialect = sequelize.getDialect();
+
+  if (dialect === 'mssql') {
+    const quotedTable = quoteIdentifier(table);
+    const quotedColumn = quoteIdentifier(column);
+
+    const existingConstraints = await sequelize.query<{ name: string }>(
+      `SELECT cc.name AS name
+         FROM sys.check_constraints cc
+         INNER JOIN sys.columns col
+           ON cc.parent_object_id = col.object_id
+          AND cc.parent_column_id = col.column_id
+         INNER JOIN sys.tables t
+           ON t.object_id = cc.parent_object_id
+        WHERE t.name = :table
+          AND col.name = :column`,
+      {
+        replacements: { table, column },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    const defaultConstraints = await sequelize.query<{ name: string }>(
+      `SELECT dc.name AS name
+         FROM sys.default_constraints dc
+         INNER JOIN sys.columns col
+           ON dc.parent_object_id = col.object_id
+          AND dc.parent_column_id = col.column_id
+         INNER JOIN sys.tables t
+           ON t.object_id = dc.parent_object_id
+        WHERE t.name = :table
+          AND col.name = :column`,
+      {
+        replacements: { table, column },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    for (const constraint of existingConstraints) {
+      await sequelize.query(`ALTER TABLE ${quotedTable} DROP CONSTRAINT ${quoteIdentifier(constraint.name)}`);
+    }
+
+    for (const constraint of defaultConstraints) {
+      await sequelize.query(`ALTER TABLE ${quotedTable} DROP CONSTRAINT ${quoteIdentifier(constraint.name)}`);
+    }
+
+    const constraintName =
+      existingConstraints[0]?.name ??
+      `${table}_${column}_enum_ck`.slice(0, 127);
+
+    const nullability = allowNull ? 'NULL' : 'NOT NULL';
+
+    await sequelize.query(`ALTER TABLE ${quotedTable} ALTER COLUMN ${quotedColumn} NVARCHAR(255) ${nullability}`);
+
+    if (!values.length) {
+      if (defaultValue !== null && defaultValue !== undefined) {
+        const defaultConstraintName = `${table}_${column}_default_df`.slice(0, 127);
+        const defaultLiteral = `N'${defaultValue.replace(/'/g, "''")}'`;
+        await sequelize.query(
+          `ALTER TABLE ${quotedTable} ADD CONSTRAINT ${quoteIdentifier(
+            defaultConstraintName
+          )} DEFAULT ${defaultLiteral} FOR ${quotedColumn}`
+        );
+      }
+      return;
+    }
+
+    const uniqueValues = Array.from(
+      new Set(values.map((value) => value.trim()))
+    );
+    const valueList = uniqueValues
+      .map((value) => `N'${value.replace(/'/g, "''")}'`)
+      .join(', ');
+
+    await sequelize.query(
+      `ALTER TABLE ${quotedTable} ADD CONSTRAINT ${quoteIdentifier(
+        constraintName
+      )} CHECK (${quotedColumn} IN (${valueList}))`
+    );
+
+    if (defaultValue !== null && defaultValue !== undefined) {
+      const defaultConstraintName = `${table}_${column}_default_df`.slice(0, 127);
+      const defaultLiteral = `N'${defaultValue.replace(/'/g, "''")}'`;
+      await sequelize.query(
+        `ALTER TABLE ${quotedTable} ADD CONSTRAINT ${quoteIdentifier(
+          defaultConstraintName
+        )} DEFAULT ${defaultLiteral} FOR ${quotedColumn}`
+      );
+    }
+
+    return;
+  }
+
   await qi.changeColumn(table, column, {
     type: DataTypes.ENUM(...values),
     allowNull,
@@ -219,6 +312,36 @@ const randomTime = (startHour: number, endHour: number): string => {
   const hour = faker.number.int({ min: startHour, max: endHour });
   const minute = faker.number.int({ min: 0, max: 59 });
   return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:00`;
+};
+
+const extractHourMinute = (time: unknown): [number, number] => {
+  if (typeof time === 'string' && time.length) {
+    const parts = time.split(':');
+    const hour = Number.parseInt(parts[0] ?? '0', 10);
+    const minute = Number.parseInt(parts[1] ?? '0', 10);
+    if (Number.isFinite(hour) && Number.isFinite(minute)) {
+      return [hour, minute];
+    }
+  }
+
+  if (time instanceof Date) {
+    return [time.getHours(), time.getMinutes()];
+  }
+
+  const raw = (time as { hours?: () => number; minutes?: () => number } | null) ?? null;
+  if (raw?.hours && raw?.minutes) {
+    try {
+      const hour = raw.hours();
+      const minute = raw.minutes();
+      if (Number.isFinite(hour) && Number.isFinite(minute)) {
+        return [hour, minute];
+      }
+    } catch {
+      // fall through to default
+    }
+  }
+
+  return [0, 0];
 };
 
 const DEFAULT_USER_PASSWORD = 'Password123!';
@@ -785,9 +908,7 @@ const createItineraryStopsIfNeeded = async (itineraries: Itinerary[]): Promise<v
     let offsetMinutes = 0;
     for (const routeStop of routeStops) {
       offsetMinutes += faker.number.int({ min: 5, max: 15 });
-      const [hourStr, minuteStr] = itinerary.departureTime.split(':');
-      const hour = Number.parseInt(hourStr ?? '0', 10);
-      const minute = Number.parseInt(minuteStr ?? '0', 10);
+      const [hour, minute] = extractHourMinute(itinerary.departureTime);
       const baseMinutes = hour * 60 + minute + offsetMinutes;
       const scheduledHour = Math.floor(baseMinutes / 60) % 24;
       const scheduledMinute = baseMinutes % 60;

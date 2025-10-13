@@ -31,8 +31,9 @@ Resource.init(
       },
     },
     status: {
-      type: DataTypes.ENUM("ACTIVO", "INACTIVO"),
+      type: DataTypes.STRING(20),
       defaultValue: "ACTIVO",
+      validate: { isIn: [["ACTIVO", "INACTIVO"]] },
     },
   },
   {

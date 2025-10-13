@@ -32,7 +32,12 @@ name: { type: DataTypes.STRING(120), allowNull: false },
 direction: { type: DataTypes.STRING(190), allowNull: false },
 orderHint: { field: "order_hint", type: DataTypes.INTEGER, allowNull: true },
 landmark: { type: DataTypes.STRING(190), allowNull: true },
-status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
+status: {
+  type: DataTypes.STRING(20),
+  allowNull: false,
+  defaultValue: "ACTIVO",
+  validate: { isIn: [["ACTIVO", "INACTIVO"]] },
+},
 },
 { sequelize, modelName: "Stop", tableName: "stops", timestamps: true, underscored: true }
 );

@@ -37,8 +37,17 @@ studentId: { field: "student_id", type: DataTypes.BIGINT, allowNull: false },
 routeId: { field: "route_id", type: DataTypes.BIGINT, allowNull: false },
 busId: { field: "bus_id", type: DataTypes.BIGINT, allowNull: false },
 date: { type: DataTypes.DATEONLY, allowNull: false },
-time: { type: DataTypes.TIME, allowNull: false },
-status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
+time: {
+  type: DataTypes.STRING(8),
+  allowNull: false,
+  validate: { is: /^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/ },
+},
+status: {
+  type: DataTypes.STRING(20),
+  allowNull: false,
+  defaultValue: "ACTIVO",
+  validate: { isIn: [["ACTIVO", "INACTIVO"]] },
+},
 },
 { sequelize, modelName: "Assistance", tableName: "assistances", timestamps: true, underscored: true }
 );

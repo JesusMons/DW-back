@@ -42,7 +42,12 @@ phone: { type: DataTypes.STRING(30), allowNull: false },
 email: { type: DataTypes.STRING(190), allowNull: true, validate: { isEmail: true } },
 relationship: { type: DataTypes.STRING(60), allowNull: false },
 address: { type: DataTypes.STRING(190), allowNull: true },
-status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
+status: {
+  type: DataTypes.STRING(20),
+  allowNull: false,
+  defaultValue: "ACTIVO",
+  validate: { isIn: [["ACTIVO", "INACTIVO"]] },
+},
 },
 { sequelize, modelName: "Guardian", tableName: "guardians", timestamps: true, underscored: true }
 );

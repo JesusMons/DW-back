@@ -39,12 +39,21 @@ Maintenance.init(
 {
 id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
 busId: { field: "bus_id", type: DataTypes.BIGINT, allowNull: false },
-type: { type: DataTypes.ENUM("PREVENTIVO", "CORRECTIVO", "INSPECCION"), allowNull: false },
+type: {
+  type: DataTypes.STRING(30),
+  allowNull: false,
+  validate: { isIn: [["PREVENTIVO", "CORRECTIVO", "INSPECCION"]] },
+},
 description: { type: DataTypes.STRING(500), allowNull: false },
 cost: { type: DataTypes.DECIMAL(12, 2), allowNull: true },
 performedAt: { field: "performed_at", type: DataTypes.DATEONLY, allowNull: false },
 nextDueDate: { field: "next_due_date", type: DataTypes.DATEONLY, allowNull: true },
-status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
+status: {
+  type: DataTypes.STRING(20),
+  allowNull: false,
+  defaultValue: "ACTIVO",
+  validate: { isIn: [["ACTIVO", "INACTIVO"]] },
+},
 mechanic: { type: DataTypes.STRING(120), allowNull: true },
 odometer: { type: DataTypes.INTEGER, allowNull: true },
 },

@@ -38,7 +38,12 @@ busId: { field: "bus_id", type: DataTypes.BIGINT, allowNull: false },
 driverId: { field: "driver_id", type: DataTypes.BIGINT, allowNull: true },
 startDate: { field: "start_date", type: DataTypes.DATEONLY, allowNull: false },
 endDate: { field: "end_date", type: DataTypes.DATEONLY, allowNull: true },
-status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
+status: {
+  type: DataTypes.STRING(20),
+  allowNull: false,
+  defaultValue: "ACTIVO",
+  validate: { isIn: [["ACTIVO", "INACTIVO"]] },
+},
 },
 { sequelize, modelName: "RouteAssignment", tableName: "route_assignments", timestamps: true, underscored: true }
 );

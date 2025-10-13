@@ -61,8 +61,9 @@ User.init(
       allowNull: false
     },
     status: {
-      type: DataTypes.ENUM("ACTIVO", "INACTIVO"),
+      type: DataTypes.STRING(20),
       defaultValue: "ACTIVO",
+      validate: { isIn: [["ACTIVO", "INACTIVO"]] },
     },
     avatar: {
       type: DataTypes.STRING,

@@ -54,9 +54,57 @@ address: { type: DataTypes.STRING(190), allowNull: true },
 phone: { type: DataTypes.STRING(30), allowNull: true },
 guardianPhone: { field: "guardian_phone", type: DataTypes.STRING(30), allowNull: true },
 email: { type: DataTypes.STRING(190), allowNull: true, validate: { isEmail: true } },
-status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
-allergies: { type: DataTypes.JSON, allowNull: true },
-emergencyContact: { field: "emergency_contact", type: DataTypes.JSON, allowNull: true },
+status: {
+  type: DataTypes.STRING(20),
+  allowNull: false,
+  defaultValue: "ACTIVO",
+  validate: { isIn: [["ACTIVO", "INACTIVO"]] },
+},
+allergies: {
+  type: DataTypes.TEXT,
+  allowNull: true,
+  get(this: Student) {
+    const stored = this.getDataValue("allergies") as string | null;
+    if (!stored) return null;
+
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return null;
+    }
+  },
+  set(this: Student, value: string[] | null) {
+    if (value === null || value === undefined) {
+      this.setDataValue("allergies", null);
+      return;
+    }
+
+    this.setDataValue("allergies", JSON.stringify(value));
+  },
+},
+emergencyContact: {
+  field: "emergency_contact",
+  type: DataTypes.TEXT,
+  allowNull: true,
+  get(this: Student) {
+    const stored = this.getDataValue("emergencyContact") as string | null;
+    if (!stored) return null;
+
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return null;
+    }
+  },
+  set(this: Student, value: StudentI["emergencyContact"]) {
+    if (!value) {
+      this.setDataValue("emergencyContact", null);
+      return;
+    }
+
+    this.setDataValue("emergencyContact", JSON.stringify(value));
+  },
+},
 },
 { sequelize, modelName: "Student", tableName: "students", timestamps: true, underscored: true }
 );

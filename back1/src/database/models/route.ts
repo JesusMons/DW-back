@@ -37,7 +37,12 @@ startPoint: { field: "start_point", type: DataTypes.STRING(190), allowNull: fals
 endPoint: { field: "end_point", type: DataTypes.STRING(190), allowNull: false },
 currentBusId: { field: "current_bus_id", type: DataTypes.BIGINT, allowNull: true },
 currentDriverId: { field: "current_driver_id", type: DataTypes.BIGINT, allowNull: true },
-status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
+status: {
+  type: DataTypes.STRING(20),
+  allowNull: false,
+  defaultValue: "ACTIVO",
+  validate: { isIn: [["ACTIVO", "INACTIVO"]] },
+},
 },
 { sequelize, modelName: "Route", tableName: "routes", timestamps: true, underscored: true }
 );

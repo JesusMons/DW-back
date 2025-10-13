@@ -24,8 +24,18 @@ ItineraryStopSchedule.init(
 {
 itineraryId: { field: "itinerary_id", type: DataTypes.BIGINT, allowNull: false, primaryKey: true },
 stopId: { field: "stop_id", type: DataTypes.BIGINT, allowNull: false, primaryKey: true },
-scheduledTime: { field: "scheduled_time", type: DataTypes.TIME, allowNull: false },
-status: { type: DataTypes.ENUM("ACTIVO", "INACTIVO"), allowNull: false, defaultValue: "ACTIVO" },
+scheduledTime: {
+  field: "scheduled_time",
+  type: DataTypes.STRING(8),
+  allowNull: false,
+  validate: { is: /^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/ },
+},
+status: {
+  type: DataTypes.STRING(20),
+  allowNull: false,
+  defaultValue: "ACTIVO",
+  validate: { isIn: [["ACTIVO", "INACTIVO"]] },
+},
 },
 { sequelize, modelName: "ItineraryStopSchedule", tableName: "itinerary_stop_schedule", timestamps: false, underscored: true }
 );
