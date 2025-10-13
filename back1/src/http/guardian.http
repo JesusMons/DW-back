@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:4000
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzYwMzI3NjM0LCJleHAiOjE3NjAzMjg4MzR9.UjTvoaC69blul75Gsdsrzpnt_3A3c_Gk6cXaYgMZoE0
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzYwMzI4MzU5LCJleHAiOjE3NjAzMjk1NTl9.R_UAeptTDKDIpYt-5LmYY-3A1IQWQVvCob7pt_YWxAM
 
 ### ================== TUTORES ==================
 
@@ -17,9 +17,9 @@ Content-Type: application/json
 {
   "firstName": "Maria",
   "lastName": "Lopez",
-  "document": "87654321",
+  "document": "87655321",
   "phone": "555-8888",
-  "email": "maria.lopez@example.com",
+  "email": "mariaa.loper@example.com",
   "relationship": "Madre",
   "address": "Calle Secundaria 456",
   "status": "ACTIVO"

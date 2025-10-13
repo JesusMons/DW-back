@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:4000
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzYwMzI3NjM0LCJleHAiOjE3NjAzMjg4MzR9.UjTvoaC69blul75Gsdsrzpnt_3A3c_Gk6cXaYgMZoE0
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzYwMzI4MzU5LCJleHAiOjE3NjAzMjk1NTl9.R_UAeptTDKDIpYt-5LmYY-3A1IQWQVvCob7pt_YWxAM
 
 ### ================== ESTUDIANTES ==================
 
@@ -16,15 +16,15 @@ Content-Type: application/json
 
 {
   "name": "Carlos",
-  "lastName": "Gomez",
-  "document": "9876543",
+  "lastName": "Jimenez",
+  "document": "9876943",
   "guardianId": 2,
   "grade": 5,
   "birthdate": "2014-04-21",
   "address": "Av. Los Cedros 123",
   "phone": "555-2222",
   "guardianPhone": "555-8888",
-  "email": "carlos.gomez@example.com",
+  "email": "carlos.Jimen@example.com",
   "status": "ACTIVO",
   "allergies": ["Maní"],
   "emergencyContact": {

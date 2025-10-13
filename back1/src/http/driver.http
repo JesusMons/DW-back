@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:4000
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzYwMzI3NjM0LCJleHAiOjE3NjAzMjg4MzR9.UjTvoaC69blul75Gsdsrzpnt_3A3c_Gk6cXaYgMZoE0
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzYwMzI4MzU5LCJleHAiOjE3NjAzMjk1NTl9.R_UAeptTDKDIpYt-5LmYY-3A1IQWQVvCob7pt_YWxAM
 
 ### ================== CONDUCTORES ==================
 
@@ -15,16 +15,16 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "Juan Perez M",
+  "name": "Juan Marcos M",
   "document": "12345678",
   "phone": "555-1234",
-  "email": "juan.perez@example.com",
+  "email": "juan.marco@example.com",
   "address": "Av. Principal 123",
   "typeLicence": "B",
   "licenceExpiry": "2026-01-01",
   "experienceYears": 5,
   "status": "ACTIVO",
-  "assignedBusId": 2,
+  "assignedBusId": 3,
   "photoUrl": "https://example.com/photo.jpg"
 }
 

@@ -67,6 +67,8 @@ export class GuardianController {
           document,
           email,
           status: normalizedStatus,
+          firstName,
+          lastName,
           transaction,
         });
 

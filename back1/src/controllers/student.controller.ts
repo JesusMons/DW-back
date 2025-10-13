@@ -77,6 +77,8 @@ export class StudentController {
           document,
           email,
           status: normalizedStatus,
+          firstName: name,
+          lastName,
           transaction,
         });
 

@@ -21,8 +21,8 @@ POST {{baseUrl}}/api/login
 Content-Type: application/json
 
 {
-  "email": "carlos.gomez@example.com",
-  "password": "123456789"
+  "email": "admin@uniguajira.com",
+  "password": "6640"
 }
 
 ###

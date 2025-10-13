@@ -73,6 +73,7 @@ export class DriverController {
           document,
           email,
           status: normalizedStatus,
+          fullName: name,
           transaction,
         });
 
