@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
-import { Driver, DriverI } from "../database/models/driver";
+import sequelize from "../database/db";
+import { Driver, DriverI, DriverStatus } from "../database/models/driver";
+import { createUserForPerson } from "../utils/createUserForPerson";
 
 export class DriverController {
   public async getAllDrivers(req: Request, res: Response) {
@@ -47,6 +49,9 @@ export class DriverController {
     } = req.body;
 
     try {
+      const normalizedStatus: DriverStatus =
+        status === "INACTIVO" ? "INACTIVO" : "ACTIVO";
+
       const body: DriverI = {
         name,
         document,
@@ -56,12 +61,24 @@ export class DriverController {
         typeLicence,
         licenceExpiry,
         experienceYears,
-        status,
+        status: normalizedStatus,
         assignedBusId,
         photoUrl,
       };
 
-      const newDriver = await Driver.create({ ...body });
+      const newDriver = await sequelize.transaction(async (transaction) => {
+        const createdDriver = await Driver.create({ ...body }, { transaction });
+
+        await createUserForPerson({
+          document,
+          email,
+          status: normalizedStatus,
+          transaction,
+        });
+
+        return createdDriver;
+      });
+
       res.status(201).json(newDriver);
     } catch (error: any) {
       res.status(400).json({ error: error.message });

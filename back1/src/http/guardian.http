@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:4000
-@token =
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzYwMzI3NjM0LCJleHAiOjE3NjAzMjg4MzR9.UjTvoaC69blul75Gsdsrzpnt_3A3c_Gk6cXaYgMZoE0
 
 ### ================== TUTORES ==================
 

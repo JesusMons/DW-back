@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
-import { Guardian, GuardianI } from "../database/models/guardian";
+import sequelize from "../database/db";
+import { Guardian, GuardianI, GuardianStatus } from "../database/models/guardian";
+import { createUserForPerson } from "../utils/createUserForPerson";
 
 export class GuardianController {
   public async getAllGuardians(req: Request, res: Response) {
@@ -44,6 +46,9 @@ export class GuardianController {
     } = req.body;
 
     try {
+      const normalizedStatus: GuardianStatus =
+        status === "INACTIVO" ? "INACTIVO" : "ACTIVO";
+
       const body: GuardianI = {
         firstName,
         lastName,
@@ -52,10 +57,22 @@ export class GuardianController {
         email,
         relationship,
         address,
-        status,
+        status: normalizedStatus,
       };
 
-      const newGuardian = await Guardian.create({ ...body });
+      const newGuardian = await sequelize.transaction(async (transaction) => {
+        const createdGuardian = await Guardian.create({ ...body }, { transaction });
+
+        await createUserForPerson({
+          document,
+          email,
+          status: normalizedStatus,
+          transaction,
+        });
+
+        return createdGuardian;
+      });
+
       res.status(201).json(newGuardian);
     } catch (error: any) {
       res.status(400).json({ error: error.message });

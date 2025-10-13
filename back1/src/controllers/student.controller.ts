@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
-import { Student, StudentI } from "../database/models/student";
+import sequelize from "../database/db";
+import { Student, StudentI, StudentStatus } from "../database/models/student";
+import { createUserForPerson } from "../utils/createUserForPerson";
 
 export class StudentController {
   public async getAllStudents(req: Request, res: Response) {
@@ -49,6 +51,9 @@ export class StudentController {
     } = req.body;
 
     try {
+      const normalizedStatus: StudentStatus =
+        status === "INACTIVO" ? "INACTIVO" : "ACTIVO";
+
       const body: StudentI = {
         name,
         lastName,
@@ -60,12 +65,24 @@ export class StudentController {
         phone,
         guardianPhone,
         email,
-        status,
+        status: normalizedStatus,
         allergies,
         emergencyContact,
       };
 
-      const newStudent = await Student.create({ ...body });
+      const newStudent = await sequelize.transaction(async (transaction) => {
+        const createdStudent = await Student.create({ ...body }, { transaction });
+
+        await createUserForPerson({
+          document,
+          email,
+          status: normalizedStatus,
+          transaction,
+        });
+
+        return createdStudent;
+      });
+
       res.status(201).json(newStudent);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
