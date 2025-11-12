@@ -7,7 +7,15 @@
   </div>
 
   <!-- Tabla de Estudiantes -->
-  <p-table [value]="students" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
+  <p-table
+    [value]="students"
+    [tableStyle]="{ 'min-width': '64rem' }"
+    responsiveLayout="scroll"
+    [paginator]="students.length > 8"
+    [rows]="8"
+    [rowsPerPageOptions]="[5, 8, 15, 25]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords}">
     <ng-template pTemplate="header">
       <tr>
         <th>ID</th>
@@ -23,24 +31,21 @@
     <ng-template pTemplate="body" let-s>
       <tr>
         <td>{{ s.id }}</td>
-        <td>{{ s.name }} {{ s.last_name }}</td>
+        <td>{{ s.name }} {{ s.lastName }}</td>
         <td>{{ s.document }}</td>
-        <td>{{ s.guardian }}</td>
+        <td>{{ s.guardianId ?? 'N/D' }}</td>
         <td>{{ s.grade || '-' }}</td>
         <td>
           <p-tag
             [value]="s.status || 'ACTIVO'"
-            [severity]="
-              (s.status || 'ACTIVO') === 'ACTIVO' ? 'success' :
-              (s.status || '') === 'GRADUADO' ? 'info' :
-              'danger'
-            ">
+            [severity]="statusSeverity(s.status)">
           </p-tag>
         </td>
         <td class="flex gap-2 justify-center w-20">
           <p-button icon="pi pi-eye" severity="info" class="p-1" (click)="showDetails(s)"></p-button>
           <p-button icon="pi pi-pencil" severity="warn" class="p-1" [routerLink]="['/student/edit', s.id]"></p-button>
-          <p-button icon="pi pi-trash" severity="danger" class="p-1" (click)="delete(s.id!)"></p-button>
+          <p-button icon="pi pi-power-off" severity="secondary" class="p-1" (click)="deactivate(s.id)"></p-button>
+          <p-button icon="pi pi-trash" severity="danger" class="p-1" (click)="delete(s.id)"></p-button>
         </td>
       </tr>
     </ng-template>
@@ -51,9 +56,10 @@
 <p-dialog header="Detalle del Estudiante" [(visible)]="detailsVisible" [modal]="true" [style]="{width: '40rem'}">
   <div *ngIf="selected" class="space-y-2">
     <p><strong>ID:</strong> {{ selected.id }}</p>
-    <p><strong>Nombre:</strong> {{ selected.name }} {{ selected.last_name }}</p>
+    <p><strong>Nombre:</strong> {{ selected.name }} {{ selected.lastName }}</p>
     <p><strong>Documento:</strong> {{ selected.document }}</p>
-    <p><strong>Acudiente:</strong> {{ selected.guardian }} ({{ selected.guardianPhone || 'N/D' }})</p>
+    <p><strong>Acudiente (ID):</strong> {{ selected.guardianId ?? 'N/D' }}</p>
+    <p><strong>Teléfono acudiente:</strong> {{ selected.guardianPhone || 'N/D' }}</p>
     <p><strong>Grado:</strong> {{ selected.grade || 'N/D' }}</p>
     <p><strong>Dirección:</strong> {{ selected.address || 'N/D' }}</p>
     <p><strong>Teléfono:</strong> {{ selected.phone || 'N/D' }}</p>
@@ -62,11 +68,7 @@
       <strong>Estado:</strong>
       <p-tag
         [value]="selected.status || 'ACTIVO'"
-        [severity]="
-          (selected.status || 'ACTIVO') === 'ACTIVO' ? 'success' :
-          (selected.status || '') === 'GRADUADO' ? 'info' :
-          'danger'
-        ">
+        [severity]="statusSeverity(selected.status)">
       </p-tag>
     </p>
 

@@ -1,100 +1,114 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { RouteI } from '../models/routes.models';
-import { BehaviorSubject } from 'rxjs';
-
+import { BehaviorSubject, map, Observable, switchMap, tap } from 'rxjs';
+import { RouteI, RouteStatus } from '../models/routes.models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RoutesService {
-  
-  private routeService = new BehaviorSubject<RouteI[]>([
-  {
-    id: 1,
-    name: "Ruta Norte",
-    stops: ["Parque Central", "Av. Bolívar", "Colegio Nacional"],
-    startPoint: "Terminal Norte",
-    endPoint: "Universidad de La Guajira",
-    schedule: ["06:30", "12:00", "18:00"],
-    bus: 101,
-    driver: "Carlos Gómez",
-    status: "ACTIVE",
-    createdAt: new Date("2025-01-10T08:00:00"),
-    updatedAt: new Date("2025-09-01T14:30:00")
-  },
-  {
-    id: 2,
-    name: "Ruta Sur",
-    stops: ["Hospital", "Plaza Mayor", "Barrio San José"],
-    startPoint: "Terminal Sur",
-    endPoint: "Colegio San Martín",
-    schedule: ["07:00", "13:00", "19:00"],
-    bus: 202,
-    driver: "María López",
-    status: "ACTIVE",
-    createdAt: new Date("2025-02-05T09:00:00"),
-    updatedAt: new Date("2025-08-28T16:45:00")
-  },
-  {
-    id: 3,
-    name: "Ruta Centro",
-    stops: ["Estadio", "Av. Libertador", "Plaza del Sol"],
-    startPoint: "Parque Industrial",
-    endPoint: "Centro Comercial Guajira Plaza",
-    schedule: ["08:00", "14:00", "20:00"],
-    bus: 303,
-    driver: "José Pérez",
-    status: "INACTIVE",
-    createdAt: new Date("2025-03-15T10:00:00"),
-    updatedAt: new Date("2025-07-20T18:20:00")
+  private readonly baseUrl = '/api/routes';
+  private readonly store = new BehaviorSubject<RouteI[]>([]);
+  private loaded = false;
+
+  readonly routes$ = this.store.asObservable();
+
+  constructor(private readonly http: HttpClient) {}
+
+  /** Normaliza objetos desde API (campos snake_case incluidos). */
+  private normalize(raw: any): RouteI {
+    const normalizeDate = (value?: string | Date | null): Date | undefined =>
+      !value ? undefined : value instanceof Date ? value : new Date(value);
+
+    return {
+      id: raw?.id ?? raw?.ID,
+      name: raw?.name ?? '',
+      startPoint: raw?.startPoint ?? raw?.start_point ?? '',
+      endPoint: raw?.endPoint ?? raw?.end_point ?? '',
+      currentBusId: raw?.currentBusId ?? raw?.current_bus_id ?? null,
+      currentDriverId: raw?.currentDriverId ?? raw?.current_driver_id ?? null,
+      status: (raw?.status as RouteStatus | undefined) ?? 'ACTIVO',
+      createdAt: normalizeDate(raw?.createdAt ?? raw?.created_at),
+      updatedAt: normalizeDate(raw?.updatedAt ?? raw?.updated_at)
+    };
   }
-]);
 
-routes$ = this.routeService.asObservable();
+  private normalizeList(resp: any): RouteI[] {
+    const list =
+      resp?.routes ??
+      (Array.isArray(resp?.data) ? resp.data : resp?.data?.routes) ??
+      resp ??
+      [];
 
-getRoutes(){
-  return this.routeService.value;
-}
+    return Array.isArray(list) ? list.map(item => this.normalize(item)) : [];
+  }
 
-addRoute(route: RouteI){
-  const routes = this.routeService.value;
-  route.id = routes.length ? Math.max(...routes.map(r => r.id ?? 0)) + 1:1;
-  this.routeService.next([...routes, route]);
-}
+  private replace(route: RouteI) {
+    const list = this.store.value;
+    const idx = list.findIndex(r => r.id === route.id);
+    if (idx === -1) {
+      this.store.next([...list, route]);
+    } else {
+      const next = [...list];
+      next[idx] = route;
+      this.store.next(next);
+    }
+  }
 
-updateRoute(id: number, changes: Partial<RouteI>): boolean {
-  const routes = this.routeService.value;              // valor actual del BehaviorSubject
-  const idx = routes.findIndex(r => r.id === id);      // buscamos la ruta por id
-  if (idx === -1) return false;                        // si no existe, devolvemos false
+  loadAll(force = false): void {
+    if (this.loaded && !force) {
+      return;
+    }
+    this.fetchAll().subscribe({
+      error: err => console.error('Error cargando rutas', err)
+    });
+  }
 
-  const updated: RouteI = {                            // ruta actualizada
-    ...routes[idx], 
-    ...changes, 
-    updatedAt: new Date()
-  };
+  fetchAll(): Observable<RouteI[]> {
+    return this.http.get<any>(this.baseUrl).pipe(
+      map(resp => this.normalizeList(resp)),
+      tap(routes => {
+        this.store.next(routes);
+        this.loaded = true;
+      })
+    );
+  }
 
-  // Inmutabilidad: creamos un nuevo array
-  const next = [...routes];
-  next[idx] = updated;
+  getRoutes(): RouteI[] {
+    if (!this.loaded) {
+      this.loadAll();
+    }
+    return this.store.value;
+  }
 
-  // Emitimos el nuevo array a todos los suscriptores
-  this.routeService.next(next);
+  getById(id: number): Observable<RouteI> {
+    return this.http.get<any>(`${this.baseUrl}/${id}`).pipe(map(resp => this.normalize(resp)));
+  }
 
-  return true; // confirmamos que sí se actualizó
-}
+  create(payload: RouteI): Observable<RouteI> {
+    return this.http.post<any>(this.baseUrl, payload).pipe(
+      map(resp => this.normalize(resp)),
+      tap(route => this.store.next([...this.store.value, route]))
+    );
+  }
 
-deleteRoute(id: number): boolean {
-  const current = this.routeService.value;
-  const exists = current.some(r => r.id === id);
-  if (!exists) return false;
+  update(id: number, payload: RouteI): Observable<RouteI> {
+    return this.http.put<any>(`${this.baseUrl}/${id}`, payload).pipe(
+      map(resp => this.normalize(resp)),
+      tap(route => this.replace(route))
+    );
+  }
 
-  // inmutabilidad: creamos un nuevo array sin la ruta eliminada
-  const next = current.filter(r => r.id !== id);
-  this.routeService.next(next);
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+      tap(() => this.store.next(this.store.value.filter(r => r.id !== id)))
+    );
+  }
 
-  return true;
-}
-
-
-
+  deactivate(id: number): Observable<RouteI> {
+    return this.http.patch<void>(`${this.baseUrl}/${id}/deactivate`, {}).pipe(
+      switchMap(() => this.getById(id)),
+      tap(route => this.replace(route))
+    );
+  }
 }

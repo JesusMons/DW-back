@@ -11,13 +11,13 @@
     <!-- Apellido -->
     <div>
       <label class="block font-semibold">Apellido</label>
-      <input [(ngModel)]="form.last_name" name="last_name" class="w-full border rounded px-3 py-2" required />
+      <input [(ngModel)]="form.lastName" name="lastName" class="w-full border rounded px-3 py-2" required />
     </div>
 
     <!-- Documento -->
     <div>
       <label class="block font-semibold">Documento</label>
-      <input type="number" [(ngModel)]="form.document" name="document" class="w-full border rounded px-3 py-2" required />
+      <input [(ngModel)]="form.document" name="document" class="w-full border rounded px-3 py-2" required />
     </div>
 
     <!-- Grado -->
@@ -69,8 +69,8 @@
 
     <!-- Acudiente -->
     <div class="md:col-span-2">
-      <label class="block font-semibold">Acudiente</label>
-      <input [(ngModel)]="form.guardian" name="guardian" class="w-full border rounded px-3 py-2" required />
+      <label class="block font-semibold">Acudiente (ID)</label>
+      <input type="number" [(ngModel)]="form.guardianId" name="guardianId" class="w-full border rounded px-3 py-2" />
     </div>
 
     <!-- Contacto de emergencia -->

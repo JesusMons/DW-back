@@ -1,98 +1,74 @@
-import { Component, NgZone } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { RoutesService } from '../../services/routes.service';
-import { RouteI } from '../../models/routes.models';
 
-// PrimeNG
-import { ProgressBar } from 'primeng/progressbar';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { RoutesService } from '../../services/routes.service';
+import { RouteI, RouteStatus } from '../../models/routes.models';
 
 @Component({
   selector: 'app-add-route',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProgressBar, ToastModule],
-  templateUrl: './add-route.html',
-  providers: [MessageService]
+  imports: [CommonModule, FormsModule],
+  templateUrl: './add-route.html'
 })
 export class AddRoute {
-  // Modelo temporal
-  newRoute: Partial<RouteI> = { name: '', startPoint: '', endPoint: '', bus: 0, driver: '', status: 'ACTIVE' };
-  stopsInput = '';
-  scheduleInput = '';
+  form: Partial<RouteI> = {
+    name: '',
+    startPoint: '',
+    endPoint: '',
+    currentBusId: undefined,
+    currentDriverId: undefined,
+    status: 'ACTIVO'
+  };
 
-  // Barra de progreso
-  value = 0;
   loading = false;
-  interval: any;
-
-  stops: string[] = [];
-  schedules: string[] = [];
-
+  error?: string;
 
   constructor(
-    private routeService: RoutesService,
-    private router: Router,
-    private messageService: MessageService,
-    private ngZone: NgZone
-  ) { }
+    private readonly routesService: RoutesService,
+    private readonly router: Router
+  ) {}
 
-  addRoute() {
-    if (!this.newRoute.name || !this.newRoute.startPoint || !this.newRoute.endPoint) {
-      this.messageService.add({ severity: 'warn', summary: 'Campos faltantes', detail: 'Completa todos los obligatorios.' });
+  save() {
+    if (!this.form.name || !this.form.startPoint || !this.form.endPoint) {
+      alert('Completa Nombre, Punto de inicio y Punto final.');
       return;
     }
 
-    const route: RouteI = {
-      id: 0,
-      name: this.newRoute.name!,
-      stops: this.stops,
-      startPoint: this.newRoute.startPoint!,
-      endPoint: this.newRoute.endPoint!,
-      schedule: this.schedules,
-      bus: this.newRoute.bus!,
-      driver: this.newRoute.driver!,
-      status: this.newRoute.status!,
-      createdAt: new Date(),
-      updatedAt: new Date()
+    const payload: RouteI = {
+      name: this.form.name,
+      startPoint: this.form.startPoint,
+      endPoint: this.form.endPoint,
+      currentBusId: this.normalizeId(this.form.currentBusId),
+      currentDriverId: this.normalizeId(this.form.currentDriverId),
+      status: (this.form.status as RouteStatus) ?? 'ACTIVO'
     };
 
-
-    // 🔹 activar barra de carga
     this.loading = true;
-    this.value = 0;
-
-    this.ngZone.runOutsideAngular(() => {
-      this.interval = setInterval(() => {
-        this.ngZone.run(() => {
-          this.value += Math.floor(Math.random() * 15) + 5; // avanza un poco aleatorio
-          if (this.value >= 100) {
-            this.value = 100;
-            clearInterval(this.interval);
-            this.loading = false;
-
-            this.messageService.add({ severity: 'success', summary: 'Ruta creada', detail: `"${route.name}" fue agregada con éxito ✅` });
-            this.routeService.addRoute(route);
-            this.router.navigate(['/routes']);
-          }
-        });
-      }, 400); // cada 0.4 seg
+    this.error = undefined;
+    this.routesService.create(payload).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/routes']);
+      },
+      error: err => {
+        console.error('Error creando ruta', err);
+        this.error = 'No se pudo crear la ruta.';
+        this.loading = false;
+      }
     });
   }
 
-  addStop() {
-    if (this.stopsInput.trim()) {
-      this.stops.push(this.stopsInput.trim());
-      this.stopsInput = '';
-    }
+  cancel() {
+    this.router.navigate(['/routes']);
   }
 
-  addSchedule() {
-    if (this.scheduleInput.trim()) {
-      this.schedules.push(this.scheduleInput.trim());
-      this.scheduleInput = '';
+  private normalizeId(value?: number | null): number | null | undefined {
+    if (value === undefined || value === null || value === ('' as unknown as number)) {
+      return null;
     }
+    const num = Number(value);
+    return Number.isNaN(num) ? null : num;
   }
 }

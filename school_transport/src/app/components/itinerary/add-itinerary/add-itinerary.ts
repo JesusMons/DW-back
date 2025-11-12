@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { ItineraryService  } from '../../services/itinerary.service';
-import { ItineraryI } from '../../models/itinerary.models';
+
+import { ItineraryService } from '../../services/itinerary.service';
+import { ItineraryI, ItineraryStatus } from '../../models/itinerary.models';
 
 @Component({
   selector: 'app-add-itinerary',
@@ -13,52 +14,67 @@ import { ItineraryI } from '../../models/itinerary.models';
   templateUrl: './add-itinerary.html'
 })
 export class AddItinerary {
-  form: Partial<ItineraryI> = {
-    routeId: 1,
-    date: new Date(),
+  form = {
+    routeId: undefined as number | undefined,
+    date: new Date().toISOString().slice(0, 10),
     departureTime: '',
     arrivalTime: '',
-    stopsSchedule: [],
-    driver: '',
-    bus: 0,
-    status: 'PLANEADO',
+    driverId: undefined as number | undefined,
+    busId: undefined as number | undefined,
+    status: 'ACTIVO' as ItineraryStatus,
     notes: ''
   };
 
-  stop = '';
-  time = '';
-  stops: { stop: string; time: string }[] = [];
+  loading = false;
+  error?: string;
 
-  constructor(private svc: ItineraryService, private router: Router) {}
+  constructor(private readonly svc: ItineraryService, private readonly router: Router) {}
 
-  addStop() {
-    if (this.stop.trim() && this.time.trim()) {
-      this.stops.push({ stop: this.stop.trim(), time: this.time.trim() });
-      this.stop = '';
-      this.time = '';
+  private normalizeTime(value: string): string {
+    if (!value) return '';
+    return value.length === 5 ? `${value}:00` : value;
+  }
+
+  save(): void {
+    if (
+      !this.form.routeId ||
+      !this.form.date ||
+      !this.form.departureTime ||
+      !this.form.arrivalTime ||
+      !this.form.driverId ||
+      !this.form.busId
+    ) {
+      alert('Completa Ruta, Fecha, Horas, Conductor y Bus.');
+      return;
     }
-  }
 
-  removeStop(i: number) {
-    this.stops.splice(i, 1);
-  }
+    const payload: ItineraryI = {
+      routeId: Number(this.form.routeId),
+      date: new Date(this.form.date),
+      departureTime: this.normalizeTime(this.form.departureTime),
+      arrivalTime: this.normalizeTime(this.form.arrivalTime),
+      driverId: Number(this.form.driverId),
+      busId: Number(this.form.busId),
+      status: this.form.status,
+      notes: this.form.notes?.trim() ? this.form.notes.trim() : null
+    };
 
-  save() {
-    if (!this.form.routeId || !this.form.departureTime || !this.form.arrivalTime) return;
-
-    this.svc.add({
-      id: 0,
-      routeId: this.form.routeId!,
-      date: this.form.date!,
-      departureTime: this.form.departureTime!,
-      arrivalTime: this.form.arrivalTime!,
-      stopsSchedule: this.stops,
-      driver: this.form.driver || '',
-      bus: this.form.bus || 0,
-      status: this.form.status!,
-      notes: this.form.notes
+    this.loading = true;
+    this.error = undefined;
+    this.svc.create(payload).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/itinerary']);
+      },
+      error: err => {
+        console.error('Error creando itinerario', err);
+        this.error = 'No se pudo crear el itinerario.';
+        this.loading = false;
+      }
     });
+  }
 
+  cancel(): void {
     this.router.navigate(['/itinerary']);
   }
 }

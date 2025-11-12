@@ -1,99 +1,47 @@
-<div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
-  <h2 class="text-xl font-bold mb-6 col-span-2">Agregar Nueva Ruta</h2>
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
+  <h2 class="text-2xl font-bold mb-6 text-gray-700">Nueva Ruta</h2>
 
-  <form (ngSubmit)="addRoute()" *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <!-- Nombre -->
+  <form (ngSubmit)="save()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div>
-      <label class="block font-semibold">Nombre</label>
-      <input [(ngModel)]="newRoute.name" name="name"
-             class="w-full border rounded px-3 py-2" required />
+      <label class="block text-sm font-semibold mb-1">Nombre</label>
+      <input [(ngModel)]="form.name" name="name" required class="w-full border rounded px-3 py-2" />
     </div>
 
-    <!-- Punto de inicio -->
     <div>
-      <label class="block font-semibold">Punto de inicio</label>
-      <input [(ngModel)]="newRoute.startPoint" name="startPoint"
-             class="w-full border rounded px-3 py-2" required />
+      <label class="block text-sm font-semibold mb-1">Punto de inicio</label>
+      <input [(ngModel)]="form.startPoint" name="startPoint" required class="w-full border rounded px-3 py-2" />
     </div>
 
-    <!-- Punto final -->
     <div>
-      <label class="block font-semibold">Punto final</label>
-      <input [(ngModel)]="newRoute.endPoint" name="endPoint"
-             class="w-full border rounded px-3 py-2" required />
+      <label class="block text-sm font-semibold mb-1">Punto final</label>
+      <input [(ngModel)]="form.endPoint" name="endPoint" required class="w-full border rounded px-3 py-2" />
     </div>
 
-    <!-- Bus -->
     <div>
-      <label class="block font-semibold">Bus</label>
-      <input type="number" [(ngModel)]="newRoute.bus" name="bus"
-             class="w-full border rounded px-3 py-2" />
+      <label class="block text-sm font-semibold mb-1">Bus actual (ID)</label>
+      <input type="number" [(ngModel)]="form.currentBusId" name="currentBusId" class="w-full border rounded px-3 py-2" />
     </div>
 
-    <!-- Conductor -->
     <div>
-      <label class="block font-semibold">Conductor</label>
-      <input [(ngModel)]="newRoute.driver" name="driver"
-             class="w-full border rounded px-3 py-2" />
+      <label class="block text-sm font-semibold mb-1">Conductor actual (ID)</label>
+      <input type="number" [(ngModel)]="form.currentDriverId" name="currentDriverId" class="w-full border rounded px-3 py-2" />
     </div>
 
-    <!-- Estado -->
     <div>
-      <label class="block font-semibold">Estado</label>
-      <select [(ngModel)]="newRoute.status" name="status"
-              class="w-full border rounded px-3 py-2">
-        <option value="ACTIVE">Activo</option>
-        <option value="INACTIVE">Inactivo</option>
+      <label class="block text-sm font-semibold mb-1">Estado</label>
+      <select [(ngModel)]="form.status" name="status" class="w-full border rounded px-3 py-2">
+        <option value="ACTIVO">Activo</option>
+        <option value="INACTIVO">Inactivo</option>
       </select>
     </div>
 
-    <!-- Paradas -->
-    <div class="md:col-span-2">
-      <label class="block font-semibold">Paradas</label>
-      <div class="flex gap-2">
-        <input [(ngModel)]="stopsInput" name="stopInput"
-               class="flex-1 border rounded px-3 py-2"
-               placeholder="Ej: Parque Central" />
-        <button type="button" (click)="addStop()"
-                class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">
-          <i class="pi pi-plus"></i>
-        </button>
-      </div>
-      <ul class="mt-2 text-sm text-gray-700 list-disc list-inside">
-        <li *ngFor="let stop of stops">{{ stop }}</li>
-      </ul>
-    </div>
+    <p class="md:col-span-2 text-sm text-red-600" *ngIf="error">{{ error }}</p>
 
-    <!-- Horarios -->
-    <div class="md:col-span-2">
-      <label class="block font-semibold">Horarios</label>
-      <div class="flex gap-2">
-        <input [(ngModel)]="scheduleInput" name="scheduleInput"
-               class="flex-1 border rounded px-3 py-2"
-               placeholder="Ej: 06:30" />
-        <button type="button" (click)="addSchedule()"
-                class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">
-          <i class="pi pi-plus"></i>
-        </button>
-      </div>
-      <ul class="mt-2 text-sm text-gray-700 list-disc list-inside">
-        <li *ngFor="let schedule of schedules">{{ schedule }}</li>
-      </ul>
-    </div>
-
-    <!-- Botón Crear -->
-    <div class="md:col-span-2 flex justify-end mt-4">
-      <button type="submit"
-              class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
-        Crear Ruta
+    <div class="md:col-span-2 flex gap-3 justify-end pt-4">
+      <button type="button" class="px-4 py-2 rounded border border-gray-300" (click)="cancel()">Cancelar</button>
+      <button type="submit" class="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-60" [disabled]="loading">
+        {{ loading ? 'Guardando...' : 'Crear Ruta' }}
       </button>
     </div>
   </form>
-
-  <!-- Barra de progreso -->
-  <div *ngIf="loading" class="mt-6">
-    <p-progressbar [value]="value"></p-progressbar>
-  </div>
-
-  <p-toast></p-toast>
 </div>

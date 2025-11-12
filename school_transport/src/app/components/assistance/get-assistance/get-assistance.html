@@ -38,7 +38,15 @@
   </div>
 
   <!-- Tabla -->
-  <p-table [value]="rows" [tableStyle]="{ 'min-width': '64rem' }" responsiveLayout="scroll">
+  <p-table
+    [value]="rows"
+    [tableStyle]="{ 'min-width': '64rem' }"
+    responsiveLayout="scroll"
+    [paginator]="rows.length > 5"
+    [rows]="8"
+    [rowsPerPageOptions]="[5, 10, 20, 50]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords}">
     <ng-template pTemplate="header">
       <tr>
         <th>Estudiante</th>
@@ -63,9 +71,6 @@
         </td>
         <td class="flex gap-2 ">
         <button pButton icon="pi pi-pencil"    severity="secondary"  class="p-1" [routerLink]="['/assistance/edit', r.id]"></button>
-          <button pButton icon="pi pi-check"  severity="success"  class="p-1" (click)="setStatus(r, 'CONFIRMADO')"></button>
-          <button pButton icon="pi pi-times"  severity="danger"   class="p-1" (click)="setStatus(r, 'AUSENTE')"></button>
-          <button pButton icon="pi pi-ban"    severity="warn"  class="p-1" (click)="setStatus(r, 'CANCELADO')"></button>
         </td>
       </tr>
     </ng-template>

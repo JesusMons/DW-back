@@ -1,96 +1,57 @@
-<div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow">
-  <h2 class="text-xl font-bold mb-6">Crear Itinerario</h2>
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow">
+  <h2 class="text-2xl font-bold mb-6 text-gray-700">Crear Itinerario</h2>
 
   <form (ngSubmit)="save()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <!-- Ruta -->
     <div>
-      <label class="block font-semibold">Ruta (ID)</label>
-      <input type="number" [(ngModel)]="form.routeId" name="routeId"
-             class="w-full border rounded px-3 py-2" required />
+      <label class="block text-sm font-semibold mb-1">Ruta (ID)</label>
+      <input type="number" [(ngModel)]="form.routeId" name="routeId" class="w-full border rounded px-3 py-2" required />
     </div>
 
-    <!-- Fecha -->
     <div>
-      <label class="block font-semibold">Fecha</label>
-      <input type="date"
-             [(ngModel)]="form.date"
-             name="date"
-             class="w-full border rounded px-3 py-2"
-             [value]="(form.date | date:'yyyy-MM-dd')"
-             (change)="form.date=$any($event.target).valueAsDate" required />
+      <label class="block text-sm font-semibold mb-1">Fecha</label>
+      <input type="date" [(ngModel)]="form.date" name="date" class="w-full border rounded px-3 py-2" required />
     </div>
 
-    <!-- Salida -->
     <div>
-      <label class="block font-semibold">Hora de Salida</label>
-      <input type="time" [(ngModel)]="form.departureTime" name="departureTime"
-             class="w-full border rounded px-3 py-2" required />
+      <label class="block text-sm font-semibold mb-1">Hora de salida</label>
+      <input type="time" [(ngModel)]="form.departureTime" name="departureTime" class="w-full border rounded px-3 py-2" required />
     </div>
 
-    <!-- Llegada -->
     <div>
-      <label class="block font-semibold">Hora de Llegada</label>
-      <input type="time" [(ngModel)]="form.arrivalTime" name="arrivalTime"
-             class="w-full border rounded px-3 py-2" required />
+      <label class="block text-sm font-semibold mb-1">Hora de llegada</label>
+      <input type="time" [(ngModel)]="form.arrivalTime" name="arrivalTime" class="w-full border rounded px-3 py-2" required />
     </div>
 
-    <!-- Bus -->
     <div>
-      <label class="block font-semibold">Bus</label>
-      <input type="number" [(ngModel)]="form.bus" name="bus"
-             class="w-full border rounded px-3 py-2" />
+      <label class="block text-sm font-semibold mb-1">Conductor (ID)</label>
+      <input type="number" [(ngModel)]="form.driverId" name="driverId" class="w-full border rounded px-3 py-2" required />
     </div>
 
-    <!-- Conductor -->
     <div>
-      <label class="block font-semibold">Conductor</label>
-      <input [(ngModel)]="form.driver" name="driver"
-             class="w-full border rounded px-3 py-2" />
+      <label class="block text-sm font-semibold mb-1">Bus (ID)</label>
+      <input type="number" [(ngModel)]="form.busId" name="busId" class="w-full border rounded px-3 py-2" required />
     </div>
 
-    <!-- Estado -->
     <div>
-      <label class="block font-semibold">Estado</label>
-      <select [(ngModel)]="form.status" name="status"
-              class="w-full border rounded px-3 py-2">
-        <option value="PLANNED">PLANEADO</option>
-        <option value="IN_PROGRESS">EN PROGRESO</option>
-        <option value="COMPLETED">COMPLETADO</option>
-        <option value="CANCELLED">CANCELADO</option>
+      <label class="block text-sm font-semibold mb-1">Estado</label>
+      <select [(ngModel)]="form.status" name="status" class="w-full border rounded px-3 py-2">
+        <option value="ACTIVO">Activo</option>
+        <option value="INACTIVO">Inactivo</option>
       </select>
     </div>
 
-    <!-- Paradas y horarios -->
     <div class="md:col-span-2">
-      <label class="block font-semibold mb-1">Paradas / Horarios</label>
-      <div class="flex gap-2 mb-2">
-        <input [(ngModel)]="stop" name="stop" placeholder="Parada"
-               class="flex-1 border rounded px-3 py-2" />
-        <input [(ngModel)]="time" name="time" type="time"
-               class="w-40 border rounded px-3 py-2" />
-        <button pButton type="button" icon="pi pi-plus" (click)="addStop()" severity="success"></button>
-      </div>
-      <ul class="mt-2 text-sm">
-        <li *ngFor="let s of stops; let i = index"
-            class="flex items-center justify-between py-1 border-b">
-          <span>{{ s.time }} — {{ s.stop }}</span>
-          <button type="button"
-                  (click)="removeStop(i)"
-                  class="text-red-600 hover:underline">Eliminar</button>
-        </li>
-      </ul>
+      <label class="block text-sm font-semibold mb-1">Notas</label>
+      <textarea [(ngModel)]="form.notes" name="notes" rows="3" class="w-full border rounded px-3 py-2"></textarea>
     </div>
 
-    <!-- Notas -->
-    <div class="md:col-span-2">
-      <label class="block font-semibold">Notas</label>
-      <textarea [(ngModel)]="form.notes" name="notes"
-                rows="3" class="w-full border rounded px-3 py-2"></textarea>
-    </div>
+    <p class="md:col-span-2 text-sm text-red-600" *ngIf="error">{{ error }}</p>
 
-    <!-- Botón Guardar -->
-    <div class="md:col-span-2 flex justify-end">
-      <p-button type="submit" label="Guardar" icon="pi pi-save" severity="primary"></p-button>
+    <div class="md:col-span-2 flex justify-end gap-3 pt-2">
+      <button type="button" class="px-4 py-2 rounded border border-gray-300" (click)="cancel()">Cancelar</button>
+      <button type="submit" class="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50" [disabled]="loading">
+        {{ loading ? 'Guardando...' : 'Guardar' }}
+      </button>
     </div>
   </form>
 </div>

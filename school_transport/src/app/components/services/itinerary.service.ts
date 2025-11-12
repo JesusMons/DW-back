@@ -1,49 +1,117 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { ItineraryI } from '../models/itinerary.models';
-
-
+import { BehaviorSubject, map, Observable, switchMap, tap } from 'rxjs';
+import { ItineraryI, ItineraryStatus } from '../models/itinerary.models';
 
 @Injectable({ providedIn: 'root' })
 export class ItineraryService {
-  private store = new BehaviorSubject<ItineraryI[]>([
-    {
-      id: 1,
-      routeId: 1,
-      date: new Date(),
-      departureTime: '06:30',
-      arrivalTime: '07:45',
-      stopsSchedule: [
-        { stop: 'Parque Central', time: '06:40' },
-        { stop: 'Av. Bolívar', time: '07:00' }
-      ],
-      driver: 'Carlos Gómez',
-      bus: 101,
-      status: 'PLANEADO',
-      createdAt: new Date(),
-      updatedAt: new Date()
+  private readonly baseUrl = '/api/itineraries';
+  private readonly store = new BehaviorSubject<ItineraryI[]>([]);
+  private loaded = false;
+
+  readonly itineraries$ = this.store.asObservable();
+
+  constructor(private readonly http: HttpClient) {}
+
+  private normalize(raw: any): ItineraryI {
+    if (!raw) {
+      return raw;
     }
-  ]);
 
-  itineraries$ = this.store.asObservable();
+    const normalizeDate = (value?: string | Date | null): Date =>
+      value instanceof Date ? value : new Date(value ?? Date.now());
 
-  getAll() { return this.store.value; }
-  getById(id: number) { return this.store.value.find(i => i.id === id); }
+    const normalizeTime = (value?: string): string => value ?? '';
 
-  add(it: ItineraryI) {
+    return {
+      id: raw?.id ?? raw?.ID,
+      routeId: Number(raw?.routeId ?? raw?.route_id ?? 0),
+      date: normalizeDate(raw?.date),
+      departureTime: normalizeTime(raw?.departureTime ?? raw?.departure_time),
+      arrivalTime: normalizeTime(raw?.arrivalTime ?? raw?.arrival_time),
+      driverId: Number(raw?.driverId ?? raw?.driver_id ?? 0),
+      busId: Number(raw?.busId ?? raw?.bus_id ?? 0),
+      status: (raw?.status as ItineraryStatus | undefined) ?? 'ACTIVO',
+      notes: raw?.notes ?? null,
+      createdAt: raw?.createdAt ? new Date(raw.createdAt) : undefined,
+      updatedAt: raw?.updatedAt ? new Date(raw.updatedAt) : undefined
+    };
+  }
+
+  private normalizeList(resp: any): ItineraryI[] {
+    const list =
+      resp?.itineraries ??
+      (Array.isArray(resp?.data) ? resp.data : resp?.data?.itineraries) ??
+      resp ??
+      [];
+
+    return Array.isArray(list) ? list.map(item => this.normalize(item)) : [];
+  }
+
+  private replace(itinerary: ItineraryI) {
     const list = this.store.value;
-    it.id = list.length ? Math.max(...list.map(x => x.id ?? 0)) + 1 : 1;
-    it.createdAt = new Date(); it.updatedAt = new Date();
-    this.store.next([...list, it]);
+    const idx = list.findIndex(it => it.id === itinerary.id);
+    if (idx === -1) {
+      this.store.next([...list, itinerary]);
+    } else {
+      const clone = [...list];
+      clone[idx] = itinerary;
+      this.store.next(clone);
+    }
   }
 
-  update(it: ItineraryI) {
-    const list = this.store.value.slice();
-    const idx = list.findIndex(x => x.id === it.id);
-    if (idx >= 0) { it.updatedAt = new Date(); list[idx] = { ...it }; this.store.next(list); }
+  loadAll(force = false): void {
+    if (this.loaded && !force) return;
+    this.fetchAll().subscribe({
+      error: err => console.error('Error cargando itinerarios', err)
+    });
   }
 
-  remove(id: number) {
-    this.store.next(this.store.value.filter(x => x.id !== id));
+  fetchAll(): Observable<ItineraryI[]> {
+    return this.http.get<any>(this.baseUrl).pipe(
+      map(resp => this.normalizeList(resp)),
+      tap(list => {
+        this.store.next(list);
+        this.loaded = true;
+      })
+    );
+  }
+
+  getSnapshot(): ItineraryI[] {
+    if (!this.loaded) {
+      this.loadAll();
+    }
+    return this.store.value;
+  }
+
+  getById(id: number): Observable<ItineraryI> {
+    return this.http.get<any>(`${this.baseUrl}/${id}`).pipe(map(resp => this.normalize(resp)));
+  }
+
+  create(payload: ItineraryI): Observable<ItineraryI> {
+    return this.http.post<any>(this.baseUrl, payload).pipe(
+      map(resp => this.normalize(resp)),
+      tap(it => this.store.next([...this.store.value, it]))
+    );
+  }
+
+  update(id: number, payload: ItineraryI): Observable<ItineraryI> {
+    return this.http.put<any>(`${this.baseUrl}/${id}`, payload).pipe(
+      map(resp => this.normalize(resp)),
+      tap(it => this.replace(it))
+    );
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+      tap(() => this.store.next(this.store.value.filter(it => it.id !== id)))
+    );
+  }
+
+  deactivate(id: number): Observable<ItineraryI> {
+    return this.http.patch<void>(`${this.baseUrl}/${id}/deactivate`, {}).pipe(
+      switchMap(() => this.getById(id)),
+      tap(it => this.replace(it))
+    );
   }
 }

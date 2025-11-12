@@ -1,13 +1,20 @@
 <div class="card">
-  <h2 class="text-2xl font-bold mb-4 text-gray-700">Listado de Itinerarios</h2>
+  <h2 class="text-2xl font-bold mb-4 text-gray-700">Itinerarios</h2>
 
-  <!-- Botón Crear -->
-  <div class="flex justify-end mb-4">
+  <div class="flex justify-between items-center mb-4">
+    <span class="text-sm text-gray-500" *ngIf="loading">Cargando...</span>
     <p-button label="Crear Itinerario" severity="success" [routerLink]="['/itinerary/add']"></p-button>
   </div>
 
-  <!-- Tabla de Itinerarios -->
-  <p-table [value]="itineraries" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
+  <p-table
+    [value]="itineraries"
+    [tableStyle]="{ 'min-width': '64rem' }"
+    responsiveLayout="scroll"
+    [paginator]="itineraries.length > 8"
+    [rows]="8"
+    [rowsPerPageOptions]="[5, 8, 15, 25]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords}">
     <ng-template pTemplate="header">
       <tr>
         <th>ID</th>
@@ -29,61 +36,37 @@
         <td>{{ it.date | date:'yyyy-MM-dd' }}</td>
         <td>{{ it.departureTime }}</td>
         <td>{{ it.arrivalTime }}</td>
-        <td>{{ it.bus }}</td>
-        <td>{{ it.driver }}</td>
+        <td>{{ it.busId }}</td>
+        <td>{{ it.driverId }}</td>
         <td>
-          <p-tag
-            [value]="it.status"
-            [severity]="
-              it.status === 'PLANNED' ? 'warning' :
-              it.status === 'IN_PROGRESS' ? 'info' :
-              it.status === 'COMPLETED' ? 'success' :
-              'danger'
-            ">
-          </p-tag>
+          <p-tag [value]="it.status" [severity]="statusSeverity(it.status)"></p-tag>
         </td>
-
-        <td class="flex gap-2 justify-center max-w-20">
-          <!-- Botón Ver Detalles -->
-          <p-button icon="pi pi-eye" severity="info" class="p-1"
-                    (click)="showDetails(it)"></p-button>
-
-          <p-button icon="pi pi-pencil" severity="warn" class="p-1"
-                    [routerLink]="['/itinerary/edit', it.id]"></p-button>
-
-          <p-button icon="pi pi-trash" severity="danger" class="p-1"
-                    (click)="delete(it.id!)"></p-button>
+        <td class="flex gap-2 justify-center">
+          <p-button icon="pi pi-eye" severity="info" class="p-1" (click)="showDetails(it)"></p-button>
+          <p-button icon="pi pi-pencil" severity="warn" class="p-1" [routerLink]="['/itinerary/edit', it.id]"></p-button>
+          <p-button icon="pi pi-power-off" severity="secondary" class="p-1" (click)="deactivate(it.id)"></p-button>
+          <p-button icon="pi pi-trash" severity="danger" class="p-1" (click)="delete(it.id)"></p-button>
         </td>
       </tr>
     </ng-template>
   </p-table>
 </div>
 
-<!-- Diálogo de detalles -->
-<p-dialog header="Detalles del Itinerario"
-          [(visible)]="detailsVisible"
-          [modal]="true"
-          [style]="{width: '40rem'}"
-          [closable]="true">
-  <div *ngIf="selectedItinerary" class="space-y-2">
+<p-dialog
+  header="Detalles del Itinerario"
+  [(visible)]="detailsVisible"
+  [modal]="true"
+  [style]="{ width: '30rem' }"
+  [closable]="true">
+  <div *ngIf="selectedItinerary" class="space-y-2 text-sm">
     <p><strong>ID:</strong> {{ selectedItinerary.id }}</p>
     <p><strong>Ruta:</strong> #{{ selectedItinerary.routeId }}</p>
     <p><strong>Fecha:</strong> {{ selectedItinerary.date | date:'yyyy-MM-dd' }}</p>
     <p><strong>Salida:</strong> {{ selectedItinerary.departureTime }}</p>
     <p><strong>Llegada:</strong> {{ selectedItinerary.arrivalTime }}</p>
-    <p><strong>Bus:</strong> {{ selectedItinerary.bus }}</p>
-    <p><strong>Conductor:</strong> {{ selectedItinerary.driver }}</p>
-    <p><strong>Estado:</strong> {{ selectedItinerary.status }}</p>
-    
-    <div>
-      <strong>Paradas:</strong>
-      <ul class="list-disc ml-6">
-        <li *ngFor="let stop of selectedItinerary.stopsSchedule">
-          {{ stop.time }} — {{ stop.stop }}
-        </li>
-      </ul>
-    </div>
-
+    <p><strong>Bus:</strong> #{{ selectedItinerary.busId }}</p>
+    <p><strong>Conductor:</strong> #{{ selectedItinerary.driverId }}</p>
+    <p><strong>Status:</strong> {{ selectedItinerary.status }}</p>
     <div *ngIf="selectedItinerary.notes">
       <strong>Notas:</strong>
       <p>{{ selectedItinerary.notes }}</p>

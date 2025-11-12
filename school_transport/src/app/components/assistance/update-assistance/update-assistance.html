@@ -1,7 +1,9 @@
 <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow">
-  <h2 class="text-xl font-bold mb-6">Editar Asistencia #{{ form?.id }}</h2>
+  <ng-container *ngIf="!loading; else loadingTpl">
+    <h2 class="text-xl font-bold mb-6">Editar Asistencia #{{ form?.id }}</h2>
+    <p *ngIf="error" class="mb-4 text-sm text-red-600">{{ error }}</p>
 
-  <form *ngIf="form" (ngSubmit)="save()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form *ngIf="form" (ngSubmit)="save()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <!-- Ruta -->
     <div>
       <label class="block font-semibold mb-1">Ruta *</label>
@@ -29,7 +31,7 @@
       <select [(ngModel)]="form.studentId" name="studentId" class="w-full border rounded px-3 py-2" required>
         <option [ngValue]="undefined">Seleccione un estudiante</option>
         <option *ngFor="let s of students" [ngValue]="s.id">
-          #{{ s.id }} — {{ s.name }} {{ s.last_name || '' }}
+          #{{ s.id }} — {{ s.name }} {{ s.lastName || '' }}
         </option>
       </select>
     </div>
@@ -47,19 +49,30 @@
     </div>
 
     <!-- Estado -->
-    <div class="md:col-span-2">
-      <label class="block font-semibold mb-1">Estado</label>
-      <select [(ngModel)]="form.status" name="status" class="w-full border rounded px-3 py-2">
-        <option value="CONFIRMADO">CONFIRMADO</option>
-        <option value="AUSENTE">AUSENTE</option>
-        <option value="CANCELADO">CANCELADO</option>
-      </select>
-    </div>
+      <div class="md:col-span-2">
+        <label class="block font-semibold mb-1">Estado</label>
+        <select [(ngModel)]="form.status" name="status" class="w-full border rounded px-3 py-2">
+          <option value="ACTIVO">ACTIVO</option>
+          <option value="INACTIVO">INACTIVO</option>
+        </select>
+      </div>
 
-    <!-- Acciones -->
-    <div class="md:col-span-2 flex justify-end gap-2 mt-2">
-      <button pButton type="button" label="Cancelar" class="!bg-gray-500 !border-none" (click)="cancel()"></button>
-      <button pButton type="submit" label="Guardar" icon="pi pi-save" severity="primary"></button>
-    </div>
-  </form>
+      <!-- Acciones -->
+      <div class="md:col-span-2 flex justify-end gap-2 mt-2">
+        <button pButton type="button" label="Cancelar" class="!bg-gray-500 !border-none" (click)="cancel()"></button>
+        <button
+          pButton
+          type="submit"
+          [label]="saving ? 'Guardando...' : 'Guardar'"
+          icon="pi pi-save"
+          severity="primary"
+          [disabled]="saving">
+        </button>
+      </div>
+    </form>
+  </ng-container>
+
+  <ng-template #loadingTpl>
+    <p class="text-center text-gray-600">Cargando asistencia...</p>
+  </ng-template>
 </div>

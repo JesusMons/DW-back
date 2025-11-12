@@ -1,11 +1,13 @@
-export interface assistanceI {
+export type AssistanceStatus = "ACTIVO" | "INACTIVO";
+
+export interface AssistanceI {
   id?: number;
-  studentId: number;   // referencia a studentI
-  routeId: number;     // referencia a RouteI
-  busId: number;       // referencia a busI
-  date: Date;          // día de la asistencia
-  time: string;        // hora de confirmación
-  status: "CONFIRMADO" | "AUSENTE" | "CANCELADO";
+  studentId: number;
+  routeId: number;
+  busId: number;
+  date: Date;
+  time: string; // TIME
+  status?: AssistanceStatus;
   createdAt?: Date;
   updatedAt?: Date;
 }
