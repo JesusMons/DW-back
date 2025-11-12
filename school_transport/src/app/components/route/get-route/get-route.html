@@ -8,17 +8,23 @@
   </div>
 
   <!-- Tabla de Rutas -->
-  <p-table [value]="routes" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
-    <!-- Encabezado -->
+  <p-table
+    [value]="routes"
+    [tableStyle]="{ 'min-width': '64rem' }"
+    responsiveLayout="scroll"
+    [paginator]="routes.length > 8"
+    [rows]="8"
+    [rowsPerPageOptions]="[5, 8, 15, 25]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords}">
     <ng-template pTemplate="header">
       <tr>
         <th>ID</th>
         <th>Nombre</th>
-        <th>Paradas</th>
-        <th>Salida</th>
-        <th>Llegada</th>
-        <th>Horarios</th>
-        <th>Bus</th>
+        <th>Punto inicio</th>
+        <th>Punto final</th>
+        <th>Bus actual</th>
+        <th>Conductor actual</th>
         <th>Estado</th>
         <th class="text-center">Acciones</th>
       </tr>
@@ -29,17 +35,18 @@
       <tr>
         <td>{{ route.id }}</td>
         <td>{{ route.name }}</td>
-        <td>{{ route.stops?.join(', ') }}</td>
         <td>{{ route.startPoint }}</td>
         <td>{{ route.endPoint }}</td>
-        <td>{{ route.schedule?.join(' | ') }}</td>
-        <td>{{ route.bus }}</td>
+        <td>{{ route.currentBusId ?? 'Sin asignar' }}</td>
+        <td>{{ route.currentDriverId ?? 'Sin asignar' }}</td>
         <td>
-          <p-tag [value]="route.status" [severity]="route.status === 'ACTIVE' ? 'success' : 'danger'">
+          <p-tag [value]="route.status" [severity]="route.status === 'ACTIVO' ? 'success' : 'danger'">
           </p-tag>
         </td>
         <td class="flex gap-2 justify-center">
           <p-button icon="pi pi-pencil" severity="warn" class="p-1" [routerLink]="['/routes/edit', route.id]">
+          </p-button>
+          <p-button icon="pi pi-power-off" severity="secondary" class="p-1" (click)="deactivate(route.id)">
           </p-button>
           <p-button icon="pi pi-trash" severity="danger" class="p-1" (click)="delete(route.id)">
           </p-button>

@@ -1,15 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
-// PrimeNG
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { DialogModule } from 'primeng/dialog';
 
 import { StudentService } from '../../services/student.service';
-import { studentI } from '../../models/student.models';
+import { StudentI } from '../../models/student.models';
 
 @Component({
   selector: 'app-get-student',
@@ -17,26 +15,44 @@ import { studentI } from '../../models/student.models';
   imports: [CommonModule, RouterModule, TableModule, ButtonModule, TagModule, DialogModule],
   templateUrl: './get-student.html'
 })
-export class GetStudent {
-  students: studentI[] = [];
+export class GetStudent implements OnInit, OnDestroy {
+  students: StudentI[] = [];
   detailsVisible = false;
-  selected?: studentI;
+  selected?: StudentI;
 
-  constructor(private svc: StudentService) {
-    this.refresh();
+  private subscription?: { unsubscribe: () => void };
+
+  constructor(private readonly svc: StudentService) {}
+
+  ngOnInit(): void {
+    this.subscription = this.svc.students$.subscribe(list => (this.students = list));
+    this.svc.loadAll();
   }
 
-  refresh() {
-    this.students = this.svc.getAll();
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
-  delete(id: number) {
-    this.svc.remove(id);
-    this.refresh();
+  delete(id?: number): void {
+    if (!id || !confirm('¿Eliminar este estudiante?')) return;
+    this.svc.delete(id).subscribe({
+      error: () => alert('No se pudo eliminar el estudiante.')
+    });
   }
 
-  showDetails(s: studentI) {
+  deactivate(id?: number): void {
+    if (!id || !confirm('¿Marcar como INACTIVO?')) return;
+    this.svc.deactivate(id).subscribe({
+      error: () => alert('No se pudo actualizar el estado.')
+    });
+  }
+
+  showDetails(s: StudentI) {
     this.selected = s;
     this.detailsVisible = true;
+  }
+
+  statusSeverity(status?: StudentI['status']) {
+    return status === 'ACTIVO' ? 'success' : 'danger';
   }
 }

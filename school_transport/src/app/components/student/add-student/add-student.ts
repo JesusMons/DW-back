@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { StudentService } from '../../services/student.service';
-import { studentI } from '../../models/student.models';
+import { StudentI, StudentStatus } from '../../models/student.models';
 
 @Component({
   selector: 'app-add-student',
@@ -13,25 +13,26 @@ import { studentI } from '../../models/student.models';
   templateUrl: './add-student.html'
 })
 export class AddStudent {
-  // Modelo del formulario
-  form: Partial<studentI> = {
+  form = {
     name: '',
-    last_name: '',
-    document: undefined as unknown as number,
-    guardian: '',
-    grade: undefined,
-    birthdate: undefined,
+    lastName: '',
+    document: '',
+    guardianId: undefined as number | undefined,
+    grade: undefined as number | undefined,
+    birthdate: '',
     address: '',
     phone: '',
     guardianPhone: '',
     email: '',
-    status: 'ACTIVO',
-    allergies: [],
+    status: 'ACTIVO' as StudentStatus,
+    allergies: [] as string[],
     emergencyContact: { name: '', phone: '', relationship: '' }
   };
 
   // campos auxiliares para añadir alergias
   allergyInput = '';
+  loading = false;
+  error?: string;
 
   constructor(private svc: StudentService, private router: Router) {}
 
@@ -48,36 +49,45 @@ export class AddStudent {
 
   save() {
     // Validaciones básicas
-    if (!this.form.name || !this.form.last_name || !this.form.document || !this.form.guardian) {
-      alert('Completa: Nombre, Apellido, Documento y Acudiente');
+    if (!this.form.name || !this.form.lastName || !this.form.document) {
+      alert('Completa: Nombre, Apellido y Documento');
       return;
     }
 
-    const student: studentI = {
-      id: 0,
-      name: this.form.name!,
-      last_name: this.form.last_name!,
-      document: Number(this.form.document),
-      guardian: this.form.guardian!,
-      grade: this.form.grade,
-      birthdate: this.form.birthdate ? new Date(this.form.birthdate) : undefined,
-      address: this.form.address,
-      phone: this.form.phone,
-      guardianPhone: this.form.guardianPhone,
-      email: this.form.email,
-      status: (this.form.status as any) || 'ACTIVO',
-      allergies: this.form.allergies || [],
-      emergencyContact: this.form.emergencyContact?.name
+    const student: StudentI = {
+      name: this.form.name.trim(),
+      lastName: this.form.lastName.trim(),
+      document: this.form.document.trim(),
+      guardianId: this.form.guardianId ?? null,
+      grade: this.form.grade ?? null,
+      birthdate: this.form.birthdate ? new Date(this.form.birthdate) : null,
+      address: this.form.address || null,
+      phone: this.form.phone || null,
+      guardianPhone: this.form.guardianPhone || null,
+      email: this.form.email || null,
+      status: this.form.status,
+      allergies: this.form.allergies.length ? [...this.form.allergies] : null,
+      emergencyContact: this.form.emergencyContact.name
         ? {
             name: this.form.emergencyContact.name,
-            phone: this.form.emergencyContact.phone || '',
-            relationship: this.form.emergencyContact.relationship || ''
+            phone: this.form.emergencyContact.phone,
+            relationship: this.form.emergencyContact.relationship
           }
-        : undefined
+        : null
     };
 
-    this.svc.add(student);
-    this.router.navigate(['/student']);
+    this.loading = true;
+    this.error = undefined;
+    this.svc.create(student).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/student']);
+      },
+      error: () => {
+        this.error = 'No se pudo crear el estudiante.';
+        this.loading = false;
+      }
+    });
   }
 
   cancel() {

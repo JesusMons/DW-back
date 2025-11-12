@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { maintenanceI } from '../models/mantenimientoBus.models'; // ajusta la ruta al modelo
+import { maintenanceI } from '../models/mantenimientoBus.models'; 
 
 @Injectable({
   providedIn: 'root'

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { guardianI } from '../models/guardian.models'; // aquí importas tu modelo real
+import { guardianI } from '../models/guardian.models'; 
 
 @Injectable({
   providedIn: 'root'

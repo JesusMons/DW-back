@@ -1,18 +1,20 @@
-export interface studentI {
+export type StudentStatus = "ACTIVO" | "INACTIVO";
+
+export interface StudentI {
   id?: number;
   name: string;
-  last_name: string;
-  document: number;
-  guardian: string;
-  grade?: number;
-  birthdate?: Date;
-  address?: string;
-  phone?: string;
-  guardianPhone?: string;
-  email?: string;
-  status?: "ACTIVO" | "INACTIVO" | "GRADUADO";
-  allergies?: string[];
-  emergencyContact?: { name: string; phone: string; relationship: string };
+  lastName: string;
+  document: string;
+  guardianId?: number | null;
+  grade?: number | null;
+  birthdate?: Date | null;
+  address?: string | null;
+  phone?: string | null;
+  guardianPhone?: string | null;
+  email?: string | null;
+  status?: StudentStatus;
+  allergies?: string[] | null;
+  emergencyContact?: { name: string; phone: string; relationship: string } | null;
   createdAt?: Date;
   updatedAt?: Date;
 }

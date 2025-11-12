@@ -1,13 +1,13 @@
+export type RouteStatus = "ACTIVO" | "INACTIVO";
+
 export interface RouteI {
-    id?: number;
-    name: string;
-    stops: string[];
-    startPoint: string;
-    endPoint: string;
-    schedule: string[];
-    bus: number;
-    driver: string;
-    status: "ACTIVE" | "INACTIVE";
-    createdAt?: Date;
-    updatedAt?: Date;
+  id?: number;
+  name: string;
+  startPoint: string;
+  endPoint: string;
+  currentBusId?: number | null;
+  currentDriverId?: number | null;
+  status?: RouteStatus;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

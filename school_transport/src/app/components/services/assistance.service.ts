@@ -1,95 +1,132 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { assistanceI } from '../models/assistance.models'; // ajusta la ruta del modelo
+import { map, Observable, switchMap } from 'rxjs';
+import { AssistanceI, AssistanceStatus } from '../models/assistance.models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AssistanceService {
-  // estado inicial simulado
-  private store = new BehaviorSubject<assistanceI[]>([
-    {
-      id: 1,
-      studentId: 101,
-      routeId: 1,
-      busId: 101,
-      date: new Date('2025-09-12'),
-      time: '07:30',
-      status: 'CONFIRMADO',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    {
-      id: 2,
-      studentId: 102,
-      routeId: 2,
-      busId: 202,
-      date: new Date('2025-09-12'),
-      time: '07:40',
-      status: 'AUSENTE',
-      createdAt: new Date(),
-      updatedAt: new Date()
+  private readonly baseUrl = '/api/assistances';
+
+  constructor(private readonly http: HttpClient) {}
+
+  private fromResponseItem(resp: any): any {
+    if (!resp) {
+      return resp;
     }
-  ]);
 
-  assistance$ = this.store.asObservable();
+    if (resp.assistance) {
+      return resp.assistance;
+    }
 
-  /** Obtener todas */
-  getAll(): assistanceI[] {
-    return this.store.value;
+    if (resp.data) {
+      if (Array.isArray(resp.data)) {
+        return resp.data[0];
+      }
+      if (resp.data.assistance) {
+        return resp.data.assistance;
+      }
+      return resp.data;
+    }
+
+    return resp;
+  }
+
+  private normalize(dto: any): AssistanceI {
+    const item = this.fromResponseItem(dto) ?? {};
+    const normalizeDate = (value?: string | Date | null): Date | undefined => {
+      if (!value) return undefined;
+      return value instanceof Date ? value : new Date(value);
+    };
+
+    return {
+      id: item?.id ?? item?.ID,
+      studentId: item?.studentId ?? item?.student_id,
+      routeId: item?.routeId ?? item?.route_id,
+      busId: item?.busId ?? item?.bus_id,
+      date: normalizeDate(item?.date) ?? new Date(),
+      time: item?.time ?? '',
+      status: item?.status as AssistanceStatus | undefined,
+      createdAt: normalizeDate(item?.createdAt) ?? normalizeDate(item?.created_at),
+      updatedAt: normalizeDate(item?.updatedAt) ?? normalizeDate(item?.updated_at)
+    };
+  }
+
+  private normalizeList(resp: any): AssistanceI[] {
+    if (!resp) {
+      return [];
+    }
+
+    if (Array.isArray(resp)) {
+      return resp.map(item => this.normalize(item));
+    }
+
+    const listCandidate =
+      resp?.assistances ??
+      (Array.isArray(resp?.data) ? resp?.data : resp?.data?.assistances) ??
+      [];
+
+    if (!Array.isArray(listCandidate)) {
+      return [];
+    }
+
+    return listCandidate.map((item: any) => this.normalize(item));
+  }
+
+  /** Obtener todas las asistencias */
+  getAll(): Observable<AssistanceI[]> {
+    return this.http
+      .get<any>(this.baseUrl)
+      .pipe(map(resp => this.normalizeList(resp)));
   }
 
   /** Buscar por id */
-  getById(id: number): assistanceI | undefined {
-    return this.store.value.find(a => a.id === id);
-  }
-
-  /** Filtrar por estudiante */
-  getByStudent(studentId: number): assistanceI[] {
-    return this.store.value.filter(a => a.studentId === studentId);
-  }
-
-  /** Filtrar por ruta y fecha */
-  getByRouteAndDate(routeId: number, date: Date): assistanceI[] {
-    const day = date.toDateString();
-    return this.store.value.filter(a => a.routeId === routeId && a.date.toDateString() === day);
+  getById(id: number): Observable<AssistanceI> {
+    return this.http
+      .get<any>(`${this.baseUrl}/${id}`)
+      .pipe(map(resp => this.normalize(resp)));
   }
 
   /** Crear */
-  add(asst: assistanceI) {
-    const list = this.store.value;
-    const nextId = list.length ? Math.max(...list.map(a => a.id ?? 0)) + 1 : 1;
-    const now = new Date();
-
-    const payload: assistanceI = {
-      ...asst,
-      id: nextId,
-      createdAt: now,
-      updatedAt: now
-    };
-
-    this.store.next([...list, payload]);
+  create(payload: AssistanceI): Observable<AssistanceI> {
+    return this.http
+      .post<any>(this.baseUrl, payload)
+      .pipe(map(resp => this.normalize(resp)));
   }
 
   /** Actualizar */
-  update(asst: assistanceI) {
-    const list = [...this.store.value];
-    const idx = list.findIndex(a => a.id === asst.id);
-    if (idx < 0) return;
-
-    list[idx] = { ...list[idx], ...asst, updatedAt: new Date() };
-    this.store.next(list);
+  update(id: number, payload: AssistanceI): Observable<AssistanceI> {
+    return this.http
+      .put<any>(`${this.baseUrl}/${id}`, payload)
+      .pipe(map(resp => this.normalize(resp)));
   }
 
-  /** Eliminar */
-  remove(id: number) {
-    this.store.next(this.store.value.filter(a => a.id !== id));
+  /** Eliminar físicamente */
+  remove(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  /** Eliminación lógica */
+  deactivate(id: number): Observable<AssistanceI> {
+    return this.http
+      .patch<void>(`${this.baseUrl}/${id}/deactivate`, {})
+      .pipe(switchMap(() => this.getById(id)));
   }
 
   /** Cambiar estado rápidamente */
-  setStatus(id: number, status: assistanceI['status']) {
-    const a = this.getById(id);
-    if (!a) return;
-    this.update({ ...a, status });
+  setStatus(id: number, status: AssistanceStatus): Observable<AssistanceI> {
+    if (status === 'INACTIVO') {
+      return this.deactivate(id);
+    }
+
+    return this.getById(id).pipe(
+      switchMap(current =>
+        this.update(id, {
+          ...current,
+          status
+        })
+      )
+    );
   }
 }

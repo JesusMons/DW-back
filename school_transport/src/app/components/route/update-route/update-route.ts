@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+
 import { RoutesService } from '../../services/routes.service';
-import { RouteI } from '../../models/routes.models';
+import { RouteI, RouteStatus } from '../../models/routes.models';
 
 @Component({
   selector: 'app-update-route',
@@ -12,74 +13,88 @@ import { RouteI } from '../../models/routes.models';
   templateUrl: './update-route.html'
 })
 export class UpdateRoute implements OnInit {
-  routeId!: number;
-  routeData!: RouteI;
+  form?: RouteI;
+  loading = false;
+  saving = false;
+  error?: string;
 
-  stops: string[] = [];
-  schedules: string[] = [];
-  stopInput = '';
-  scheduleInput = '';
+  private routeId!: number;
 
   constructor(
-    private routeService: RoutesService,
-    private activatedRoute: ActivatedRoute,
-    private router: Router
+    private readonly routesService: RoutesService,
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router
   ) {}
 
-  ngOnInit() {
-    // Obtener id de la URL
-    this.routeId = Number(this.activatedRoute.snapshot.paramMap.get('id'));
+  ngOnInit(): void {
+    const rawId = this.activatedRoute.snapshot.paramMap.get('id');
+    this.routeId = rawId ? Number(rawId) : NaN;
 
-    // Buscar la ruta en el servicio
-    const route = this.routeService.getRoutes().find(r => r.id === this.routeId);
-    if (route) {
-      this.routeData = { ...route };
-      this.stops = [...route.stops];
-      this.schedules = [...route.schedule];
-    } else {
-      alert('Ruta no encontrada');
-      this.router.navigate(['/mostrar-rutas']);
+    if (Number.isNaN(this.routeId)) {
+      alert('Identificador inválido');
+      this.router.navigate(['/routes']);
+      return;
     }
+
+    this.load();
   }
 
-  addStop() {
-    if (this.stopInput.trim()) {
-      this.stops.push(this.stopInput.trim());
-      this.stopInput = '';
+  private load(): void {
+    this.loading = true;
+    this.error = undefined;
+    this.routesService.getById(this.routeId).subscribe({
+      next: route => {
+        this.form = { ...route };
+        this.loading = false;
+      },
+      error: err => {
+        console.error('Error cargando ruta', err);
+        this.error = 'No se pudo cargar la ruta.';
+        this.loading = false;
+      }
+    });
+  }
+
+  save(): void {
+    if (!this.form?.name || !this.form.startPoint || !this.form.endPoint) {
+      alert('Completa Nombre, Punto de inicio y Punto final.');
+      return;
     }
-  }
 
-  removeStop(index: number) {
-    this.stops.splice(index, 1);
-  }
-
-  addSchedule() {
-    if (this.scheduleInput.trim()) {
-      this.schedules.push(this.scheduleInput.trim());
-      this.scheduleInput = '';
-    }
-  }
-
-  removeSchedule(index: number) {
-    this.schedules.splice(index, 1);
-  }
-
-  updateRoute() {
-    const updatedRoute: RouteI = {
-      ...this.routeData,
-      stops: this.stops,
-      schedule: this.schedules,
-      updatedAt: new Date()
+    const payload: RouteI = {
+      id: this.form.id,
+      name: this.form.name,
+      startPoint: this.form.startPoint,
+      endPoint: this.form.endPoint,
+      currentBusId: this.normalizeId(this.form.currentBusId),
+      currentDriverId: this.normalizeId(this.form.currentDriverId),
+      status: (this.form.status as RouteStatus) ?? 'ACTIVO'
     };
 
-    // 🔹 Lógica para reemplazar la ruta en el servicio
-    const routes = this.routeService.getRoutes();
-    const idx = routes.findIndex(r => r.id === updatedRoute.id);
-    if (idx !== -1) {
-      routes[idx] = updatedRoute;
-      this.routeService['routeService'].next([...routes]); // forzar actualización
-      alert('Ruta actualizada con éxito ✅');
-      this.router.navigate(['/routes']);
+    this.saving = true;
+    this.error = undefined;
+    this.routesService.update(this.routeId, payload).subscribe({
+      next: () => {
+        this.saving = false;
+        this.router.navigate(['/routes']);
+      },
+      error: err => {
+        console.error('Error actualizando ruta', err);
+        this.error = 'No se pudo actualizar la ruta.';
+        this.saving = false;
+      }
+    });
+  }
+
+  cancel(): void {
+    this.router.navigate(['/routes']);
+  }
+
+  private normalizeId(value?: number | null): number | null | undefined {
+    if (value === undefined || value === null || value === ('' as unknown as number)) {
+      return null;
     }
+    const num = Number(value);
+    return Number.isNaN(num) ? null : num;
   }
 }

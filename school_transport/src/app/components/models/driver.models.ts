@@ -10,7 +10,7 @@ export interface driverI {
   experienceYears?: number;
   status?: "ACTIVO" | "INACTIVO" | "SUSPENDIDO";
   assignedBusId?: number;
-  photoUrl?: string; // 👉 URL de la foto del conductor
+  photoUrl?: string; 
   createdAt?: Date;
   updatedAt?: Date;
 }

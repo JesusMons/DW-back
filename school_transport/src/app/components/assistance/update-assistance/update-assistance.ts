@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,10 +9,10 @@ import { RoutesService } from '../../services/routes.service';
 import { BusService } from '../../services/bus.service';
 import { StudentService } from '../../services/student.service';
 
-import { assistanceI } from '../../models/assistance.models';
+import { AssistanceI, AssistanceStatus } from '../../models/assistance.models';
 import { RouteI } from '../../models/routes.models';
 import { busI } from '../../models/bus.models';
-import { studentI } from '../../models/student.models';
+import { StudentI } from '../../models/student.models';
 
 @Component({
   selector: 'app-update-assistance',
@@ -20,13 +20,13 @@ import { studentI } from '../../models/student.models';
   imports: [CommonModule, FormsModule, ButtonModule],
   templateUrl: './update-assistance.html'
 })
-export class UpdateAssistance implements OnInit {
-  form!: assistanceI;
+export class UpdateAssistance implements OnInit, OnDestroy {
+  form!: AssistanceI;
 
   // catálogos
   routes: RouteI[] = [];
   buses: busI[] = [];
-  students: studentI[] = [];
+  students: StudentI[] = [];
 
   // buses filtrados según la ruta elegida
   filteredBuses: busI[] = [];
@@ -34,6 +34,12 @@ export class UpdateAssistance implements OnInit {
   // inputs de fecha/hora (para <input type="date|time">)
   dateInput = '';
   timeInput = '';
+
+  loading = false;
+  saving = false;
+  error?: string;
+
+  private studentSub?: { unsubscribe: () => void };
 
   constructor(
     private ar: ActivatedRoute,
@@ -48,7 +54,10 @@ export class UpdateAssistance implements OnInit {
     // cargar catálogos
     this.routes = (this.routeSvc as any).getAll?.() ?? (this.routeSvc as any).getRoutes?.() ?? [];
     this.buses  = (this.busSvc  as any).getAll?.() ?? [];
-    this.students = (this.studentSvc as any).getAll?.() ?? [];
+    this.studentSub = this.studentSvc.students$.subscribe(students => {
+      this.students = students;
+    });
+    this.studentSvc.loadAll();
 
     // suscripción al parámetro :id
     const raw = this.ar.snapshot.paramMap.get('id');
@@ -59,29 +68,40 @@ export class UpdateAssistance implements OnInit {
       return;
     }
 
-    const found = this.asstSvc.getById(id);
-    if (!found) {
-      alert('Asistencia no encontrada');
-      this.router.navigate(['/assistance']);
-      return;
+    this.fetchAssistance(id);
+  }
+
+  private fetchAssistance(id: number): void {
+    this.loading = true;
+    this.error = undefined;
+    this.asstSvc.getById(id).subscribe({
+      next: assistance => {
+        this.form = { ...assistance };
+        this.dateInput = this.form.date ? new Date(this.form.date).toISOString().slice(0, 10) : '';
+        this.timeInput = this.normalizeTimeInput(this.form.time);
+        this.applyBusFilter(this.form.routeId);
+        this.loading = false;
+      },
+      error: err => {
+        console.error('Error obteniendo asistencia', err);
+        this.error = 'No se pudo cargar la asistencia.';
+        this.loading = false;
+      }
+    });
+  }
+
+  private normalizeTimeInput(time?: string): string {
+    if (!time) {
+      return '';
     }
-
-    // clonar para no mutar el store
-    this.form = { ...found };
-
-    // setear date/time inputs
-    this.dateInput = this.form.date ? new Date(this.form.date).toISOString().slice(0, 10) : '';
-    this.timeInput = this.form.time || '';
-
-    // filtrar buses en base a la ruta actual
-    this.applyBusFilter(this.form.routeId);
+    return time.length === 8 ? time.slice(0, 5) : time;
   }
 
   // Filtro dependiente: si RouteI.bus existe, solo ese; si no, ninguno o todos (elige política)
   private applyBusFilter(routeId: number) {
     const r = this.routes.find(rt => rt.id === routeId);
-    if (r?.bus) {
-      this.filteredBuses = this.buses.filter(b => b.id === r.bus);
+    if (r?.currentBusId) {
+      this.filteredBuses = this.buses.filter(b => b.id === r.currentBusId);
       // si el bus seleccionado no coincide, resetéalo
       if (!this.filteredBuses.some(b => b.id === this.form.busId)) {
         this.form.busId = this.filteredBuses[0]?.id!;
@@ -120,15 +140,38 @@ export class UpdateAssistance implements OnInit {
       return;
     }
 
-    this.form.date = new Date(this.dateInput);
-    this.form.time = this.timeInput;
-    this.form.updatedAt = new Date();
+    const normalizedTime = this.timeInput.length === 5 ? `${this.timeInput}:00` : this.timeInput;
+    const payload: AssistanceI = {
+      ...this.form,
+      routeId: Number(this.form.routeId),
+      busId: Number(this.form.busId),
+      studentId: Number(this.form.studentId),
+      date: new Date(this.dateInput),
+      time: normalizedTime,
+      status: (this.form.status as AssistanceStatus) || 'ACTIVO'
+    };
 
-    this.asstSvc.update(this.form);
-    this.router.navigate(['/assistance']);
+    this.saving = true;
+    this.error = undefined;
+    this.asstSvc.update(this.form.id!, payload).subscribe({
+      next: updated => {
+        this.saving = false;
+        this.form = { ...updated };
+        this.router.navigate(['/assistance']);
+      },
+      error: err => {
+        console.error('Error actualizando asistencia', err);
+        this.error = 'No se pudo actualizar la asistencia.';
+        this.saving = false;
+      }
+    });
   }
 
   cancel() {
     this.router.navigate(['/assistance']);
+  }
+
+  ngOnDestroy(): void {
+    this.studentSub?.unsubscribe();
   }
 }

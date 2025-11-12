@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { busI } from '../models/bus.models'; // 👈 importa tu modelo real desde /models
+import { busI } from '../models/bus.models'; 
 
 @Injectable({
   providedIn: 'root'

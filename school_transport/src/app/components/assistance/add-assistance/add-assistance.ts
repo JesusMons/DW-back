@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -10,10 +10,10 @@ import { BusService } from '../../services/bus.service';
 import { StudentService } from '../../services/student.service';
 import { RouteAssignmentService } from '../../services/route-assignment.service';
 
-import { assistanceI } from '../../models/assistance.models';
+import { AssistanceI, AssistanceStatus } from '../../models/assistance.models';
 import { RouteI } from '../../models/routes.models';
 import { busI } from '../../models/bus.models';
-import { studentI } from '../../models/student.models';
+import { StudentI } from '../../models/student.models';
 import { route_assignment } from '../../models/route-assignment.models';
 
 @Component({
@@ -22,11 +22,11 @@ import { route_assignment } from '../../models/route-assignment.models';
   imports: [CommonModule, FormsModule, ButtonModule],
   templateUrl: './add-assistance.html'
 })
-export class AddAssistance {
+export class AddAssistance implements OnDestroy {
   // catálogos
   routes: RouteI[] = [];
   buses: busI[] = [];
-  students: studentI[] = [];
+  students: StudentI[] = [];
 
   // asignaciones de la ruta seleccionada (para mostrar disponibilidad)
   routeAssignments: route_assignment[] = [];
@@ -35,18 +35,22 @@ export class AddAssistance {
   filteredBuses: busI[] = [];
 
   // modelo del formulario
-  form: Partial<assistanceI> = {
+  form: Partial<AssistanceI> = {
     routeId: undefined!,
     busId: undefined!,
     studentId: undefined!,
     date: new Date(),
     time: '',
-    status: 'CONFIRMADO'
+    status: 'ACTIVO'
   };
 
   // helpers para inputs date/time
   dateInput: string = ''; // yyyy-MM-dd
   timeInput: string = ''; // HH:mm
+
+  isSaving = false;
+  error?: string;
+  private studentSub?: { unsubscribe: () => void };
 
   constructor(
     private asstSvc: AssistanceService,
@@ -58,7 +62,10 @@ export class AddAssistance {
   ) {
     this.routes = (this.routeSvc as any).getAll?.() ?? (this.routeSvc as any).getRoutes?.() ?? [];
     this.buses = (this.busSvc as any).getAll?.() ?? [];
-    this.students = (this.studentSvc as any).getAll?.() ?? [];
+    this.studentSub = this.studentSvc.students$.subscribe(students => {
+      this.students = students;
+    });
+    this.studentSvc.loadAll();
 
     const now = new Date();
     this.dateInput = now.toISOString().slice(0, 10);
@@ -84,7 +91,9 @@ export class AddAssistance {
 
     if (!result.length) {
       const r = this.routes.find(rt => rt.id === routeId);
-      if (r?.bus) result = this.buses.filter(b => b.id === r.bus);
+      if (r?.currentBusId) {
+        result = this.buses.filter(b => b.id === r.currentBusId);
+      }
     }
     return result;
   }
@@ -131,20 +140,29 @@ export class AddAssistance {
       return;
     }
 
-    const payload: assistanceI = {
-      id: 0,
+    const normalizedTime = this.timeInput?.length === 5 ? `${this.timeInput}:00` : this.timeInput;
+    const payload: AssistanceI = {
       routeId: Number(this.form.routeId),
       busId: Number(this.form.busId),
       studentId: Number(this.form.studentId),
       date: new Date(this.dateInput),
-      time: this.timeInput,
-      status: (this.form.status as any) || 'CONFIRMADO',
-      createdAt: new Date(),
-      updatedAt: new Date()
+      time: normalizedTime,
+      status: (this.form.status as AssistanceStatus) || 'ACTIVO'
     };
 
-    this.asstSvc.add(payload);
-    this.router.navigate(['/assistance']); // cambia a '/assistances' si tu listado usa esa ruta
+    this.isSaving = true;
+    this.error = undefined;
+    this.asstSvc.create(payload).subscribe({
+      next: () => {
+        this.isSaving = false;
+        this.router.navigate(['/assistance']);
+      },
+      error: err => {
+        console.error('Error creando asistencia', err);
+        this.error = 'No se pudo guardar la asistencia.';
+        this.isSaving = false;
+      }
+    });
   }
 
   cancel() {
@@ -154,5 +172,9 @@ export class AddAssistance {
   // helpers para nombre/placa en el bloque de disponibilidad (por si los necesitas en el HTML)
   busPlate(id: number) {
     return this.buses.find(b => b.id === id)?.plate || `Bus #${id}`;
+  }
+
+  ngOnDestroy(): void {
+    this.studentSub?.unsubscribe();
   }
 }

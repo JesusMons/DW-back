@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // Servicios (ajusta rutas de import a tu estructura real)
@@ -9,7 +9,7 @@ import { RouteAssignmentService } from '../services/route-assignment.service';
 
 // Modelos (opcional)
 import { busI } from '../models/bus.models';
-import { studentI } from '../models/student.models';
+import { StudentI } from '../models/student.models';
 import { RouteI } from '../models/routes.models';
 
 @Component({
@@ -89,10 +89,10 @@ import { RouteI } from '../models/routes.models';
   </section>
   `
 })
-export class HomePage {
+export class HomePage implements OnDestroy {
   // datos base
   buses: busI[] = [];
-  estudiantes: studentI[] = [];
+  estudiantes: StudentI[] = [];
   rutas: RouteI[] = [];
 
   // métricas
@@ -100,6 +100,8 @@ export class HomePage {
   busesEnUso = 0;
   totalEstudiantes = 0;
   rutasActivas = 0;
+
+  private studentSub?: { unsubscribe: () => void };
 
   constructor(
     private busSvc: BusService,
@@ -110,7 +112,11 @@ export class HomePage {
   ) {
     // cargar catálogos
     this.buses = (this.busSvc as any).getAll?.() ?? [];
-    this.estudiantes = (this.studentSvc as any).getAll?.() ?? [];
+    this.studentSub = this.studentSvc.students$.subscribe(students => {
+      this.estudiantes = students;
+      this.totalEstudiantes = students.length;
+    });
+    this.studentSvc.loadAll();
 
     // soporte para RoutesService o RoutesServiceTs
     const routesService: any = this.routesSvcA ?? this.routesSvcB;
@@ -118,8 +124,6 @@ export class HomePage {
 
     // calcular métricas
     this.totalBuses = this.buses.length;
-    this.totalEstudiantes = this.estudiantes.length;
-
     // buses en uso: asignaciones activas hoy (únicos busId)
     const today = new Date();
     const activasHoy = this.raSvc.getActiveOn?.(today) ?? [];
@@ -127,9 +131,13 @@ export class HomePage {
     this.busesEnUso = busIdsUnicos.size;
 
     // rutas activas: por status del catálogo (o por asignaciones activas si prefieres)
-    this.rutasActivas = this.rutas.filter(r => (r as any).status === 'ACTIVE').length;
+    this.rutasActivas = this.rutas.filter(r => (r as any).status === 'ACTIVO').length;
     // Si prefieres por asignaciones activas:
     // const rutasUnicas = new Set(activasHoy.map((a: any) => a.routeId));
     // this.rutasActivas = rutasUnicas.size;
+  }
+
+  ngOnDestroy(): void {
+    this.studentSub?.unsubscribe();
   }
 }

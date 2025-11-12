@@ -1,113 +1,104 @@
-<div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow">
-  <h2 class="text-xl font-bold mb-6">Editar Estudiante #{{ form?.id }}</h2>
+<div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow" *ngIf="form; else loadingTpl">
+  <h2 class="text-2xl font-bold mb-6 text-gray-700">Editar Estudiante #{{ form.id }}</h2>
 
-  <form *ngIf="form" (ngSubmit)="save()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <!-- Nombre -->
+  <form (ngSubmit)="save()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div>
-      <label class="block font-semibold">Nombre</label>
-      <input [(ngModel)]="form.name" name="name" class="w-full border rounded px-3 py-2" required />
+      <label class="block text-sm font-semibold mb-1">Nombre</label>
+      <input [(ngModel)]="form!.name" name="name" class="w-full border rounded px-3 py-2" required />
     </div>
 
-    <!-- Apellido -->
     <div>
-      <label class="block font-semibold">Apellido</label>
-      <input [(ngModel)]="form.last_name" name="last_name" class="w-full border rounded px-3 py-2" required />
+      <label class="block text-sm font-semibold mb-1">Apellido</label>
+      <input [(ngModel)]="form!.lastName" name="lastName" class="w-full border rounded px-3 py-2" required />
     </div>
 
-    <!-- Documento -->
     <div>
-      <label class="block font-semibold">Documento</label>
-      <input type="number" [(ngModel)]="form.document" name="document" class="w-full border rounded px-3 py-2" required />
+      <label class="block text-sm font-semibold mb-1">Documento</label>
+      <input [(ngModel)]="form!.document" name="document" class="w-full border rounded px-3 py-2" required />
     </div>
 
-    <!-- Grado -->
     <div>
-      <label class="block font-semibold">Grado</label>
-      <input type="number" [(ngModel)]="form.grade" name="grade" class="w-full border rounded px-3 py-2" />
+      <label class="block text-sm font-semibold mb-1">Grado</label>
+      <input type="number" [(ngModel)]="form!.grade" name="grade" class="w-full border rounded px-3 py-2" />
     </div>
 
-    <!-- Fecha de Nacimiento -->
     <div>
-      <label class="block font-semibold">Fecha de Nacimiento</label>
-      <input type="date"
-             [value]="form.birthdate ? (form.birthdate | date:'yyyy-MM-dd') : null"
-             (change)="onBirthdateChange($event)"
-             class="w-full border rounded px-3 py-2" />
+      <label class="block text-sm font-semibold mb-1">Fecha de nacimiento</label>
+      <input type="date" [(ngModel)]="birthInput" name="birthdate" class="w-full border rounded px-3 py-2" />
     </div>
 
-    <!-- Estado -->
     <div>
-      <label class="block font-semibold">Estado</label>
-      <select [(ngModel)]="form.status" name="status" class="w-full border rounded px-3 py-2">
-        <option value="ACTIVO">ACTIVO</option>
-        <option value="INACTIVO">INACTIVO</option>
-        <option value="GRADUADO">GRADUADO</option>
+      <label class="block text-sm font-semibold mb-1">Estado</label>
+      <select [(ngModel)]="form!.status" name="status" class="w-full border rounded px-3 py-2">
+        <option value="ACTIVO">Activo</option>
+        <option value="INACTIVO">Inactivo</option>
       </select>
     </div>
 
-    <!-- Dirección (full width) -->
     <div class="md:col-span-2">
-      <label class="block font-semibold">Dirección</label>
-      <input [(ngModel)]="form.address" name="address" class="w-full border rounded px-3 py-2" />
+      <label class="block text-sm font-semibold mb-1">Dirección</label>
+      <input [(ngModel)]="form!.address" name="address" class="w-full border rounded px-3 py-2" />
     </div>
 
-    <!-- Teléfonos -->
     <div>
-      <label class="block font-semibold">Teléfono</label>
-      <input [(ngModel)]="form.phone" name="phone" class="w-full border rounded px-3 py-2" />
-    </div>
-    <div>
-      <label class="block font-semibold">Teléfono Acudiente</label>
-      <input [(ngModel)]="form.guardianPhone" name="guardianPhone" class="w-full border rounded px-3 py-2" />
+      <label class="block text-sm font-semibold mb-1">Teléfono</label>
+      <input [(ngModel)]="form!.phone" name="phone" class="w-full border rounded px-3 py-2" />
     </div>
 
-    <!-- Email (full width) -->
+    <div>
+      <label class="block text-sm font-semibold mb-1">Teléfono acudiente</label>
+      <input [(ngModel)]="form!.guardianPhone" name="guardianPhone" class="w-full border rounded px-3 py-2" />
+    </div>
+
     <div class="md:col-span-2">
-      <label class="block font-semibold">Email</label>
-      <input type="email" [(ngModel)]="form.email" name="email" class="w-full border rounded px-3 py-2" />
+      <label class="block text-sm font-semibold mb-1">Email</label>
+      <input type="email" [(ngModel)]="form!.email" name="email" class="w-full border rounded px-3 py-2" />
     </div>
 
-    <!-- Acudiente (full width) -->
-    <div class="md:col-span-2">
-      <label class="block font-semibold">Acudiente</label>
-      <input [(ngModel)]="form.guardian" name="guardian" class="w-full border rounded px-3 py-2" required />
-    </div>
-
-    <!-- Contacto de emergencia -->
     <div>
-      <label class="block font-semibold">Contacto Emergencia - Nombre</label>
-      <input [(ngModel)]="form.emergencyContact!.name" name="ec_name" class="w-full border rounded px-3 py-2" />
+      <label class="block text-sm font-semibold mb-1">Acudiente (ID)</label>
+      <input type="number" [(ngModel)]="form!.guardianId" name="guardianId" class="w-full border rounded px-3 py-2" />
+    </div>
+
+    <div class="md:col-span-2">
+      <label class="block text-sm font-semibold mb-1">Contacto emergencia - Nombre</label>
+      <input [(ngModel)]="form!.emergencyContact!.name" name="ecName" class="w-full border rounded px-3 py-2" />
     </div>
     <div>
-      <label class="block font-semibold">Contacto Emergencia - Teléfono</label>
-      <input [(ngModel)]="form.emergencyContact!.phone" name="ec_phone" class="w-full border rounded px-3 py-2" />
+      <label class="block text-sm font-semibold mb-1">Contacto emergencia - Teléfono</label>
+      <input [(ngModel)]="form!.emergencyContact!.phone" name="ecPhone" class="w-full border rounded px-3 py-2" />
     </div>
-    <div class="md:col-span-2">
-      <label class="block font-semibold">Contacto Emergencia - Relación</label>
-      <input [(ngModel)]="form.emergencyContact!.relationship" name="ec_rel" class="w-full border rounded px-3 py-2" />
+    <div>
+      <label class="block text-sm font-semibold mb-1">Contacto emergencia - Relación</label>
+      <input [(ngModel)]="form!.emergencyContact!.relationship" name="ecRel" class="w-full border rounded px-3 py-2" />
     </div>
 
-    <!-- Alergias -->
     <div class="md:col-span-2">
-      <label class="block font-semibold">Alergias</label>
+      <label class="block text-sm font-semibold mb-1">Alergias</label>
       <div class="flex gap-2">
-        <input [(ngModel)]="allergyInput" name="allergyInput" placeholder="Ej: Maní"
-               class="flex-1 border rounded px-3 py-2" />
+        <input [(ngModel)]="allergyInput" name="allergyInput" class="flex-1 border rounded px-3 py-2" placeholder="Ej: Maní" />
         <button pButton type="button" icon="pi pi-plus" (click)="addAllergy()" severity="success"></button>
       </div>
-
       <ul class="mt-2 text-sm">
-        <li *ngFor="let a of form.allergies; let i = index" class="flex items-center justify-between py-1 border-b">
-          <span>{{ a }}</span>
+        <li *ngFor="let allergy of form!.allergies; let i = index" class="flex items-center justify-between py-1 border-b">
+          <span>{{ allergy }}</span>
           <button type="button" class="text-red-600 hover:underline" (click)="removeAllergy(i)">Eliminar</button>
         </li>
       </ul>
     </div>
 
-    <!-- Acciones -->
-    <div class="md:col-span-2 flex justify-end gap-2">
-      <button pButton type="button" label="Cancelar" class="!bg-gray-500 !border-none" (click)="cancel()"></button>
-      <button pButton type="submit" label="Guardar" icon="pi pi-save" severity="primary"></button>
+    <p class="md:col-span-2 text-sm text-red-600" *ngIf="error">{{ error }}</p>
+
+    <div class="md:col-span-2 flex justify-end gap-3">
+      <button type="button" class="px-4 py-2 rounded border border-gray-300" (click)="cancel()">Cancelar</button>
+      <button type="submit" class="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-60" [disabled]="saving">
+        {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+      </button>
     </div>
   </form>
 </div>
+
+<ng-template #loadingTpl>
+  <div class="text-center py-10" *ngIf="loading">Cargando estudiante...</div>
+  <div class="text-center py-10 text-red-600" *ngIf="!loading && error">{{ error }}</div>
+</ng-template>

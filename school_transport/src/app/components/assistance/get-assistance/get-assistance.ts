@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -14,13 +14,13 @@ import { BusService } from '../../services/bus.service';
 import { StudentService } from '../../services/student.service';
 import { RouteAssignmentService } from '../../services/route-assignment.service';
 
-import { assistanceI } from '../../models/assistance.models';
+import { AssistanceI, AssistanceStatus } from '../../models/assistance.models';
 import { RouteI } from '../../models/routes.models';
 import { busI } from '../../models/bus.models';
-import { studentI } from '../../models/student.models';
+import { StudentI } from '../../models/student.models';
 import { route_assignment } from '../../models/route-assignment.models';
 
-type AssistanceRow = assistanceI & {
+type AssistanceRow = AssistanceI & {
   routeName?: string;
   busPlate?: string;
   studentName?: string;
@@ -32,12 +32,12 @@ type AssistanceRow = assistanceI & {
   imports: [CommonModule, FormsModule, TableModule, ButtonModule, TagModule, RouterModule],
   templateUrl: './get-assistance.html'
 })
-export class GetAssistance {
+export class GetAssistance implements OnInit, OnDestroy {
   // Catálogos base
   routes: RouteI[] = [];
   buses: busI[] = [];
-  students: studentI[] = [];
-  assistances: assistanceI[] = [];
+  students: StudentI[] = [];
+  assistances: AssistanceI[] = [];
 
   // Filtros
   selectedRouteId?: number;
@@ -48,20 +48,52 @@ export class GetAssistance {
   // Render
   rows: AssistanceRow[] = [];
 
+  loading = false;
+  error?: string;
+
+  private studentSub?: { unsubscribe: () => void };
+
   constructor(
     private asstSvc: AssistanceService,
     private routeSvc: RoutesService,
     private busSvc: BusService,
     private studentSvc: StudentService,
     private raSvc: RouteAssignmentService
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     // Cargas base
     this.routes = this.routeSvc.getRoutes?.() ?? [];
     this.buses = this.busSvc.getAll?.() ?? [];
-    this.students = this.studentSvc.getAll?.() ?? [];
-    this.assistances = this.asstSvc.getAll();
+    this.studentSub = this.studentSvc.students$.subscribe(students => {
+      this.students = students;
+      this.refreshRows();
+    });
+    this.studentSvc.loadAll();
+    this.fetchAssistances();
+  }
 
-    this.refreshRows();
+  ngOnDestroy(): void {
+    this.studentSub?.unsubscribe();
+  }
+
+  private fetchAssistances(): void {
+    this.loading = true;
+    this.error = undefined;
+    this.asstSvc.getAll().subscribe({
+      next: assistances => {
+        this.assistances = assistances;
+        this.refreshRows();
+        this.loading = false;
+      },
+      error: err => {
+        console.error('Error fetching assistances', err);
+        this.error = 'No se pudieron cargar las asistencias.';
+        this.loading = false;
+        this.assistances = [];
+        this.refreshRows();
+      }
+    });
   }
 
   /** Obtiene buses disponibles para una ruta:
@@ -85,8 +117,8 @@ export class GetAssistance {
     // 2) Fallback: si no hay asignaciones, usa route.bus (modelo simple)
     if (!result.length) {
       const r = this.routes.find(rt => rt.id === routeId);
-      if (r?.bus) {
-        result = this.buses.filter(b => b.id === r.bus);
+      if (r?.currentBusId) {
+        result = this.buses.filter(b => b.id === r.currentBusId);
       }
     }
 
@@ -132,7 +164,7 @@ export class GetAssistance {
   }
   private studentName(id: number) {
     const s = this.students.find(st => st.id === id);
-    return s ? `${s.name} ${s.last_name ?? ''}`.trim() : `Estudiante #${id}`;
+    return s ? `${s.name} ${s.lastName ?? ''}`.trim() : `Estudiante #${id}`;
   }
 
   refreshRows() {
@@ -158,17 +190,26 @@ export class GetAssistance {
   }
 
   // Acciones rápidas de estado
-  setStatus(a: AssistanceRow, status: assistanceI['status']) {
-    this.asstSvc.setStatus(a.id!, status);
-    this.assistances = this.asstSvc.getAll();
-    this.refreshRows();
+  setStatus(a: AssistanceRow, status: AssistanceStatus) {
+    if (!a.id) {
+      return;
+    }
+    this.asstSvc.setStatus(a.id, status).subscribe({
+      next: updated => {
+        this.assistances = this.assistances.map(item => item.id === updated.id ? updated : item);
+        this.refreshRows();
+      },
+      error: err => {
+        console.error('Error updating assistance status', err);
+        this.error = 'No se pudo actualizar el estado.';
+      }
+    });
   }
 
-  statusSeverity(s: assistanceI['status']) {
+  statusSeverity(s?: AssistanceStatus) {
     switch (s) {
-      case 'CONFIRMADO': return 'success';
-      case 'AUSENTE': return 'danger';
-      case 'CANCELADO': return 'warning';
+      case 'ACTIVO': return 'success';
+      case 'INACTIVO': return 'secondary';
       default: return 'info';
     }
   }

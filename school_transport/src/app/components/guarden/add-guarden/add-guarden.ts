@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -8,7 +8,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { GuardianService } from '../../services/guarden.service';
 import { guardianI } from '../../models/guardian.models';
 import { StudentService } from '../../services/student.service';
-import { studentI } from '../../models/student.models'
+import { StudentI } from '../../models/student.models';
 
 @Component({
   selector: 'app-add-guarden',
@@ -16,7 +16,7 @@ import { studentI } from '../../models/student.models'
   imports: [CommonModule, FormsModule, ButtonModule, MultiSelectModule, RouterModule],
   templateUrl: './add-guarden.html'
 })
-export class AddGuarden {
+export class AddGuarden implements OnDestroy {
   form: Partial<guardianI> = {
     firstName: '',
     lastName: '',
@@ -33,17 +33,20 @@ export class AddGuarden {
   studentOptions: { label: string; value: number }[] = [];
   selectedStudentIds: number[] = []; // binding del multiselect
 
+  private studentSub?: { unsubscribe: () => void };
+
   constructor(
     private svc: GuardianService,
     private studentSvc: StudentService,
     private router: Router
   ) {
-    // cargar estudiantes y mapear a opciones
-    const students = this.studentSvc.getAll(); // [{id, name, last_name, ...}]
-    this.studentOptions = students.map((s: studentI) => ({
-      label: `${s.name} ${s.last_name} — #${s.id}`,
-      value: s.id!
-    }));
+    this.studentSub = this.studentSvc.students$.subscribe((students: StudentI[]) => {
+      this.studentOptions = students.map(s => ({
+        label: `${s.name} ${s.lastName} — #${s.id}`,
+        value: s.id!
+      }));
+    });
+    this.studentSvc.loadAll();
   }
 
   save() {
@@ -73,5 +76,9 @@ export class AddGuarden {
 
   cancel() {
     this.router.navigate(['/guardian']);
+  }
+
+  ngOnDestroy(): void {
+    this.studentSub?.unsubscribe();
   }
 }

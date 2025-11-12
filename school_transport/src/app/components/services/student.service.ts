@@ -1,84 +1,117 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { studentI } from '../models/student.models';
+import { BehaviorSubject, map, Observable, switchMap, tap } from 'rxjs';
+import { StudentI, StudentStatus } from '../models/student.models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StudentService {
-  private students$ = new BehaviorSubject<studentI[]>([
-    {
-      id: 1,
-      name: 'María',
-      last_name: 'González',
-      document: 10012345,
-      guardian: 'Pedro González',
-      grade: 5,
-      birthdate: new Date('2015-04-10'),
-      address: 'Calle 10 #5-20',
-      phone: '3001234567',
-      guardianPhone: '3109876543',
-      email: 'maria.gonzalez@example.com',
-      status: 'ACTIVO',
-      allergies: ['Maní'],
-      emergencyContact: { name: 'Laura Pérez', phone: '3201112233', relationship: 'Tía' },
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    {
-      id: 2,
-      name: 'Juan',
-      last_name: 'Martínez',
-      document: 10067890,
-      guardian: 'Ana Martínez',
-      grade: 6,
-      birthdate: new Date('2014-08-22'),
-      address: 'Carrera 15 #8-50',
-      phone: '3015557890',
-      guardianPhone: '3154443322',
-      email: 'juan.martinez@example.com',
-      status: 'INACTIVO',
-      allergies: [],
-      emergencyContact: { name: 'Carlos Ramírez', phone: '3112223344', relationship: 'Abuelo' },
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
-  ]);
+  private readonly baseUrl = '/api/students';
+  private readonly store = new BehaviorSubject<StudentI[]>([]);
+  private loaded = false;
 
-  studentsObservable = this.students$.asObservable();
+  readonly students$ = this.store.asObservable();
 
-  /** Obtener todos los estudiantes */
-  getAll(): studentI[] {
-    return this.students$.value;
+  constructor(private readonly http: HttpClient) {}
+
+  private normalize(raw: any): StudentI {
+    if (!raw) return raw;
+    const normalizeDate = (value?: string | Date | null): Date | null => {
+      if (!value) return null;
+      return value instanceof Date ? value : new Date(value);
+    };
+
+    return {
+      id: raw?.id ?? raw?.ID,
+      name: raw?.name ?? '',
+      lastName: raw?.lastName ?? raw?.last_name ?? '',
+      document: String(raw?.document ?? ''),
+      guardianId: raw?.guardianId ?? raw?.guardian_id ?? null,
+      grade: raw?.grade ?? null,
+      birthdate: normalizeDate(raw?.birthdate ?? raw?.birth_date),
+      address: raw?.address ?? null,
+      phone: raw?.phone ?? null,
+      guardianPhone: raw?.guardianPhone ?? raw?.guardian_phone ?? null,
+      email: raw?.email ?? null,
+      status: (raw?.status as StudentStatus | undefined) ?? 'ACTIVO',
+      allergies: raw?.allergies ?? null,
+      emergencyContact: raw?.emergencyContact ?? raw?.emergency_contact ?? null,
+      createdAt: normalizeDate(raw?.createdAt ?? raw?.created_at) ?? undefined,
+      updatedAt: normalizeDate(raw?.updatedAt ?? raw?.updated_at) ?? undefined
+    };
   }
 
-  /** Buscar un estudiante por id */
-  getById(id: number): studentI | undefined {
-    return this.students$.value.find(s => s.id === id);
+  private normalizeList(resp: any): StudentI[] {
+    const list =
+      resp?.students ??
+      (Array.isArray(resp?.data) ? resp.data : resp?.data?.students) ??
+      resp ??
+      [];
+    return Array.isArray(list) ? list.map(item => this.normalize(item)) : [];
   }
 
-  /** Crear nuevo estudiante */
-  add(student: studentI) {
-    const list = this.students$.value;
-    student.id = list.length ? Math.max(...list.map(s => s.id ?? 0)) + 1 : 1;
-    student.createdAt = new Date();
-    student.updatedAt = new Date();
-    this.students$.next([...list, student]);
-  }
-
-  /** Editar estudiante existente */
-  update(student: studentI) {
-    const list = this.students$.value.slice();
+  private replace(student: StudentI): void {
+    const list = this.store.value;
     const idx = list.findIndex(s => s.id === student.id);
-    if (idx >= 0) {
-      student.updatedAt = new Date();
-      list[idx] = { ...student };
-      this.students$.next(list);
+    if (idx === -1) {
+      this.store.next([...list, student]);
+    } else {
+      const clone = [...list];
+      clone[idx] = student;
+      this.store.next(clone);
     }
   }
 
-  /** Eliminar estudiante */
-  remove(id: number) {
-    this.students$.next(this.students$.value.filter(s => s.id !== id));
+  loadAll(force = false): void {
+    if (this.loaded && !force) return;
+    this.fetchAll().subscribe({
+      error: err => console.error('Error cargando estudiantes', err)
+    });
+  }
+
+  fetchAll(): Observable<StudentI[]> {
+    return this.http.get<any>(this.baseUrl).pipe(
+      map(resp => this.normalizeList(resp)),
+      tap(list => {
+        this.store.next(list);
+        this.loaded = true;
+      })
+    );
+  }
+
+  getSnapshot(): StudentI[] {
+    return this.store.value;
+  }
+
+  getById(id: number): Observable<StudentI> {
+    return this.http.get<any>(`${this.baseUrl}/${id}`).pipe(map(resp => this.normalize(resp)));
+  }
+
+  create(payload: StudentI): Observable<StudentI> {
+    return this.http.post<any>(this.baseUrl, payload).pipe(
+      map(resp => this.normalize(resp)),
+      tap(student => this.store.next([...this.store.value, student]))
+    );
+  }
+
+  update(id: number, payload: StudentI): Observable<StudentI> {
+    return this.http.put<any>(`${this.baseUrl}/${id}`, payload).pipe(
+      map(resp => this.normalize(resp)),
+      tap(student => this.replace(student))
+    );
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+      tap(() => this.store.next(this.store.value.filter(s => s.id !== id)))
+    );
+  }
+
+  deactivate(id: number): Observable<StudentI> {
+    return this.http.patch<void>(`${this.baseUrl}/${id}/deactivate`, {}).pipe(
+      switchMap(() => this.getById(id)),
+      tap(student => this.replace(student))
+    );
   }
 }

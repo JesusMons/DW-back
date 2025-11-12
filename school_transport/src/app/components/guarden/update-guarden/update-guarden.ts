@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -8,7 +8,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { GuardianService } from '../../services/guarden.service';
 import { guardianI } from '../../models/guardian.models';
 import { StudentService } from '../../services/student.service';
-import { studentI } from '../../models/student.models'
+import { StudentI } from '../../models/student.models';
 
 @Component({
   selector: 'app-update-guarden',
@@ -16,10 +16,11 @@ import { studentI } from '../../models/student.models'
   imports: [CommonModule, FormsModule, ButtonModule, MultiSelectModule, RouterModule],
   templateUrl: './update-guarden.html'
 })
-export class UpdateGuarden implements OnInit {
+export class UpdateGuarden implements OnInit, OnDestroy {
   form!: guardianI;
   studentOptions: { label: string; value: number }[] = [];
   selectedStudentIds: number[] = [];
+  private studentSub?: { unsubscribe: () => void };
 
   constructor(
     private ar: ActivatedRoute,
@@ -29,12 +30,13 @@ export class UpdateGuarden implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // cargar opciones de estudiantes
-    const students = this.studentSvc.getAll();
-    this.studentOptions = students.map((s: studentI) => ({
-      label: `${s.name} ${s.last_name} — #${s.id}`,
-      value: s.id!
-    }));
+    this.studentSub = this.studentSvc.students$.subscribe((students: StudentI[]) => {
+      this.studentOptions = students.map(s => ({
+        label: `${s.name} ${s.lastName} — #${s.id}`,
+        value: s.id!
+      }));
+    });
+    this.studentSvc.loadAll();
 
     // cargar acudiente por id
     const id = Number(this.ar.snapshot.paramMap.get('id'));
@@ -68,5 +70,9 @@ export class UpdateGuarden implements OnInit {
 
   cancel() {
     this.router.navigate(['/guardian']);
+  }
+
+  ngOnDestroy(): void {
+    this.studentSub?.unsubscribe();
   }
 }
